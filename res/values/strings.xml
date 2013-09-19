@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Card</string>
+    <string name="app_by">nwice.com</string>
+    <string name="app_sponsor">burstyourcondom.com</string>    
+    
+    <string name="settings_deck">Deck Type</string>
+    <string name="settings_explicit">Explicit Content</string>    
+
+    <string name="deck">Deck</string>
+        
+    <string name="war">War!</string>
+    
+    <string name="settings_war_bury_cards">Bury Cards</string>
+    <string name="settings_war_beats_ace">Beat Aces</string>    
+    <string name="settings_war_shuffle_win">Shuffle Win Pile</string>
+    
+    <string name="blackjack">Blackjack</string>
+
+</resources>
