@@ -1,2 +1,4 @@
 /gen
 /bin
+html/**/np_*
+html/np_*
