@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+<head>
+<title>Nwice - Card</title>
+
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+<meta name="description"
+	content="Splash page for my android application">
+
+<style>
+html {
+	height: 100%;
+}
+
+body {
+	min-height: 95%;
+}
+
+h3:first-letter {
+	font-size: 150%;
+}
+
+.card {
+	position: absolute;
+	display: none;
+}
+
+.bigred {
+	font-size: 1.5em;
+	text-decoration: underline;
+	color: red
+}
+
+#cardtable { //
+	border: 1px dashed red;
+	position: absolute;
+	top: 20px;
+	right: 20px;
+}
+
+#hidden_card {
+	display: none;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+
+#feelings,#mutual {
+	display: none;
+	position: absolute;
+	cursor: pointer;
+}
+
+#cardlink {
+	cursor: pointer;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	border: 1px solid #000;
+}
+
+#welcome {
+	position: absolute;
+	top: 40px;
+	left: 40px;
+}
+
+#credits {
+	position: absolute;
+	margin:20px;
+	bottom: 0px;
+	left: 0px;
+}
+</style>
+<script type="text/javascript"
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript"
+	src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js"></script>
+
+<script type="text/javascript" src="card_deck.js"></script>
+<script type="text/javascript" src="rgbcolor.js"></script>
+<script type="text/javascript" src="canvg.js"></script>
+
+<script type="text/javascript">
+
+$(document).ready(function() { 
+  cardcounter = 0;
+  d = new deck();
+  d.cards = shuffle(d.cards);
+
+  canvg('hidden_card', '/deck/' + d.cards[cardcounter] + '.svg');
+
+  $(window).resize(function() {
+	$("#cardlink").css("width", $('#hidden_card').width() );
+	$("#cardlink").css("height", $('#hidden_card').height() );
+	$("#cardtable").css("width", document.body.clientWidth - $("#welcome").width() - 20 * 2 );
+	$("#cardtable").css("height", document.body.clientHeight - 20 * 2 );
+	
+	$("#bottom_card").css( { left: $("#cardtable").width() / 2 - $('#hidden_card').width(), top: $('#hidden_card').height() / 2} );
+	$("#middle_card").css( { left: $("#cardtable").width() / 2 - $('#hidden_card').width() / 2, top: 0} );
+	$("#top_card").css( { left: $("#cardtable").width() / 2, top: $('#hidden_card').height() / 2 } );
+	$("#extra_card").css( { left: $("#cardtable").width() / 2 - $('#hidden_card').width() / 2, top: $('#hidden_card').height() } );
+	
+	$("#feelings").css( { right: $("#cardtable").width() / 2 + $('#hidden_card').width() / 2, top: $('#hidden_card').height() / 2 - $('#feelings').height() } );
+	$("#mutual").css( { left: $("#cardtable").width() / 2 + $('#hidden_card').width() / 2, top: $('#hidden_card').height() / 2 - $('#mutual').height() } );
+  });
+  
+  $(window).resize();
+  
+  function changeCards() {
+  	if ( cardcounter > 51 ) {
+  		d.cards = Shuffle(d.cards);
+  		cardcounter = 0;  		
+  	}
+	canvg('bottom_card', '/deck/' + d.cards[cardcounter++] + '.svg');  
+  	canvg('middle_card', '/deck/' + d.cards[cardcounter++] + '.svg');
+  	canvg('top_card', '/deck/' + d.cards[cardcounter++] + '.svg'); 
+  	canvg('extra_card', '/deck/' + d.cards[cardcounter++] + '.svg');
+  	if ( !$("#cards").children().is(":visible") ) {
+  		$("#cards").children().show("slow");
+  	}
+  }
+  
+  changeCards();
+  
+  $("#welcome").click(function () {
+	if (  !$("#feelings").is(":visible") ) {
+		$("#feelings").show("slow");
+		$("#mutual").show("slow");
+	}
+	changeCards();
+  });
+
+  $(".card").click(function () {
+	if (  !$("#feelings").is(":visible") ) {
+		$("#feelings").show("slow");
+		$("#mutual").show("slow");
+	}
+	changeCards();
+  });  
+  
+  
+  $("#feelings").click(function () {
+  	changeCards();	
+	window.open('https://play.google.com/store/apps/details?id=com.nwice.card');
+  });
+  $("#mutual").click(function () {
+  	changeCards();	
+	window.open('https://play.google.com/store/apps/details?id=com.nwice.card');
+  });  
+});
+</script>
+
+</head>
+<body>
+
+	<canvas id="hidden_card"></canvas>
+
+	<div id="welcome">
+		<div id="cardlink">
+			<h3 style="margin: 15px">
+				Have you ever <span style="color: red">hated</span> your mobile
+				handheld wireless communication entertainment device so much that
+				you wanted to declare <span style="color: red">war</span>?!				
+			</h3>
+			<div align="center">
+				<button style="font-size:1.5em;padding:5px">DEAL<span style="color: red;margin-left:5px">>></span></button>
+			</div>
+		</div>
+	</div>
+
+	<div id="cardtable">
+		<div id="cards">
+			<canvas class="card" id="bottom_card"></canvas>
+			<canvas class="card" id="middle_card"></canvas>
+			<canvas class="card" id="top_card"></canvas>
+			<canvas class="card" id="extra_card"></canvas>
+		</div>
+
+		<div id="feelings">
+			<h1>
+				<span class="bigred">Feelings</span>
+			</h1>
+		</div>
+
+		<div id="mutual">
+			<h1>
+				<span class="bigred">Mutual</span>
+			</h1>
+		</div>
+	</div>
+
+	<div id="credits">
+		<div style="margin-right:20px;float:left">
+			<h3>By:</h3>
+			<p>
+				<a href="mailto:kebin70@gmail.com">Kevin McIntyre</a>
+			</p>
+			<p>
+				<a href="mp">Multi-player</a><br>
+				<a href="war.html">HTML version</a><br>
+				<a href="automate.html">Automated version</a>
+			</p>		
+			<p>
+				<a href="https://github.com/kmcintyre/mp_blackjack">Source code</a> at github
+			</p>
+		</div>
+		<div style="float:left">
+			<h3>Thanks:</h3>
+			<p>
+				<a href="http://www.andengine.org/">AndEngine</a><br>
+				<a
+					href="https://github.com/nicolasgramlich/AndEngineSVGTextureRegionExtension">AndEngineSVGTextureRegionExtension</a>
+				<br>
+				<a href="http://code.google.com/p/vectorized-playing-cards/">Vector
+					Playing Card Library 1.3</a>
+				<br>
+				<a href="http://code.google.com/p/canvg/">canvg</a>
+			</p>
+		</div>
+	</div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+<head>
+<title>Nwice - War - Automate</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="description"
+	content="Try to find the needle in the haystack with javascript war">
+
+<style>
+fieldset {
+	display: inline;
+	vertical-align: top;
+}
+</style>
+
+<script type="text/javascript" src="card_deck.js"></script>
+<script type="text/javascript" src="war.js"></script>
+
+<script type="text/javascript">
+war = new War();
+autotimer = null;
+
+function automate() {
+	
+	war.start( {'beatsace': new Array(2), 'shufflewinpile': true, 'warbury': 3 } );
+
+	loopcount = 0;
+	
+	try {
+		loopcount = 0;
+		while (true) {					
+			war.war();
+			loopcount++;
+		}				
+	} catch (err) {
+		document.getElementById("outcome").value = err["outcome"];
+		document.getElementById("warcount").value = loopcount;
+		
+		document.getElementById("battletotals").value = parseInt(document.getElementById("battletotals").value) + loopcount;
+		
+		if ( loopcount > parseInt(document.getElementById("battlemax").value) ) {
+			document.getElementById("battlemax").value = '' + loopcount; 
+		}
+
+		if ( loopcount < parseInt(document.getElementById("battlemin").value) ) {
+			document.getElementById("battlemin").value = '' + loopcount; 
+		}
+		
+		for (var i = 1; i < 10; i++ ) {
+			var w = err["war" + i];
+			document.getElementById("war" + i).value = w;
+			document.getElementById("war" + i + "totals").value = parseInt(document.getElementById("war" + i + "totals").value) + w;
+			if ( document.getElementById("war" + i + "record").value < w ) {
+				document.getElementById("war" + i + "record").value = w;
+			}
+		} 
+				
+		if ( err["outcome"] == "Player 1 Wins!") {
+			document.getElementById("p1w").value++;
+		} else if ( err["outcome"] == "Player 2 Wins!") {
+			document.getElementById("p2w").value++;
+		} else {
+			document.getElementById("cg").value++;
+			endautomate();
+			throw "cat's game";
+		}
+		
+		autotimer = window.setTimeout(function () { automate(); }, 0);
+	}
+}
+
+function endautomate() {
+	window.clearTimeout(autotimer);
+}
+</script>
+</head>
+<body>
+	<div>
+		<div style="float: left; margin: 10px; width: 450px">
+
+			<h1>In search of...a cat's game</h1>
+
+			<div style="padding: 10px;">
+				<blockquote>
+					In theory a cat's game in the cardgame war is possible. It requires
+					at a minimum an octo-war, although there are other permutations. <br>
+					<br> I'm still working out the math, statistics was never my
+					strong <i>suit</i>.
+				</blockquote>
+			</div>
+		</div>
+		<div style="float: left; margin: 10px; width: 300px">
+			<div
+				style="padding: 10px; -moz-border-radius: 10px; border-radius: 10px; border: 1px solid #000; box-shadow: 10px 10px 5px #888888;">
+				Note: automatation is cpu intensive while browser window is in
+				foreground.</div>
+			<br>
+			<br>
+			<button onClick="automate();">Start Automation</button>
+			<button onClick="endautomate();">End Automation</button>
+			<br>
+			<br> <b>automate ends on cat's game</b> <br>
+			<br> game preferences:
+			<ul>
+				<li>3 bury cards
+				<li>2's beat aces
+				<li>shuffle win pile
+			</ul>
+		</div>
+	</div>
+
+	<div style="clear: both; margin: 10px">
+		<fieldset>
+			<legend>last game</legend>
+			wars <input type="text" id="war1" size="5"><br> double
+			wars <input type="text" id="war2" size="3"><br> triple
+			wars <input type="text" id="war3" size="3"><br> quad
+			wars <input type="text" id="war4" size="3"><br> quint
+			wars <input type="text" id="war5" size="3"><br> sext
+			wars <input type="text" id="war6" size="2"><br> sept
+			wars <input type="text" id="war7" size="1"><br> octo
+			wars <input type="text" id="war8" size="1"><br> nono
+			wars <input type="text" id="war9" size="1"><br> battles
+			<input type="text" id="warcount" size="5"><br> outcome <input
+				type="text" id="outcome" size="10"><br>
+		</fieldset>
+		<fieldset>
+			<legend>outcomes</legend>
+			player 1 wins <input type="text" id="p1w" value="0" size="10"><br>
+			player 2 wins <input type="text" id="p2w" value="0" size="10"><br>
+			cat's game <input type="text" id="cg" value="0" size="1">
+		</fieldset>
+		<fieldset>
+			<legend>individual game records</legend>
+			wars <input type="text" id="war1record" size="8" value="0"><br>
+			double wars <input type="text" id="war2record" size="5" value="0"><br>
+			triple wars <input type="text" id="war3record" size="5" value="0"><br>
+			quad wars <input type="text" id="war4record" size="4" value="0"><br>
+			quint wars <input type="text" id="war5record" size="4" value="0"><br>
+			sext wars <input type="text" id="war6record" size="4" value="0"><br>
+			sept wars <input type="text" id="war7record" size="3" value="0"><br>
+			octo wars <input type="text" id="war8record" size="2" value="0"><br>
+			nono wars <input type="text" id="war9record" size="1" value="0"><br>
+			max battles <input type="text" id="battlemax" size="5" value="0"><br>
+			min battles <input type="text" id="battlemin" size="5" value="1000"><br>
+		</fieldset>
+		<fieldset>
+			<legend>totals</legend>
+			wars <input type="text" id="war1totals" size="10" value="0"><br>
+			double wars <input type="text" id="war2totals" size="8" value="0"><br>
+			triple wars <input type="text" id="war3totals" size="8" value="0"><br>
+			quad wars <input type="text" id="war4totals" size="6" value="0"><br>
+			quint wars <input type="text" id="war5totals" size="6" value="0"><br>
+			sext wars <input type="text" id="war6totals" size="5" value="0"><br>
+			sept wars <input type="text" id="war7totals" size="5" value="0"><br>
+			octo wars <input type="text" id="war8totals" size="3" value="0"><br>
+			nono wars <input type="text" id="war9totals" size="3" value="0"><br>
+			battles <input type="text" id="battletotals" size="15" value="0">
+		</fieldset>
+	</div>
+</body>
+</html>

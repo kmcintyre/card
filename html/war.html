@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+<head>
+<title>Nwice - War!</title>
+
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+<meta name="description"
+	content="Play War! a web version of my android application">
+
+<script type="text/javascript"
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript"
+	src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js"></script>
+
+<script type="text/javascript" src="card_deck.js"></script>
+<script type="text/javascript" src="war.js"></script>
+
+<style>
+button {
+	margin: 20px;
+	font-size: 1.6em;
+}
+
+.panel {
+	padding: 1em;
+	display: none;
+	z-index: 1;
+	background-color: white;
+}
+
+.gamerules {
+	color: red;
+}
+
+.player {
+	clear: both;
+}
+
+.playername {
+	font-size: 2em;
+	text-align: center;
+}
+
+.playpile {
+	float: left;
+}
+
+.warpile {
+	display: inline;
+}
+
+.winpile {
+	float: right;
+}
+
+#game,#deck,#stopcontinouswar,#gather {
+	display: none;
+}
+
+#gameresults {
+	display: none;
+	padding: 20px;
+	position: absolute;
+	font-size: 3em;
+	min-width: 300px;
+	z-index: 1;
+	background-color: white;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	border: 1px solid #000;
+	box-shadow: 10px 10px 5px #888888;
+}
+</style>
+
+<script type="text/javascript">
+war = new War();
+continuoustimer = null;
+
+$(document).ready(function() {
+
+	function load_deck() { 
+		if ( !$("#deck").attr('loaded') ) {
+			d = new deck();			
+			for (var i = 0; i < d.cards.length; i++ ) {			
+				var $elem = "<img id=\"" + d.cards[i] + "\" class=\"card\" src=\"/deck/" + d.cards[i] + ".svg\">";			
+				$("#deck").append($elem);
+			}			
+			$("#deck").attr('loaded', true);			
+		}
+	}
+	
+	function player_display(p) {
+		$("#" + p + " > .warpile").empty();		
+		for (var i = 0; i < war.players[p].warpile.length; i++ ) {
+			if ( i % (war.props["warbury"] + 1) == 0 || ( i + 1 == war.players[p].warpile.length && war.players[p].cardCount() == 0 ) ) {
+				var $elem = $("#" + war.players[p].warpile[i]).clone();
+				$elem.click(function () { $("#gather").click() });
+				$("#" + p + " > .warpile").append( $elem );
+			} else {				
+				var $elem = $("#" + $("#cardback:checked").val() + "_Back").clone();
+				//$elem.click(function () { alert("yo"); });
+				$("#" + p + " > .warpile").append( $elem );
+			}				
+		} 
+		$("#" + p + " > .playpile").empty();
+		if ( war.players[p].playpile.length > 0 ) {
+			var $elem = $("#" + $("#cardback:checked").val() + "_Back").clone();
+			$elem.click(function () { $("#war").click() });
+			$("#" + p + " > .playpile").append( $elem ); 			
+			$("#" + p + " > .playpile").append( "<br>" + war.players[p].playpile.length  );
+		} else {
+			$("#" + p + " > .playpile").append( $("#Blank_Card").clone() );
+		}
+		
+		$("#" + p + " > .winpile").empty();		
+		if ( war.players[p].winpile.length > 0 ) {
+			var $elem = $("#" + $("#cardback:checked").val() + "_Back").clone()
+			$("#" + p + " > .winpile").append( $elem ); 			
+			$("#" + p + " > .winpile").append( "<br>" + war.players[p].winpile.length  );
+		}
+	}
+	
+	function display_preferences() {
+		var p = new_game_preferences();
+		for (var k in p) { $("#" + k + "_value").html('' + p[k]); }		
+	}
+	
+	display_preferences();
+	
+	function new_game_preferences() {
+     	var ba = [];
+		$("input[name=\"beataces\"]:checked").each(function() {
+       		ba.push( parseInt($(this).val().substring(0,1)));
+     	});
+     	
+     	return {
+			"beatsace" : ba,
+			"shufflewinpile": $("#shuffle").prop('checked'), 
+			"warbury": parseInt( $("#warbury").val() )
+		}
+	}
+	
+	function war_display() {
+		player_display("player1");
+		player_display("player2");
+	} 
+			
+	function cardsize_pref() {
+		if ( $("#autoresize").prop('checked') ) {
+			$(".card").width( $(window).width() / 10.0 );
+			$(".card").height( $(".card").width() * 1.4 );
+		}
+	}
+
+	function result_pref() {
+		$("#gameresults").css( 
+			{ "left": window.innerWidth / 2 - $("#gameresults").width() / 2 , "top": window.innerHeight / 2 - $("#gameresults").height() / 2 } 
+		);		
+	}
+	
+	$(window).resize( function() {
+		result_pref();
+		cardsize_pref();
+	});
+		
+	$("#startgame").click(function () {
+		load_deck();
+		
+		$("#gameresults, .panel").hide();
+		
+		war.start(new_game_preferences());
+		$("#game").show();
+		war_display();
+		
+		if ( $("#autocont").prop("checked") ) {
+			$("#continouswar").click();
+		}		
+	});
+			
+	$("#gather").click(function () {
+		war.gather();
+		war_display();
+	});		
+			
+	$("#war").click(function () {
+		try {			
+			war.war();
+			war_display();
+		} catch (err) {
+			$("#stopcontinouswar").click();
+			$("#gameresults").html(err["outcome"]);
+			result_pref();
+			$("#gameresults").show();
+			$("#endgame").click();
+			throw err;
+		}
+	});
+
+	$("#continouswar").click(function () {
+		$("#continouswar").hide();
+		$("#stopcontinouswar").show();
+		try {
+			$("#war").click();	
+			continuoustimer = window.setTimeout( function() {
+				$("#continouswar").click();
+			}, parseInt( $("#delaymillis").val() ) );
+		} catch (err) {
+			throw err;				
+		}			
+	});	
+	
+	$("#stopcontinouswar").click(function () {
+		window.clearTimeout(continuoustimer);
+		$("#stopcontinouswar").hide();
+		$("#continouswar").show();	
+	});	
+
+	$("#endgame").click(function () {
+
+		war.quit();
+		
+		if ( !$("#gameresults").is(":visible") ) {
+			$("#gameresults").html("Quit Game");
+			$("#gameresults").show();
+		}
+
+		if ( $("#autorestart").prop("checked") ) {
+			window.setTimeout( function() {				
+				$("#startgame").click();
+			}, parseInt( $("#resultdelaymillis").val() ) );
+		}			
+		
+	});
+		
+	$("#sitecontrols > button").click( function() {
+		$("#" + $(this).attr('id') + "Panel").toggle();
+	});
+	
+	$(window).resize();
+	
+	$("#shuffle, #warbury, input[name=\"beataces\"]").change( function() {
+		display_preferences();
+	});
+	
+	if ( $("#autorestart").prop("checked") ) {
+		$("#startgame").click();
+	} else {
+		$("#newgame").click();
+	}
+});
+</script>
+</head>
+<body>
+
+	<div id="sitecontrols">
+		<button id="newgame">New Game</button>
+		<button id="preferences">Preferences</button>
+		<button id="stats">Stats</button>
+		<button id="automation">Automation</button>
+		<button id="deckpref">Deck</button>
+
+		<div class="panel" id="newgamePanel">
+
+			<div>
+				Beat Aces: <span class="gamerules" id="beatsace_value"></span>
+			</div>
+			<div>
+				Shuffle Win Pile: <span class="gamerules" id="shufflewinpile_value"></span>
+			</div>
+			<div>
+				War Bury: <span class="gamerules" id="warbury_value"></span>
+			</div>
+			<button id="startgame">Start War!</button>
+
+		</div>
+
+		<div class="panel" id="preferencesPanel">
+
+			<fieldset>
+				<legend>Game</legend>
+				<label>Beat Aces</label> 2's <input id="twosbeataces"
+					type="checkbox" name="beataces" value="2's" checked> 3's <input
+					id="threesbeataces" type="checkbox" name="beataces" value="3's">
+				4's <input id="foursbeataces" type="checkbox" name="beataces"
+					value="4's"> <br> <label for="shuffle">Shuffle
+					Win Pile</label> <input id="shuffle" type="checkbox" name="shuffle" checked>
+				<br> <label for="warbury">War Bury</label> <input id="warbury"
+					type="text" name="warbury" value="3" size="1">
+			</fieldset>
+
+		</div>
+
+		<div class="panel" id="statsPanel">
+
+			<div>stats!</div>
+
+		</div>
+
+		<div class="panel" id="automationPanel">
+			<fieldset>
+				<legend>Automation</legend>
+				<label for="displaygame">Display Game</label> <input
+					id="displaygame" type="checkbox" name="displaygame"> <br>
+				<label for="autorestart">Auto Restart</label> <input
+					id="autorestart" type="checkbox" name="autorestart"> <br>
+				<label for="autocont">Auto Continous War!</label> <input
+					id="autocont" type="checkbox" name="autocont"> <br> <label
+					for="delaymillis">Continuous Delay Millis</label> <input
+					id="delaymillis" type="text" name="delaymillis" value="50" size="3">
+				<br> <label for="delaymillis">Result Delay Millis</label> <input
+					id="resultdelaymillis" type="text" name="resultdelaymillis"
+					value="1000" size="3">
+			</fieldset>
+		</div>
+
+		<div class="panel" id="deckprefPanel">
+
+			<fieldset>
+				<legend>Deck</legend>
+				<label for="autoresize">Auto Resize Cards</label> <input
+					id="autoresize" type="checkbox" name="autoresize"> <br>
+				<label for="cardback">Card Back</label> <img src="deck/Red_Back.svg"
+					width="30" height="42"> <input id="cardback" type="radio"
+					name="cardback" value="Red" checked> <img
+					src="deck/Blue_Back.svg" width="30" height="42"> <input
+					id="cardback" type="radio" name="cardback" value="Blue">
+			</fieldset>
+
+		</div>
+
+	</div>
+
+	<div id="gameresults"></div>
+
+	<div id="game">
+
+		<div id="gamecontrols">
+			<button id="endgame">End Game</button>
+			<button id="war">War!</button>
+			<button id="gather">Gather</button>
+			<button id="continouswar">Continuous War!</button>
+			<button id="stopcontinouswar">Stop Continous</button>
+		</div>
+
+		<div class="player" id="player1">
+			<div class="playername">player1</div>
+			<div class="playpile"></div>
+			<div class="warpile"></div>
+			<div class="winpile"></div>
+		</div>
+
+		<div class="player" id="player2">
+			<div class="playername">player2</div>
+			<div class="playpile"></div>
+			<div class="warpile"></div>
+			<div class="winpile"></div>
+		</div>
+
+		<div id="deck">
+			<div id="cardback">
+				<img id="Blue_Back" class="card" src="/deck/Blue_Back.svg"> <img
+					id="Red_Back" class="card" src="/deck/Red_Back.svg"> <img
+					id="Blank_Card" class="card" src="deck/blank.png" width="223"
+					height="312">
+			</div>
+		</div>
+
+	</div>
+
+</body>
+</html>

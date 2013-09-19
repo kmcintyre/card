@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+<head>
+<title>Nwice - Margrave</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="description" content="javascript deck test page">
+<meta name="keywords" content="">
+
+<script type="text/javascript" src="card_deck.js"></script>
+
+<script type="text/javascript">
+var deck = new Deck();
+
+var autotimer = null;
+var p1array = new Array(0, 4, 8, 12,16,20,24,25)
+var p2array = new Array(26,30,34,38,42,46,50,51);
+var statsarray = [0,0,0,0,0,0,0,0];
+var plays = 0;
+
+function do_play() {
+	plays++;
+	var cards = Shuffle(deck.cards);
+	for (var i = 0; i < 8; i++) {		
+		if ( cards[p1array[i]].card != cards[p2array[i]].card ) {
+			statsarray[i]++;
+			return;
+		} 
+	}
+	statsarray[7]++;			
+}
+
+function update_occurrence() {
+	var sum = 0;
+	for (var i = 8; i >= 0; i--) {
+		sum += parseInt( document.getElementById("match" + i).value );
+		document.getElementById("occurrence" + i).value = sum / parseInt(document.getElementById("plays").value);
+	}
+}
+
+function update_totals() {
+	document.getElementById("plays").value = plays
+	for (var i = 0; i < 8; i++) {		
+		document.getElementById("match" + i).value = statsarray[i];		
+	}
+}
+
+function automate() {	
+	try {
+		do_play();
+		update_totals();
+		update_occurrence();
+		autotimer = window.setTimeout(function () { automate(); }, 0);						
+	} catch (err) {
+		alert('shoud not get here!' + err);
+	}
+}
+
+function endautomate() {
+	window.clearTimeout(autotimer);
+}
+</script>
+</head>
+<body>
+	<div>
+
+		<div style="float: left; margin: 10px; width: 450px">
+
+			<h1>In search of...8 matching pairs</h1>
+
+			<div style="padding: 10px;">
+				<blockquote>What are the chances of pulling 8 pairs of
+					cards from a deck, and have them each match?</blockquote>
+			</div>
+		</div>
+		<div style="float: left; margin: 10px; width: 300px">
+			<div
+				style="padding: 10px; -moz-border-radius: 10px; border-radius: 10px; border: 1px solid #000; box-shadow: 10px 10px 5px #888888;">
+				Note: automatation is cpu intensive while browser window is in
+				foreground.</div>
+			<br>
+			<br>
+			<button onClick="automate();">Start Automation</button>
+			<button onClick="endautomate();">End Automation</button>
+		</div>
+	</div>
+
+	<div style="clear: both; margin: 10px">
+		<fieldset style="display: inline">
+			<legend>totals</legend>
+			plays <input type="text" id="plays" size="15" value="0"><br>
+			0 matches <input type="text" id="match0" size="10" value="0"><br>
+			1 matches <input type="text" id="match1" size="10" value="0"><br>
+			2 matches <input type="text" id="match2" size="10" value="0"><br>
+			3 matches <input type="text" id="match3" size="10" value="0"><br>
+			4 matches <input type="text" id="match4" size="10" value="0"><br>
+			5 matches <input type="text" id="match5" size="10" value="0"><br>
+			6 matches <input type="text" id="match6" size="10" value="0"><br>
+			7 matches <input type="text" id="match7" size="10" value="0"><br>
+			8 matches <input type="text" id="match8" size="10" value="0">
+		</fieldset>
+		<fieldset style="display: inline">
+			<legend>occurrence</legend>
+			0 matches <input type="text" id="occurrence0" size="10" value="0"><br>
+			1 matches <input type="text" id="occurrence1" size="10" value="0"><br>
+			2 matches <input type="text" id="occurrence2" size="10" value="0"><br>
+			3 matches <input type="text" id="occurrence3" size="10" value="0"><br>
+			4 matches <input type="text" id="occurrence4" size="10" value="0"><br>
+			5 matches <input type="text" id="occurrence5" size="10" value="0"><br>
+			6 matches <input type="text" id="occurrence6" size="10" value="0"><br>
+			7 matches <input type="text" id="occurrence7" size="10" value="0"><br>
+			8 matches <input type="text" id="occurrence8" size="10" value="0">
+		</fieldset>
+	</div>
+</body>
+</html>

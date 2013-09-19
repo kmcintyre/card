@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+<head>
+<title>Node Test</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="description" content="Testing node.js with socket.io">
+<meta name="keywords" content="blank">
+
+<script src="/card_deck.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+
+<style>
+.card {
+	position: absolute;
+}
+.hand {
+	position: relative;
+}
+</style>
+
+<script>
+	var socket = io.connect('/');
+
+	// on connection to server, ask for user's name with an anonymous callback
+	socket.on('connect', function(){
+		// call the server-side function 'adduser' and send one parameter (value of prompt)
+		// socket.emit('adduser', prompt("What's your name?"));
+	});
+
+	// listener, whenever the server emits 'users', this updates the users
+	socket.on('users', function(users) {	
+		$('#users').empty();
+		$.each(users, function(key, value) {
+			$('#users').append('<div>' + value + '</div>');
+		});
+	});
+		
+	socket.on('card', function(user, card) {
+		if ( !$('#table > .' + user).length ) {
+			$('#table').append('<div class="' + user + '"><b>' + user + '</b><div class="hand"></div></div>');
+		}
+		$('#table > .' + user + ' > .hand').append('<img class="card" src="/deck/' + card.card + card.suite + '.png">');
+		$('#table > .' + user + ' > .hand').children('img').each(function(i) {
+			$(this).css('left', 10 * i + 'px' );
+			$(this).css('top', 5 * i + 'px' );
+		});		
+	});
+
+	// on load of page
+	$(function() {
+		// when the client clicks SEND
+		//$('#datasend').click( function() {
+		//	var message = $('#data').val();
+		//	$('#data').val('');
+			// tell server to execute 'sendchat' and send along one parameter
+		//	socket.emit('sendchat', message);
+		//});
+
+		// when the client hits ENTER on their keyboard
+		//$('#data').keypress(function(e) {
+		//	if(e.which == 13) {
+		//		$('#datasend').focus().click();
+		//		$(this).focus();
+		//	}
+		//});
+		
+		$('#signin').click( function() { 
+			var name = prompt("What's your name?");
+			if ( name.length > 0 ) {
+				$('#signin').empty();
+				$('#signin').append(name);
+				socket.emit('adduser', name);
+			}				 
+		});
+		
+		$('#requestcard').click( function() { socket.emit('requestcard'); });				
+	});
+	
+
+</script>
+</head>
+<body>
+
+	<div style="float:left;width:100px;border-right:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
+		<b>USERS</b>
+		<div id="users"></div>
+		<button id="signin">whoami</button>
+	</div>
+	
+	<div style="float:left;padding:10px;overflow:scroll-y;">
+		<b>TABLE</b>
+		<button id="requestcard">requestcard</button>
+		<div id="table"></div>
+	</div>
+
+</body>
+</html>
