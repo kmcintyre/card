@@ -1,4 +1,6 @@
-package com.nwice.test;
+package com.nwice.card;
+
+import com.nwice.test.R;
 
 import android.os.Bundle;
 import android.app.Activity;
