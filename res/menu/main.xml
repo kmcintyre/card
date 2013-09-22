@@ -1,15 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/settings_deck"
+        android:id="@+id/menu_login"
         android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/settings_deck"/>
-
-    <item
-        android:id="@+id/settings_explicit"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/settings_explicit"/>
-
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_login"
+        />
+    
+    
+    <item 
+        android:id="@+id/menu_settings" 
+        android:orderInCategory="101" 
+        android:showAsAction="ifRoom" 
+        android:title="@string/menu_settings"         
+    />
+    
 </menu>
