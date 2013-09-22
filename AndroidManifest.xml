@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.nwice.test"
+    package="com.nwice.card"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -25,9 +25,19 @@
             </intent-filter>
         </activity>
         
-        <activity android:name="com.nwice.card.DeckActivity"></activity>
-        <activity android:name="com.nwice.card.WarActivity"></activity>        
-        <activity android:name="com.nwice.card.BlackjackActivity"></activity>
+        <activity android:name=".SettingsActivity"
+            android:theme="@style/GameTheme"
+            ></activity>
+        
+        <activity android:name=".DeckActivity"
+            android:theme="@style/GameTheme"            
+            ></activity>
+        <activity android:name=".WarActivity"
+            android:theme="@style/GameTheme"
+            ></activity>        
+        <activity android:name=".BlackjackActivity"
+            android:theme="@style/GameTheme"
+            ></activity>        
         
     </application>
 
