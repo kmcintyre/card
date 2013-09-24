@@ -1,11 +1,21 @@
 card
 ============
 
-Project to teach myself client javascript and perhaps websocket or some kinda polling for server/dealer
+Project to teach myself client/server javascript, websockets, Android SDK, and HTML5 canvas.
 
 Log:
 
-Day 12 - 15:
+Day 15 - 16:
+
+Integrate with <a href="http://autobahn.ws/android">Autobahn.ws</a> creating the echo ws activity
+
+Moved from socket.io to <a href="http://einaros.github.io/ws/">ws</a> since autobahn.ws socket.io doesn't support ws: protocol. 
+
+Moved from to PNG due to AngEngine not supporting card SVGs
+
+Next up - figure out how HTML5 and Android version can use the same javascript objects.
+
+Day 12 - 14:
 
 Moving my mp_blackjack since I'm doing more games. Essentially a rename to card. 
 
@@ -33,4 +43,4 @@ Day 1:
 
 Write some prototypes for card, deck.
 
-I want to be able to render in 2d a card.
+I want to be able to render in 2d a set of cards.
