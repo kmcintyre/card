@@ -34,18 +34,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/deck"
+        android:paddingTop="20dp"
         android:clickable="true"
         android:onClick="war"
         android:text="@string/war"
         android:textAppearance="@style/GameTheme" />
-
-    <WebView
-        android:id="@+id/webView1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/war"
-        android:layout_marginRight="78dp"
-        android:layout_marginTop="82dp" />
     
 </RelativeLayout>

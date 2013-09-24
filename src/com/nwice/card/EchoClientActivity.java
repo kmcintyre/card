@@ -22,9 +22,6 @@ import de.tavendo.autobahn.WebSocketConnectionHandler;
 
 public class EchoClientActivity extends Activity {
 
-   static final String TAG = "de.tavendo.autobahn.echo";
-   private static final String PREFS_NAME = "AutobahnAndroidEcho";
-
    static EditText mHostname;
    static EditText mPort;
    static TextView mStatusline;
@@ -135,7 +132,7 @@ public class EchoClientActivity extends Activity {
             }
          });
       } catch (WebSocketException e) {
-         Log.e(TAG, e.toString());
+         Log.e("nwice", e.toString());
       }
    }
 
@@ -152,7 +149,7 @@ public class EchoClientActivity extends Activity {
       mMessage = (EditText) findViewById(R.id.msg);
       mSendMessage = (Button) findViewById(R.id.sendMsg);
 
-      mSettings = getSharedPreferences(PREFS_NAME, 0);
+      mSettings = getSharedPreferences("nwice", 0);
       loadPrefs();
 
       setButtonConnect();
