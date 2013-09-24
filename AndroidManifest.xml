@@ -7,6 +7,8 @@
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="17" />
+    
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
 
     <application
         android:allowBackup="true"
@@ -27,8 +29,7 @@
         
         <activity android:name=".SettingsActivity"
             android:theme="@style/GameTheme"
-            ></activity>
-        
+            ></activity>        
         <activity android:name=".DeckActivity"
             android:theme="@style/GameTheme"            
             ></activity>
@@ -38,6 +39,8 @@
         <activity android:name=".BlackjackActivity"
             android:theme="@style/GameTheme"
             ></activity>        
+        <activity android:name=".EchoClientActivity"            
+            ></activity>            
         
     </application>
 
