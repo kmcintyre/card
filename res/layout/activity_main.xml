@@ -9,15 +9,15 @@
     android:keepScreenOn="true"
    	tools:context=".MainActivity"
     >
-    
+
     <TextView
         android:id="@+id/blackjack"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"        
+        android:layout_height="wrap_content"
         android:clickable="true"
         android:onClick="blackjack"
         android:text="@string/blackjack"
-        />    
+        android:textAppearance="@style/GameTheme" />
     
     <TextView
         android:id="@+id/deck"
@@ -27,7 +27,7 @@
         android:clickable="true"
         android:onClick="deck"
         android:text="@string/deck"
-        />    
+        android:textAppearance="@style/GameTheme" />
 
     <TextView
         android:id="@+id/war"
@@ -37,6 +37,15 @@
         android:clickable="true"
         android:onClick="war"
         android:text="@string/war"
-        />
+        android:textAppearance="@style/GameTheme" />
+
+    <WebView
+        android:id="@+id/webView1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/war"
+        android:layout_marginRight="78dp"
+        android:layout_marginTop="82dp" />
     
 </RelativeLayout>

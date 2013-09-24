@@ -5,8 +5,13 @@
     <string name="app_by">nwice.com</string>
     <string name="app_sponsor">burstyourcondom.com</string>    
         
-    <string name="menu_login">Login/Logout</string>
+   	<string name="menu_games">Games</string>
+   	<string name="menu_connect">Connect</string>
+    <string name="menu_login">Login</string>
     <string name="menu_settings">Settings</string>
+    <string name="menu_ws">WS</string>
+        
+    <!-- settings -->
     
     <string name="settings_deck">Deck Type</string>
     <string name="settings_deck_default">red</string>
@@ -15,8 +20,12 @@
         <item>red</item>
     </string-array>
     
+    <string name="settings_connect">Auto-connect</string>
+    <string name="settings_connect_summary">Auto-connect summary</string>    
+    
     <string name="settings_sound">Sound</string>
     <string name="settings_sound_summary">Sound Summary</string>
+    
     <string name="settings_explicit">Explicit Content</string>
     <string name="settings_explicit_summary">Explicit Content Summary</string>
     
@@ -29,7 +38,5 @@
     <string name="war_settings_bury_cards">Bury Cards</string>
     <string name="war_settings_beats_ace">Beat Aces</string>    
     <string name="war_settings_shuffle_win">Shuffle Win Pile</string>
-    
-    
-    
+ 
 </resources>
