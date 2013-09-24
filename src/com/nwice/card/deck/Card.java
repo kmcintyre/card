@@ -1,4 +1,4 @@
-package com.nwice.card;
+package com.nwice.card.deck;
 
 public interface Card {
 

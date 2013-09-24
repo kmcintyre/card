@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.util.Log;
 
 public class MainActivity extends Activity {
 
@@ -26,9 +27,17 @@ public class MainActivity extends Activity {
     
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
+    	try {
+    		Log.i("nwice", "selected item:" + item.getItemId());
+    	} catch (Exception e) {
+    		Log.e("nwice", "ops:" + e.toString());
+    	}
         switch (item.getItemId()) {
-        case R.id.menu_login:
-            return true;
+        case R.id.menu_games:
+            return true;        
+        case R.id.menu_connect:
+            startActivity(new Intent(this, EchoClientActivity.class));
+            return true;        	
         case R.id.menu_settings:
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);

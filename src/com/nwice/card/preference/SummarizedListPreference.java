@@ -16,10 +16,12 @@ public class SummarizedListPreference extends ListPreference {
 	
     @Override
     public void setValue(final String value) {
-        super.setValue(value);
-		Log.i("nwice", "new deck setting:" + value);
-        setSummary(value);
-        notifyChanged();
+    	if ( getValue() == null || !getValue().equals(value) ) {
+    		super.setValue(value);
+    		Log.i("nwice", "set summary to:" + value);
+    		setSummary(value);
+    		notifyChanged();
+    	}    			       
     }
 	
 }

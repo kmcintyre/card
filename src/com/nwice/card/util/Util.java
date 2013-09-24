@@ -1,7 +1,10 @@
-package com.nwice.card;
+package com.nwice.card.util;
 
 import java.util.ArrayList;
 import java.util.Random;
+
+import com.nwice.card.deck.Card;
+import com.nwice.card.deck.Deck;
 
 public class Util {
 

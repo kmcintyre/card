@@ -1,10 +1,13 @@
-package com.nwice.card;
+package com.nwice.card.war;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+
+import com.nwice.card.deck.Card;
+import com.nwice.card.deck.CardGame;
 
 public class WarCardGame implements CardGame {
 
