@@ -39,8 +39,13 @@
         <activity android:name=".BlackjackActivity"
             android:theme="@style/GameTheme"
             ></activity>        
-        <activity android:name=".EchoClientActivity"            
-            ></activity>            
+        <activity android:name=".ConnectActivity"            
+            ></activity>
+        
+        <service 
+            android:name="com.nwice.card.ConnectIntentService"
+            android:label="@string/connect_service"
+            ></service>
         
     </application>
 

@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".EchoActivity" >
+    tools:context=".ConnectActivity" >
 
     <TextView
         android:id="@+id/textView"
@@ -47,43 +47,6 @@
         android:layout_height="wrap_content"        
         android:text="Button"
         android:layout_below="@+id/uri"
-        >
-    </Button>    
-
-    <TextView
-        android:id="@+id/statusline"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Ready."
-        android:layout_below="@+id/start"
-        />    
-
-    <TextView
-        android:id="@+id/textViewEcho"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Message to echo"
-        android:layout_below="@+id/statusline"
-		>
-    </TextView>
-    
-    <EditText
-        android:id="@+id/msg"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:text="Hello, world!"
-        android:layout_below="@+id/textViewEcho"
-        >
-    </EditText>
-    
-    <Button
-        android:id="@+id/sendMsg"
-        android:layout_centerHorizontal="true"
-        android:text="Send"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"                
-        android:layout_below="@+id/msg"
         >
     </Button>
     

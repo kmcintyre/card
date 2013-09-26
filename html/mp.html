@@ -23,7 +23,6 @@
   function onOpen(evt)
   {
     writeToScreen("CONNECTED");
-    doSend("WebSocket rocks");
   }
 
   function onClose(evt)
@@ -34,7 +33,6 @@
   function onMessage(evt)
   {
     writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>');
-    websocket.close();
   }
 
   function onError(evt)
@@ -46,14 +44,15 @@
   {
     writeToScreen("SENT: " + message); 
     websocket.send(message);
+    document.getElementById('send').value = '';
   }
 
   function writeToScreen(message)
   {
     var pre = document.createElement("p");
-    pre.style.wordWrap = "break-word";
+    pre.style.wordWrap = "break-word";    
     pre.innerHTML = message;
-    output.appendChild(pre);
+    output.insertBefore(pre,output.firstChild);
   }
 
   window.addEventListener("load", init, false);
@@ -61,6 +60,8 @@
 </script>
 
 <h2>WebSocket Test</h2>
+
+<input id="send" value=""/><button onClick="doSend(document.getElementById('send').value)">send</button>
 
 <div id="output"></div>
 

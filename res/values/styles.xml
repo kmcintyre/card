@@ -18,8 +18,12 @@
     
     <style name="GameTheme" parent="AppTheme">
         <item name="android:windowNoTitle">true</item>
-        <item name="android:textSize">26sp</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">22sp</item>
     </style>    
+
+    <style name="GameThemeHeader" parent="AppTheme">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 
 </resources>

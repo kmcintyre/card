@@ -9,7 +9,7 @@
         	android:defaultValue="@string/settings_deck_default"	         
         />              
         
-		<CheckBoxPreference 
+		<CheckBoxPreference 		    
 		    android:key="settings_connect"
             android:title="@string/settings_connect"
             android:defaultValue="true"            
