@@ -1,23 +1,16 @@
-var WebSocketServer = require('ws').Server,
-	cards = require('../card.js'),
-	deck = require('../deck.js'), 	
+var requirejs = require('requirejs'),
+	WebSocketServer = require('ws').Server, 	
 	wss = new WebSocketServer({port: 8080});
+
+requirejs.config({
+    nodeRequire: require
+});
+
+var card = requirejs('card')
 	
 var stdin = process.openStdin();
 
 console.log('started');
-
-var mycards = deck.shuffle( new deck.deck().cards );
-
-function drawcard() {
-	var c = mycards.pop();
-	if ( !c ) {
-		wss.broadcast("new deck");
-		mycards = cards.shuffle( new cards.deck().cards );
-		c = mycards.pop();
-	}
-	return c;
-}
 
 function verify() {
 	return true;
@@ -49,9 +42,9 @@ wss.on('connection', function(ws) {
 	    	wss.broadcast(JSON.stringify({ "type": "user", "nickname": json.nickname }), this);
 	    });
 	    
-	    ws.on('requestcard', function(data) {        
-	    	ws.send( JSON.stringify( drawcard() ) );
-	    });
+	    //ws.on('requestcard', function(data) {        
+	    //	ws.send( JSON.stringify( drawcard() ) );
+	    //});
 	        
 	    ws.send( JSON.stringify({ "type": "msg" , "txt" : "welcome", "from": "server"}) );
     
@@ -61,8 +54,10 @@ wss.on('connection', function(ws) {
 
 stdin.on('data', function(message) { wss.showcard() });
 
-wss.showcard = function() {
-	var c = drawcard();
+wss.showcard = function() { 
+	var i = Math.floor((Math.random()*52));
+	console.log('i:' + i);
+	var c = new card(i);
 	c['type'] = "card";
 	wss.broadcast( JSON.stringify( c ) );	
 };
