@@ -77,7 +77,8 @@ public class ConnectActivity extends Activity {
       
       try {
          mConnection.connect(wsuri, new WebSocketConnectionHandler() {
-            
+
+        	        	 
         	@Override
             public void onOpen() {
                Log.i("nwice", "onOpen()");
@@ -85,10 +86,23 @@ public class ConnectActivity extends Activity {
 
             @Override
             public void onTextMessage(String message) {
-               Log.i("nwice", "onTextMessage:" + message);
+               Log.i("nwice", "onTextMessage:" + message);               
                alert(message);
             }
+            
+            @Override
+            public void onRawTextMessage(byte[] payload) {
+            	Log.i("nwice", "onRawTextMessage:" + payload);               
+            	alert("raw message");
+         	}
 
+            
+            @Override
+            public void onBinaryMessage(byte[] payload) {
+            	Log.i("nwice", "onBinaryMessage:" + payload);               
+            	alert("binary message");
+         	}
+            
             @Override
             public void onClose(int code, String reason) {
                Log.i("nwice", "Connection lost - " + code + " reason:" + reason);
@@ -110,7 +124,7 @@ public class ConnectActivity extends Activity {
       mPort = (EditText) findViewById(R.id.port);
       mStart = (Button) findViewById(R.id.start);
 
-      mHostname.setText("me.nwice.com");
+      mHostname.setText("dev.nwice.com");
       mPort.setText("8080");
       
       setButtonConnect();

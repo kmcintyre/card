@@ -1,68 +1,137 @@
 <!DOCTYPE html>
-<title>WebSocket Test</title>
+<title>Multi-player</title>
+
+<style>
+.simple {
+	float:left;
+	border:1px solid black;
+	padding:20px;	
+	margin:20px;
+}
+.simple2 {
+	background-color:lightgray;
+	border:1px solid black;
+	padding:2px;	
+	margin:2px;
+}
+.card {
+	position: absolute;
+}
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+
 <script language="javascript" type="text/javascript">
 
-  var wsUri = "ws://localhost:8080/";
-  var output;
-
-  function init()
-  {
-    output = document.getElementById("output");
-    testWebSocket();
+  var cardsocket = null;
+  function onMessage(evt) {
+  	console.info( "RECEIVED:" + evt.data );  	
+  	try {  	
+  		var incoming = JSON.parse(evt.data);
+  		$(document).trigger(incoming.type, incoming);  		  	
+	 } catch (err) {
+	 	console.error("TRIGGER ERROR:" + err);
+	 }  	
   }
 
-  function testWebSocket()
-  {
-    websocket = new WebSocket(wsUri);
-    websocket.onopen = function(evt) { onOpen(evt) };
-    websocket.onclose = function(evt) { onClose(evt) };
-    websocket.onmessage = function(evt) { onMessage(evt) };
-    websocket.onerror = function(evt) { onError(evt) };
+  function send(message){
+    console.info( "SENDING:" + message );        
+    try {
+  		cardsocket.send(JSON.stringify( message ));
+  	} catch (err) {
+  		console.error("SEND ERROR:" + err);
+  	}  	
   }
-
-  function onOpen(evt)
-  {
-    writeToScreen("CONNECTED");
+    
+  function msg(evt, data) {  	
+  	$("#msg").html("<p>" + data.txt + "</p>");
   }
-
-  function onClose(evt)
-  {
-    writeToScreen("DISCONNECTED");
+  function deck(evt, data) {
+  	$('#deck').append('<img class="card" src="/deck/' + data.card + data.suite  + '.png">');
+  }  
+  function card(evt, data) {
+  	$('#card').append('<img class="card" src="/deck/' + data.card + data.suite  + '.png">');
   }
-
-  function onMessage(evt)
-  {
-    writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>');
+  function user(evt, data) {
+  	if ( data.nickname == $('#nickname').data("whoami") ) {
+  		$('#users').append('<div><b><i>Me</i></b><hr></div>');
+  		$('#nickname').html( '<b><i>' + data.nickname + '</i></b>' );	
+  	} else {
+  		$('#users').append('<div>Me' + data.nickname + '</div>');
+  	}
   }
+  
+  $(function() {
+  
+	$(document).bind("msg", msg);
+	$(document).bind("card", card);
+	$(document).bind("user", user);				
+	$(document).bind("deck", deck);
 
-  function onError(evt)
-  {
-    writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
-  }
-
-  function doSend(message)
-  {
-    writeToScreen("SENT: " + message); 
-    websocket.send(message);
-    document.getElementById('send').value = '';
-  }
-
-  function writeToScreen(message)
-  {
-    var pre = document.createElement("p");
-    pre.style.wordWrap = "break-word";    
-    pre.innerHTML = message;
-    output.insertBefore(pre,output.firstChild);
-  }
-
-  window.addEventListener("load", init, false);
+	$('#connect').click( function() {
+		if ( cardsocket == null || ( cardsocket.readyState == 0 || cardsocket.readyState == 3 )) {
+			var websocket = new WebSocket("ws://" + $('#host').val() + ":" + $('#port').val());
+			websocket.onopen = function(evt) { 
+				console.info('CONNECT'); 
+				$('#connect').html( 'disconnect' ); 
+				if ( $('#autologin').is(':checked') ) { $('#nickname').click() }
+			};
+			websocket.onclose = function(evt) { console.info('DISCONNECT'); $('#connect').html( 'connect' ); };
+			websocket.onmessage = function(evt) { onMessage(evt) };
+			websocket.onerror = function(evt) { console.error("cardsocket ERROR:" + evt.data) };
+						
+			cardsocket = websocket;							
+		} else {
+			$('#connect').html( 'disconnect' );
+			cardsocket.close();	
+		}
+	});
+	
+	$('#nickname').click( function() { 
+		var nick = prompt("nickname:");
+		send( {"type": "nickname", "nickname": nick } );
+		$('#nickname').data("whoami", nick); 				 
+	});
+	
+	if ( $('#autoconnect').is(':checked') ) {
+		$('#connect').click();
+	}	
+});
 
 </script>
 
-<h2>WebSocket Test</h2>
+<div class="simple">
+	<div>
+		<b>CONNECTION</b>
+		<input id="host" name="host" value="localhost"/>
+		<input id="port" name="port" value="8080"/>
+		Auto-connect <input type="checkbox" id="autoconnect" name="autoconnect" checked="true"/> <button id="connect">connect</button>
+	</div>
+	<div>
+		<b>USER</b>
+		Auto-login <input type="checkbox" id="autologin" name="autologin"/> <button id="nickname">nickname</button>
+	</div>			
+	<div id="msg" class="simple2"></div>
+</div>
 
-<input id="send" value=""/><button onClick="doSend(document.getElementById('send').value)">send</button>
 
-<div id="output"></div>
+
+<div class="simple">
+	<b>USERS</b>
+	<div id="users"></div>
+</div>
+
+<div class="simple">
+	<b>DECK</b>
+	<div id="deck">
+	</div>
+</div>
+
+<div class="simple">
+	<b>CARD</b>
+	<div id="card">
+	</div>
+</div>		
+
 
 </html> 

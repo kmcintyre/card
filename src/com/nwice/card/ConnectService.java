@@ -1,23 +1,17 @@
 package com.nwice.card;
 
-import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import de.tavendo.autobahn.WebSocket;
-import de.tavendo.autobahn.WebSocketConnection;
-
-public class ConnectService extends IntentService {
+public class ConnectService extends Service {
 
 	public static final String NOTIFICATION = "com.nwice.card";
 	
-	private final WebSocket mConnection = new WebSocketConnection();
-	
 	public ConnectService() {
-		super("ConnectService");		
+		super();		
 	}
 	
 	@Override
@@ -38,22 +32,9 @@ public class ConnectService extends IntentService {
 	}
 
 	@Override
-	public IBinder onBind(Intent intent) {
-		Log.i("nwice", "onBind");
+	public IBinder onBind(Intent arg0) {
+		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	// Will be called asynchronously be Android
-	@Override
-	protected void onHandleIntent(Intent intent) {
-		Log.i("nwice", "onHandleIntent:" + intent);
-		publishResults();
-	}
-	
-	
-	private void publishResults() {
-		Intent intent = new Intent(NOTIFICATION);		
-		sendBroadcast(intent);
-	}
-	
+		
 }

@@ -1,13 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<item
-        android:id="@+id/menu_games"
-        android:orderInCategory="100"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_games"
-        />
-
-	<item
         android:id="@+id/menu_connect"
         android:orderInCategory="101"
         android:showAsAction="ifRoom"
