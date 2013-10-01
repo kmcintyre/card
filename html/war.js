@@ -1,10 +1,10 @@
 define(["util", "deck", "card"], function(util, deck, card) {
 
 	warValues = {"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"10":10,"J":11,"Q":12,"K":13,"A":14};
+	
 	card.prototype.warValue = function() {
 		return warValues[this.card];
-	}
-	
+	}	
 	
 	function warplayer(cards, shufflewinpile) {
 		this.playpile = cards;
@@ -140,9 +140,6 @@ define(["util", "deck", "card"], function(util, deck, card) {
 			this.players["player1"].play(1);
 			this.players["player2"].play(1);			
 	}
-
-
-	
 	
 	return war;
 });

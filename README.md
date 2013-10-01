@@ -7,11 +7,13 @@ Log:
 
 Day 17 - 20:
 
-Using <a href="http://requirejs.org/">requirejs</a> to allow for easier use of javascript library on both node and front-end.
+Using <a href="http://requirejs.org/">requirejs</a> to allow for use of javascript library on both node and client.
 
-Moved HTML version to requirejs.
+Moved HTML versions including automated and matching pairs to requirejs.
 
-Next up - get both multi-player and single player version working together
+Removed canvg, wasn't playing well with requirejs.
+
+Next up - get both multi-player and single player version working together.
 
 Day 15 - 16:
 

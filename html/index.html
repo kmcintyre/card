@@ -6,7 +6,7 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
 <meta name="description"
-	content="Splash page for my android application">
+	content="Splash page for my multi-player android/HTML5 card application">
 
 <style>
 html {
@@ -72,89 +72,11 @@ h3:first-letter {
 	left: 0px;
 }
 </style>
-<script type="text/javascript"
-	src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-<script type="text/javascript"
-	src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/jquery-ui.min.js"></script>
 
-<script type="text/javascript" src="card_deck.js"></script>
-<script type="text/javascript" src="rgbcolor.js"></script>
-<script type="text/javascript" src="canvg.js"></script>
-
-<script type="text/javascript">
-
-$(document).ready(function() { 
-  cardcounter = 0;
-  d = new deck();
-  d.cards = shuffle(d.cards);
-
-  canvg('hidden_card', '/deck/' + d.cards[cardcounter] + '.svg');
-
-  $(window).resize(function() {
-	$("#cardlink").css("width", $('#hidden_card').width() );
-	$("#cardlink").css("height", $('#hidden_card').height() );
-	$("#cardtable").css("width", document.body.clientWidth - $("#welcome").width() - 20 * 2 );
-	$("#cardtable").css("height", document.body.clientHeight - 20 * 2 );
-	
-	$("#bottom_card").css( { left: $("#cardtable").width() / 2 - $('#hidden_card').width(), top: $('#hidden_card').height() / 2} );
-	$("#middle_card").css( { left: $("#cardtable").width() / 2 - $('#hidden_card').width() / 2, top: 0} );
-	$("#top_card").css( { left: $("#cardtable").width() / 2, top: $('#hidden_card').height() / 2 } );
-	$("#extra_card").css( { left: $("#cardtable").width() / 2 - $('#hidden_card').width() / 2, top: $('#hidden_card').height() } );
-	
-	$("#feelings").css( { right: $("#cardtable").width() / 2 + $('#hidden_card').width() / 2, top: $('#hidden_card').height() / 2 - $('#feelings').height() } );
-	$("#mutual").css( { left: $("#cardtable").width() / 2 + $('#hidden_card').width() / 2, top: $('#hidden_card').height() / 2 - $('#mutual').height() } );
-  });
-  
-  $(window).resize();
-  
-  function changeCards() {
-  	if ( cardcounter > 51 ) {
-  		d.cards = Shuffle(d.cards);
-  		cardcounter = 0;  		
-  	}
-	canvg('bottom_card', '/deck/' + d.cards[cardcounter++] + '.svg');  
-  	canvg('middle_card', '/deck/' + d.cards[cardcounter++] + '.svg');
-  	canvg('top_card', '/deck/' + d.cards[cardcounter++] + '.svg'); 
-  	canvg('extra_card', '/deck/' + d.cards[cardcounter++] + '.svg');
-  	if ( !$("#cards").children().is(":visible") ) {
-  		$("#cards").children().show("slow");
-  	}
-  }
-  
-  changeCards();
-  
-  $("#welcome").click(function () {
-	if (  !$("#feelings").is(":visible") ) {
-		$("#feelings").show("slow");
-		$("#mutual").show("slow");
-	}
-	changeCards();
-  });
-
-  $(".card").click(function () {
-	if (  !$("#feelings").is(":visible") ) {
-		$("#feelings").show("slow");
-		$("#mutual").show("slow");
-	}
-	changeCards();
-  });  
-  
-  
-  $("#feelings").click(function () {
-  	changeCards();	
-	window.open('https://play.google.com/store/apps/details?id=com.nwice.card');
-  });
-  $("#mutual").click(function () {
-  	changeCards();	
-	window.open('https://play.google.com/store/apps/details?id=com.nwice.card');
-  });  
-});
-</script>
+<script data-main="index" src="require.js"></script>
 
 </head>
 <body>
-
-	<canvas id="hidden_card"></canvas>
 
 	<div id="welcome">
 		<div id="cardlink">
@@ -170,11 +92,12 @@ $(document).ready(function() {
 	</div>
 
 	<div id="cardtable">
+		
 		<div id="cards">
-			<canvas class="card" id="bottom_card"></canvas>
-			<canvas class="card" id="middle_card"></canvas>
-			<canvas class="card" id="top_card"></canvas>
-			<canvas class="card" id="extra_card"></canvas>
+			<img class="card" id="bottom_card">
+			<img class="card" id="middle_card">
+			<img class="card" id="top_card">
+			<img class="card" id="extra_card">
 		</div>
 
 		<div id="feelings">
@@ -199,10 +122,11 @@ $(document).ready(function() {
 			<p>
 				<a href="mp.html">Multi-player</a><br>
 				<a href="war.html">HTML version</a><br>
-				<a href="automate.html">Automated version</a>
+				<a href="automate.html">Automated</a><br>
+				<a href="margrave.html">Matching pairs</a>
 			</p>		
 			<p>
-				<a href="https://github.com/kmcintyre/mp_blackjack">Source code</a> at github
+				<a href="https://github.com/kmcintyre/card">Source code</a> at github
 			</p>
 		</div>
 		<div style="float:left">
@@ -215,7 +139,7 @@ $(document).ready(function() {
 				<a href="http://code.google.com/p/vectorized-playing-cards/">Vector
 					Playing Card Library 1.3</a>
 				<br>
-				<a href="http://code.google.com/p/canvg/">canvg</a>
+				<a href="http://requirejs.org/">requirejs</a>
 			</p>
 		</div>
 	</div>
