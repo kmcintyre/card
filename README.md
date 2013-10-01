@@ -5,6 +5,14 @@ Project to teach myself client/server javascript, websockets, Android SDK, and H
 
 Log:
 
+Day 17 - 20:
+
+Using <a href="http://requirejs.org/">requirejs</a> to allow for easier use of javascript library on both node and front-end.
+
+Moved HTML version to requirejs.
+
+Next up - get both multi-player and single player version working together
+
 Day 15 - 16:
 
 Integrate with <a href="http://autobahn.ws/android">Autobahn.ws</a> creating the echo ws activity
