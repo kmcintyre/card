@@ -100,7 +100,7 @@ public class WarActivity extends SimpleBaseGameActivity implements
 		WarActivity.mCameraWidth = size.x;
 		WarActivity.mCameraHeight = size.y;
 
-		Log.i("nwice", "width:" + WarActivity.mCameraWidth + "height:" + WarActivity.mCameraHeight + "area:" + WarActivity.mCameraWidth
+		Log.i("WarActivity", "width:" + WarActivity.mCameraWidth + "height:" + WarActivity.mCameraHeight + "area:" + WarActivity.mCameraWidth
 				* WarActivity.mCameraHeight + "area per card:" + WarActivity.mCameraWidth * WarActivity.mCameraHeight / 52);
 
 		int area_per_card = size.x * size.y / 26;
@@ -108,28 +108,28 @@ public class WarActivity extends SimpleBaseGameActivity implements
 		WarActivity.cardWidth = (int) Math.sqrt(area_per_card / WarActivity.cardRatio);
 		WarActivity.cardHeight = (int) (WarActivity.cardWidth * WarActivity.cardRatio);
 		
-		Log.i("nwice", "cardWidth:" + WarActivity.cardWidth + "cardHeight:" + WarActivity.cardHeight);
+		Log.i("WarActivity", "cardWidth:" + WarActivity.cardWidth + "cardHeight:" + WarActivity.cardHeight);
 
 		int rotation = display.getRotation();
 		if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
-			Log.i("nwice", "Landscape");
+			Log.i("WarActivity", "Landscape");
 			mScreenOrientation = ScreenOrientation.LANDSCAPE_SENSOR;
 		} else {
-			Log.i("nwice", "Portrait");
+			Log.i("WarActivity", "Portrait");
 			mScreenOrientation = ScreenOrientation.PORTRAIT_SENSOR;
 		}
 		
-		Log.i("nwice", "create camera");
+		Log.i("WarActivity", "create camera");
 
 		Camera camera = new Camera(0, 0, WarActivity.mCameraWidth, WarActivity.mCameraHeight);
 		
-		Log.i("nwice", "create engine options");
+		Log.i("WarActivity", "create engine options");
 		
 		EngineOptions engineOptions = new EngineOptions(true, this.mScreenOrientation,
 				new RatioResolutionPolicy(WarActivity.mCameraWidth,
 						WarActivity.mCameraHeight), camera);
 		
-		Log.i("nwice", "set needs sound");
+		Log.i("WarActivity", "set needs sound");
 		
 		engineOptions.getAudioOptions().setNeedsSound(true);
 		
@@ -139,7 +139,7 @@ public class WarActivity extends SimpleBaseGameActivity implements
 	@Override
 	public void onCreateResources() {
 		
-		Log.i("nwice", "onCreateResources");
+		Log.i("WarActivity", "onCreateResources");
 		
 		mBuildableBitmapTextureAtlas = new BuildableBitmapTextureAtlas(
 				this.getTextureManager(), 2048, 2048, TextureOptions.DEFAULT);
@@ -159,7 +159,7 @@ public class WarActivity extends SimpleBaseGameActivity implements
 				String tc = Util.getSVGFileName(c);
 				deckMap.put(tc, new Integer(i) );				
 				String png_file = tc + ".png";
-				Log.i("nwice", "i:" + i + " png:" + png_file);
+				Log.i("WarActivity", "i:" + i + " png:" + png_file);
 				
 				this.mCardTextureRegions[i++] = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mBuildableBitmapTextureAtlas, this, png_file);
 						
@@ -170,11 +170,11 @@ public class WarActivity extends SimpleBaseGameActivity implements
 			
 			String red_back = "Red_Back.png";
 			
-			Log.i("nwice", "i:" + i + "png:" + red_back);
+			Log.i("WarActivity", "i:" + i + "png:" + red_back);
 
 			this.mCardTextureRegions[i++] = BitmapTextureAtlasTextureRegionFactory .createFromAsset(this.mBuildableBitmapTextureAtlas, this, red_back);
 			
-			Log.i("nwice", "done with back");
+			Log.i("WarActivity", "done with back");
 			
 		} catch (Exception e) {
 			Log.e("nwice", "Error loading card:" + e.toString());
@@ -182,13 +182,13 @@ public class WarActivity extends SimpleBaseGameActivity implements
 		
 		try {
 
-			Log.i("nwice", "load BlackPawnTextureAtlasBuilder");
+			Log.i("WarActivity", "load BlackPawnTextureAtlasBuilder");
 			
 			this.mBuildableBitmapTextureAtlas
 					.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(
 							0, 0, 0));
 			
-			Log.i("nwice", "go for load");
+			Log.i("WarActivity", "go for load");
 			
 			this.mBuildableBitmapTextureAtlas.load();
 		} catch (TextureAtlasBuilderException e) {
@@ -197,11 +197,11 @@ public class WarActivity extends SimpleBaseGameActivity implements
 				
 		try {
 			
-			Log.i("nwice", "load font");
+			Log.i("WarActivity", "load font");
 			
 			this.mFont = FontFactory.create(this.getFontManager(), this.getTextureManager(), 256, 256, TextureOptions.DEFAULT, Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 64, true, Color.WHITE_ABGR_PACKED_INT);
 
-			Log.i("nwice", "font loading");
+			Log.i("WarActivity", "font loading");
 			
 			this.mFont.load();
 			
@@ -213,15 +213,15 @@ public class WarActivity extends SimpleBaseGameActivity implements
 			
 			SoundFactory.setAssetBasePath("mfx/");
 			
-			Log.i("nwice", "load war sound");
+			Log.i("WarActivity", "load war sound");
 			
 			warSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "snippet2.mp3");
 			
-			Log.i("nwice", "load tba sound");
+			Log.i("WarActivity", "load tba sound");
 			
 			tbaSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "twos_beat_aces.wav");
 
-			Log.i("nwice", "load lgio sound");
+			Log.i("WarActivity", "load lgio sound");
 			
 			lgioSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "letsgetiton.mp3");			
 			
@@ -233,29 +233,29 @@ public class WarActivity extends SimpleBaseGameActivity implements
 	
 	private WarCardGame createWarCardGame() {
 
-		Log.i("nwice", "create local deck!");
+		Log.i("WarActivity", "create local deck!");
 		
 		Deck deck = new StandardDeck();
 		
-		Log.i("nwice", "shuffle deck");
+		Log.i("WarActivity", "shuffle deck");
 		
 		Util.shuffle(deck);
 		
-		Log.i("nwice", "create two piles");
+		Log.i("WarActivity", "create two piles");
 		
 		Collection<Card> computer_cards = Collections.synchronizedSet(new HashSet<Card>());
 		Collection<Card> human_cards = Collections.synchronizedSet(new HashSet<Card>());
 		
 		while (computer_cards.size() < 26 ) {
-			Log.i("nwice", "one for the computer:" + computer_cards.size());
+			Log.i("WarActivity", "one for the computer:" + computer_cards.size());
 			computer_cards.add( deck.getCards().remove(0) );
 		}
 			
-		Log.i("nwice", "the rest for the human");
+		Log.i("WarActivity", "the rest for the human");
 		
 		human_cards.addAll( deck.getCards() );
 		
-		Log.i("nwice", "split cards create game computer cards: " + computer_cards.size() + " human cards: " + human_cards.size());
+		Log.i("WarActivity", "split cards create game computer cards: " + computer_cards.size() + " human cards: " + human_cards.size());
 		
 		return new WarCardGame(computer_cards, human_cards, true); 
 		
@@ -310,23 +310,23 @@ public class WarActivity extends SimpleBaseGameActivity implements
 
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
-		Log.i("nwice", "newConfig:" + newConfig.toString());
+		Log.i("WarActivity", "newConfig:" + newConfig.toString());
 		super.onConfigurationChanged(newConfig);
 
 	}
 
 	public boolean onSceneTouchEvent(final Scene pScene, TouchEvent pSceneTouchEvent) {
-		Log.i("nwice", "scene touch event:" + pSceneTouchEvent.toString() + " action:" + pSceneTouchEvent.getAction());
+		Log.i("WarActivity", "scene touch event:" + pSceneTouchEvent.toString() + " action:" + pSceneTouchEvent.getAction());
 		
 		/*
 		switch (mEngine.getEngineOptions().getScreenOrientation()) {
 		case LANDSCAPE_SENSOR:
-			Log.i("nwice", "LANDSCAPE_SENSOR");
+			Log.i("WarActivity", "LANDSCAPE_SENSOR");
 			//mScreenOrientation = ScreenOrientation.PORTRAIT_SENSOR;
 			//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 			break;
 		case PORTRAIT_SENSOR:
-			Log.i("nwice", "PORTRAIT_SENSOR");
+			Log.i("WarActivity", "PORTRAIT_SENSOR");
 			//mScreenOrientation = ScreenOrientation.LANDSCAPE_SENSOR;
 			//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 			break;
@@ -352,7 +352,7 @@ public class WarActivity extends SimpleBaseGameActivity implements
 						}
 	        		}
 
-	        		Log.i("nwice", "pScene:" + pScene.toString());
+	        		Log.i("WarActivity", "pScene:" + pScene.toString());
 	        		
 	        		try {
 	        		
@@ -682,7 +682,7 @@ public class WarActivity extends SimpleBaseGameActivity implements
 		        		
 		        		try {
 		        			
-		        			Log.i("nwice", "score create text and attach and add to activeelements");
+		        			Log.i("WarActivity", "score create text and attach and add to activeelements");
 		        			
 		        			Text score = new Text(100, 100, mFont, warCardGame.getComputerScore() , new TextOptions(HorizontalAlign.LEFT), getVertexBufferObjectManager());
 		        			score.setColor(Color.WHITE);

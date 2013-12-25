@@ -1,17 +1,16 @@
 package com.nwice.card;
 
-import com.nwice.card.R;
-
-import android.os.Bundle;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 public class BlackjackActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+    	Log.i("BlackjackActivity", "onCreate");
         super.onCreate(savedInstanceState);
         
         

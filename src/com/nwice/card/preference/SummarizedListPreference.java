@@ -10,18 +10,22 @@ public class SummarizedListPreference extends ListPreference {
 	public SummarizedListPreference(Context context) {
 		super(context);
 	}
+	
 	public SummarizedListPreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
 	
     @Override
     public void setValue(final String value) {
+    	Log.i("SummarizedListPreference", "value:" + value);
     	if ( getValue() == null || !getValue().equals(value) ) {
     		super.setValue(value);
-    		Log.i("nwice", "set summary to:" + value);
+    		Log.i("SummarizedListPreference", "set summary to:" + value);
     		setSummary(value);
     		notifyChanged();
-    	}    			       
+    	} else {
+    		Log.i("SummarizedListPreference", "not changed or null");
+    	}
     }
 	
 }

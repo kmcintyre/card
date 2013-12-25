@@ -1,10 +1,7 @@
 package com.nwice.card;
 
-import com.nwice.card.R;
-
-import android.os.Bundle;
 import android.app.Activity;
-import android.view.Menu;
+import android.os.Bundle;
 
 public class DeckActivity extends Activity {
 
