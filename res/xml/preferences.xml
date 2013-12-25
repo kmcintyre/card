@@ -8,26 +8,34 @@
         	android:entryValues="@array/settings_deck_types"
         	android:defaultValue="@string/settings_deck_default"	         
         />              
+
+        <com.nwice.card.preference.SummarizedListPreference 
+            android:key="settings_login"
+            android:title="@string/settings_login" 
+        	android:entries="@array/settings_login_types"
+        	android:entryValues="@array/settings_login_types"
+        	android:defaultValue="@string/settings_login_default"	         
+        />
         
 		<CheckBoxPreference 		    
 		    android:key="settings_connect"
             android:title="@string/settings_connect"
-            android:defaultValue="true"            
             android:summary="@string/settings_connect_summary"
+            android:defaultValue="@string/settings_connect_default"
             />        
         
 		<CheckBoxPreference 
 		    android:key="settings_sound"
             android:title="@string/settings_sound"
-            android:defaultValue="true"            
             android:summary="@string/settings_sound_summary"
+            android:defaultValue="@string/settings_sound_default"
             />
 
 		<CheckBoxPreference 
             android:key="settings_explicit"
             android:title="@string/settings_explicit"
-            android:defaultValue="false"            
             android:summary="@string/settings_explicit_summary"
+            android:defaultValue="@string/settings_explicit_default"
             />		
 
 </PreferenceScreen>

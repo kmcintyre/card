@@ -13,10 +13,17 @@
         android:showAsAction="ifRoom"
         android:title="@string/menu_login"
         />    
+
+    <item
+        android:id="@+id/menu_multi"
+        android:orderInCategory="103"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_multi"
+        />
     
     <item 
         android:id="@+id/menu_settings" 
-        android:orderInCategory="103" 
+        android:orderInCategory="104" 
         android:showAsAction="never" 
         android:title="@string/menu_settings"         
     />

@@ -50,14 +50,14 @@
   	$('#deck').append('<img class="card" src="/deck/' + data.card + data.suite  + '.png">');
   }  
   function card(evt, data) {
-  	$('#card').append('<img class="card" src="/deck/' + data.card + data.suite  + '.png">');
+  	$('#card').append('<br><img class="card" src="/deck/' + data.card + data.suite  + '.png">');
   }
   function user(evt, data) {
   	if ( data.nickname == $('#nickname').data("whoami") ) {
   		$('#users').append('<div><b><i>Me</i></b><hr></div>');
   		$('#nickname').html( '<b><i>' + data.nickname + '</i></b>' );	
   	} else {
-  		$('#users').append('<div>Me' + data.nickname + '</div>');
+  		$('#users').append('<div>' + data.nickname + '</div>');
   	}
   }
   

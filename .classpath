@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="libs/autobahn-android-0.5.2-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="libs/jackson-core-asl-1.9.7.jar"/>
 	<classpathentry kind="lib" path="libs/jackson-mapper-asl-1.9.7.jar"/>
+	<classpathentry kind="lib" path="libs/js-1.7R2.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
