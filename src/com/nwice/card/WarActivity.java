@@ -80,8 +80,6 @@ public class WarActivity extends SimpleBaseGameActivity implements
 	
 	private static int mCameraWidth;
 	private static int mCameraHeight;
-
-	
 	
 	private Font mFont;
 	
@@ -265,19 +263,18 @@ public class WarActivity extends SimpleBaseGameActivity implements
 		
 		Log.e("nwice", "create splash text" );
 		
-		Text text = new Text(100, 100, this.mFont, "F#ck you, it's WAR!", new TextOptions(HorizontalAlign.LEFT), getVertexBufferObjectManager());
-		
-		Log.e("nwice", "set color white" );
+		Text text = new Text(0, 50, this.mFont, "WAR!", new TextOptions(HorizontalAlign.LEFT), getVertexBufferObjectManager());
+		text.setPosition((WarActivity.mCameraWidth - text.getWidth()) / 2, 50);
 		
 		text.setColor(Color.WHITE);
-		
-		Log.e("nwice", "attached splash text" );
-		
-		scene.attachChild(text);
-		
-		Log.e("nwice", "add splash text to active elements" );
-		
+		scene.attachChild(text);		
 		this.activeElements.add(text);
+
+		Text text2 = new Text(WarActivity.mCameraWidth / 2, 500, this.mFont, "(touch to start)", new TextOptions(HorizontalAlign.CENTER), getVertexBufferObjectManager());
+		text2.setPosition((WarActivity.mCameraWidth - text2.getWidth()) / 2, 500);
+		scene.attachChild(text2);		
+		this.activeElements.add(text2);
+		
 		
 		Log.e("nwice", "create splash sprite" );
 		

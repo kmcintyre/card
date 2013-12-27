@@ -1,4 +1,4 @@
-define(["jquery", "util", "war", "deck"], function($, util, war, deck) {
+define(["jquery", "cardutil", "war", "deck"], function($, cardutil, war, deck) {
 
 	var d = new deck();
 	var cardcounter = 0;
@@ -8,7 +8,7 @@ define(["jquery", "util", "war", "deck"], function($, util, war, deck) {
 
 	$(function() {
 
-	  d.cards = util.shuffle(d.cards);
+	  d.cards = cardutil.shuffle(d.cards);
 	
 	  $(window).resize(function() {
 		$("#cardlink").css("width", card_width );
@@ -31,7 +31,7 @@ define(["jquery", "util", "war", "deck"], function($, util, war, deck) {
 	  
 	  function changeCards() {
 	  	if ( cardcounter > 51 ) {
-	  		d.cards = util.shuffle(d.cards);
+	  		d.cards = cardutil.shuffle(d.cards);
 	  		cardcounter = 0;  		
 	  	}
 	  	

@@ -21,7 +21,7 @@ public class ConnectIntentService extends IntentService {
 	
 	public static final String ACTION_CONNECT = "connect";
 	public static final String ACTION_DISCONNECT = "disconnect";
-
+	
 	final WebSocket mConnection = new WebSocketConnection();
 	
 	public ConnectIntentService() {
@@ -35,9 +35,6 @@ public class ConnectIntentService extends IntentService {
 		if ( intent.getAction().equals(ACTION_CONNECT) ) {
 			Log.i("ConnectIntentService", "connect");
 			connect(intent);
-		} else if ( intent.getAction().equals(ACTION_DISCONNECT) ) {
-			Log.i("ConnectIntentService", "disconnect");
-			mConnection.disconnect();			
 		}
 	}
 	

@@ -19,7 +19,7 @@
 }
 </style>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
 <script language="javascript" type="text/javascript">
 
@@ -42,16 +42,21 @@
   		console.error("SEND ERROR:" + err);
   	}  	
   }
+   
+  function bet(evt, data) {
+    console.info('show bet');  	
+  	$("#bet > .betmin").html("Min:" + data.min);
+  	$("#bet > .betmax").html("Max:" + data.max);
+  }   
     
   function msg(evt, data) {  	
   	$("#msg").html("<p>" + data.txt + "</p>");
   }
-  function deck(evt, data) {
-  	$('#deck').append('<img class="card" src="/deck/' + data.card + data.suite  + '.png">');
-  }  
+  
   function card(evt, data) {
   	$('#card').append('<br><img class="card" src="/deck/' + data.card + data.suite  + '.png">');
   }
+  
   function user(evt, data) {
   	if ( data.nickname == $('#nickname').data("whoami") ) {
   		$('#users').append('<div><b><i>Me</i></b><hr></div>');
@@ -63,10 +68,10 @@
   
   $(function() {
   
+    $(document).bind("bet", bet);
 	$(document).bind("msg", msg);
 	$(document).bind("card", card);
 	$(document).bind("user", user);				
-	$(document).bind("deck", deck);
 
 	$('#connect').click( function() {
 		if ( cardsocket == null || ( cardsocket.readyState == 0 || cardsocket.readyState == 3 )) {
@@ -78,9 +83,8 @@
 			};
 			websocket.onclose = function(evt) { console.info('DISCONNECT'); $('#connect').html( 'connect' ); };
 			websocket.onmessage = function(evt) { onMessage(evt) };
-			websocket.onerror = function(evt) { console.error("cardsocket ERROR:" + evt.data) };
-						
-			cardsocket = websocket;							
+			websocket.onerror = function(evt) { console.error("cardsocket ERROR:" + evt.data) };						
+			cardsocket = websocket;						
 		} else {
 			$('#connect').html( 'disconnect' );
 			cardsocket.close();	
@@ -92,13 +96,26 @@
 		send( {"type": "nickname", "nickname": nick } );
 		$('#nickname').data("whoami", nick); 				 
 	});
+
+	$('#sendbutton').click( function() {				
+		console.info('send:' + $('#send').val() );
+		cardsocket.send(JSON.stringify( $('#send').val() )); 				 
+	});	
+
+	$('#betbutton').click( function(event) {	
+		event.preventDefault();	
+		console.info( 'betting:' + parseInt($('#betvalue').val()) );				
+		send( { "type" : "bet", "value": parseInt($('#betvalue').val()) } ); 				 
+	});	
 	
 	if ( $('#autoconnect').is(':checked') ) {
 		$('#connect').click();
 	}	
 });
-
 </script>
+<body>
+
+<a href="card.html">card</a> | <a href="deck.html">deck</a> | <a href="shoe.html">shoe</a> | <a href="table.html">table</a>
 
 <div class="simple">
 	<div>
@@ -112,26 +129,24 @@
 		Auto-login <input type="checkbox" id="autologin" name="autologin"/> <button id="nickname">nickname</button>
 	</div>			
 	<div id="msg" class="simple2"></div>
-</div>
-
-
-
-<div class="simple">
-	<b>USERS</b>
-	<div id="users"></div>
+	<input type="text" id="send">
+	<input type="button" id="sendbutton" value="send">
 </div>
 
 <div class="simple">
-	<b>DECK</b>
-	<div id="deck">
-	</div>
+	<b>Tourney</b>
+	<div id="tourney"></div>
 </div>
 
-<div class="simple">
-	<b>CARD</b>
-	<div id="card">
-	</div>
-</div>		
-
-
+<div class="simple" style="clear:both">
+	<b>TABLE</b>
+	<div id="bet">
+		<span class="betmin"></span>
+		<span class="betmax"></span>
+		bet: <input type="text" id="betvalue" size="4">
+		<input type="button" id="betbutton" value="place bet"/>
+	</div>	
+	<div id="hand"></div>	
+</div>
+</body>
 </html> 

@@ -1,4 +1,4 @@
-define(["util", "deck", "card"], function(util, deck, card) {
+define(["cardutil", "deck", "card"], function(cardutil, deck, card) {
 
 	warValues = {"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"10":10,"J":11,"Q":12,"K":13,"A":14};
 	
@@ -28,7 +28,7 @@ define(["util", "deck", "card"], function(util, deck, card) {
 	warplayer.prototype.gatherwinpile = function(size) {
 		var temp = this.winpile.splice(0, this.winpile.length);			
 		if ( this.shufflewinpile ) {
-			this.playpile = util.shuffle(temp);
+			this.playpile = cardutil.shuffle(temp);
 		} else {
 			//this.playpile = temp.reverse();
 			this.playpile = temp;
@@ -60,7 +60,7 @@ define(["util", "deck", "card"], function(util, deck, card) {
 	    this.props = props;
 	    this.stats = { "battles" : 0, "war1" : 0, "war2" : 0, "war3" : 0, "war4" : 0, "war5" : 0, "war6" : 0, "war7" : 0, "war8" : 0, "war9" : 0 };
 	    d = new deck(); 
-	    d.cards = util.shuffle(d.cards);
+	    d.cards = cardutil.shuffle(d.cards);
 	    this.players = { 
 	    	"player1": new warplayer(d.cards.splice(0,26), props["shufflewinpile"]), 
 	    	"player2": new warplayer(d.cards.splice(0,26), props["shufflewinpile"]) 

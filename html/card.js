@@ -4,8 +4,12 @@ define(function() {
 	var suitorder = new Array("S","H","C","D");
 
     function card(c) {
-		this.suite = suitorder[ Math.floor( c / 13 ) ];
-		this.card = cardorder[ Math.floor( c % 13 ) ]; 
+    	try {
+    		this.suite = suitorder[ Math.floor( c / 13 ) ];
+    		this.card = cardorder[ Math.floor( c % 13 ) ];
+    	} catch (err) {
+    		console.error('error:' + err);
+    	}
     };
     
     card.prototype.toString = function() {

@@ -31,10 +31,41 @@ public class ConnectFragment extends Fragment {
 		public void onReceive(Context context, Intent intent) {
 			Log.i("ConnectFragment", "onReceive" + intent);
 			if ( intent.getExtras().getString(ConnectIntentService.NOTIFICATION_CONNECT) != null ) {
-				mStart.setText("Disconnect");
+				connected();
+			} else if ( intent.getExtras().getString(ConnectIntentService.NOTIFICATION_DISCONNECT) != null ) {
+				disconnected();
 			}
 		}
 	};	
+	
+	public void connected() { 
+		mStart.setText("Disconnect");
+		mHostname.setEnabled(false);
+		mPort.setEnabled(false);
+	   	mStart.setOnClickListener(new View.OnClickListener() {
+             public void onClick(View v) {
+            	Log.i("ConnectFragment", "calling disconnect");
+     			Intent disconnect = new Intent(getActivity(), ConnectIntentService.class);
+     			disconnect.setAction(ConnectIntentService.ACTION_DISCONNECT);
+    			getActivity().startService( disconnect );
+             }
+        });
+	}
+	
+	public void disconnected() { 
+		mStart.setText("Connect");
+		mHostname.setEnabled(true);
+		mPort.setEnabled(true);
+	   	mStart.setOnClickListener(new View.OnClickListener() {
+             public void onClick(View v) {
+            	 Log.i("ConnectFragment", "calling connect");
+             	Log.i("ConnectFragment", "calling disconnect");
+      			Intent connect = new Intent(getActivity(), ConnectIntentService.class);
+     			connect.setAction(ConnectIntentService.ACTION_CONNECT);
+     			getActivity().startService( connect );            	 
+             }
+        });
+	}
 
 	@Override
 	public void onStop() {
@@ -71,8 +102,9 @@ public class ConnectFragment extends Fragment {
      mStart.setText(MainActivity.mMenu.findItem(R.id.menu_connect).getTitle());
      
      if ( MainActivity.mMenu.findItem(R.id.menu_connect).getTitle().toString().equalsIgnoreCase("disconnect") ) {
-    	 mHostname.setEnabled(false);
-    	 mPort.setEnabled(false);
+    	 connected();
+     } else {
+    	 disconnected();
      }
      
      mAutoConnect.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
