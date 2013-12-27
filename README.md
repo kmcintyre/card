@@ -5,6 +5,10 @@ Project to teach myself client/server javascript, websockets, Android SDK, and H
 
 Log:
 
+Day 20 - 40:
+
+Starting to add blackjack.  The trick to have it run as a simulation and also as a turn based game
+
 Day 17 - 20:
 
 Using <a href="http://requirejs.org/">requirejs</a> to allow for use of javascript library on both node and client.
