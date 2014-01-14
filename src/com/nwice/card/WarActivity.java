@@ -175,7 +175,7 @@ public class WarActivity extends SimpleBaseGameActivity implements
 			Log.i("WarActivity", "done with back");
 			
 		} catch (Exception e) {
-			Log.e("nwice", "Error loading card:" + e.toString());
+			Log.e("WarActivity", "Error loading card:" + e.toString());
 		}
 		
 		try {
@@ -190,7 +190,7 @@ public class WarActivity extends SimpleBaseGameActivity implements
 			
 			this.mBuildableBitmapTextureAtlas.load();
 		} catch (TextureAtlasBuilderException e) {
-			Log.e("nwice", "exception:" + e);
+			Log.e("WarActivity", "BlackPawnTextureAtlasBuilder exception:", e);
 		}		
 				
 		try {
@@ -204,7 +204,7 @@ public class WarActivity extends SimpleBaseGameActivity implements
 			this.mFont.load();
 			
 		} catch (Exception e) {
-			Log.e("nwice", e.toString());
+			Log.e("WarActivity", "load font error", e);
 		}		
 		
 		try {
@@ -224,7 +224,7 @@ public class WarActivity extends SimpleBaseGameActivity implements
 			lgioSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "letsgetiton.mp3");			
 			
 		} catch (Exception e) {
-				Log.e("nwice", "Error with sound:" + e.toString());			
+				Log.e("WarActivity", "Error with sound:" + e.toString());			
 		}	
 		
 	}
@@ -261,7 +261,7 @@ public class WarActivity extends SimpleBaseGameActivity implements
 
 	public void splash(Scene scene) {
 		
-		Log.e("nwice", "create splash text" );
+		Log.d("WarActivity", "splash" );
 		
 		Text text = new Text(0, 50, this.mFont, "WAR!", new TextOptions(HorizontalAlign.LEFT), getVertexBufferObjectManager());
 		text.setPosition((WarActivity.mCameraWidth - text.getWidth()) / 2, 50);
@@ -275,33 +275,23 @@ public class WarActivity extends SimpleBaseGameActivity implements
 		scene.attachChild(text2);		
 		this.activeElements.add(text2);
 		
-		
-		Log.e("nwice", "create splash sprite" );
-		
 		Sprite sprite = new Sprite((WarActivity.mCameraWidth - WarActivity.cardWidth) / 2, 200, WarActivity.cardWidth,
 				WarActivity.cardHeight, mCardTextureRegions[52], getVertexBufferObjectManager());
 		
-		Log.e("nwice", "attachChild splash sprite" );
-		
 		scene.attachChild(sprite);
-		
-		Log.e("nwice", "add splash sprite to active elements" );
-		
+				
 		this.activeElements.add(sprite);
 	}
 	
 	@Override
 	public Scene onCreateScene() {
-		Log.d("nwice", "onCreateScene" );
+		
+		Log.d("WarActivity", "onCreateScene" );
 		
 		Scene scene = new Scene();
-
-		Log.d("nwice", "setup listener" );
-		
 		scene.setOnSceneTouchListener(this);
 		
 		this.splash(scene);
-		
 		return scene;
 	}
 
@@ -340,12 +330,12 @@ public class WarActivity extends SimpleBaseGameActivity implements
 	        				
 	        				Object o = activeElements.remove(0);
 	        				
-	        				Log.e("nwice", "Attempt remove active element:" + o.toString());
+	        				Log.d("WarActivity", "Attempt remove active element:" + o.toString());
 	        				
 	        				pScene.detachChild((IEntity)o);
 	        				
 	        			} catch (Exception e) {
-	        				Log.e("nwice", "Oh shit! Can't clear activeElements:" + e.toString() );
+	        				Log.e("WarActivity", "Oh shit! Can't clear activeElements:" + e.toString() );
 						}
 	        		}
 
@@ -356,10 +346,10 @@ public class WarActivity extends SimpleBaseGameActivity implements
 		        		if ( !started ) {
 		        			
 		        			try {			
-		        				Log.e("nwice", "play lgioSound is loaded:" + lgioSound.isLoaded() );
+		        				Log.d("WarActivity", "play lgioSound is loaded:" + lgioSound.isLoaded() );
 		        				lgioSound.play();
 		        			} catch(Exception e) {
-		        				Log.e("nwice", "failed to play sound:" + e.toString() );
+		        				Log.e("WarActivity", "failed to play sound:" + e.toString() );
 		        			}
 		        			
 		        			started = true;
@@ -393,7 +383,7 @@ public class WarActivity extends SimpleBaseGameActivity implements
 		        			
 		        			if ( c == null ) {		        				
 		        			
-		        				Log.e("nwice", "Oh fuck we've got nullage" );		        				
+		        				Log.e("WarActivity", "Oh shit! we've got nullage" );		        				
 		        				throw new CatsGameException();		        				
 		        			
 		        			} 
@@ -507,7 +497,7 @@ public class WarActivity extends SimpleBaseGameActivity implements
 		        			
 		        			if ( h == null ) {		        				
 		        			
-		        				Log.e("nwice", "Oh fuck we've got nullage" );		        				
+		        				Log.e("WarActivity", "Oh shit! we've got nullage" );		        				
 		        				throw new CatsGameException();		        				
 		        			
 		        			} 
@@ -616,8 +606,8 @@ public class WarActivity extends SimpleBaseGameActivity implements
 		        			}
 		        			
 		        			
-		        			Log.e("nwice", "computer war card:" + cwc.getNumber() + cwc.getSuite() );
-		        			Log.e("nwice", "human war card:" + hwc.getNumber() + hwc.getSuite() );
+		        			Log.i("WarActivity", "computer war card:" + cwc.getNumber() + cwc.getSuite() );
+		        			Log.i("WarActivity", "human war card:" + hwc.getNumber() + hwc.getSuite() );
 
 		        			checkWar(cwc, hwc);
 		        				            	
@@ -629,7 +619,7 @@ public class WarActivity extends SimpleBaseGameActivity implements
 		        				throw new HumanWinnerException();
 		        			}
 		        			
-		        			Log.e("nwice", "Got computer card:" + Util.getSVGFileName(c) );
+		        			Log.i("WarActivity", "Got computer card:" + Util.getSVGFileName(c) );
 		            		Integer cardOne = deckMap.get(Util.getSVGFileName(c));
 
 		            		Card c2 = warCardGame.getHumanCard();
@@ -638,12 +628,10 @@ public class WarActivity extends SimpleBaseGameActivity implements
 		        				throw new ComputerWinnerException();
 		        			}
 		            		
-		        			Log.e("nwice", "Got human card:" + Util.getSVGFileName(c2) );
+		        			Log.i("WarActivity", "Got human card:" + Util.getSVGFileName(c2) );
 		            		Integer cardTwo = deckMap.get(Util.getSVGFileName(c2));	        			
 		            		
-		            		Log.e("nwice", "interesting:" + cardOne.toString() + "-" + cardTwo.toString() );
-	
-		            		Log.e("nwice", "create card one sprite" );
+		            		Log.d("WarActivity", "card one sprite" );
 		            		
 		            		Sprite sprite = new Sprite(
 		            				(WarActivity.mCameraWidth - WarActivity.cardWidth) / 2, 
@@ -652,25 +640,17 @@ public class WarActivity extends SimpleBaseGameActivity implements
 		            				WarActivity.cardHeight, 
 		            				mCardTextureRegions[cardOne.intValue()], getVertexBufferObjectManager());
 		            		
-		            		Log.e("nwice", "attachChild card one sprite" );
+		            		
 	
-		            		pScene.attachChild(sprite);
-		            		
-		            		Log.e("nwice", "add card one sprite to active elements" );
-		            		
+		            		pScene.attachChild(sprite);		            		
 		            		activeElements.add(sprite);
 		            		
-		            		Log.e("nwice", "create card two sprite" );
+		            		Log.d("WarActivity", "card two sprite" );
 		            		
 		            		Sprite sprite2 = new Sprite((WarActivity.mCameraWidth - WarActivity.cardWidth) / 2, (WarActivity.mCameraHeight - WarActivity.cardHeight + (2 * WarActivity.cardHeight)) / 2, WarActivity.cardWidth,
 		            				WarActivity.cardHeight, mCardTextureRegions[cardTwo.intValue()], getVertexBufferObjectManager());
 		            		
-		            		Log.e("nwice", "attachChild card two sprite" );
-		            		
 		            		pScene.attachChild(sprite2);
-		            		
-		            		Log.e("nwice", "add card two sprite to active elements" );
-		            		
 		            		activeElements.add(sprite2);
 		            		
 		            		checkWar(c, c2);
@@ -698,7 +678,7 @@ public class WarActivity extends SimpleBaseGameActivity implements
 		        			activeElements.add(score2);
 		        			
 	        			} catch (Exception e) {
-	        				Log.e("nwice", "Oh shit! Can't show score maybe no warCardGame:" + e.toString() );
+	        				Log.e("WarActivity", "Ut-oh! Can't show score maybe no warCardGame:" + e.toString() );
 						}
 		        		
 	        		} catch (HumanWinnerException e) {
@@ -708,7 +688,7 @@ public class WarActivity extends SimpleBaseGameActivity implements
 	        			pScene.attachChild(hw);
 	        			activeElements.add(hw);	        			
 	        			
-	        			gameOver = true;	        			
+	        			gameOver = true;			
 					} catch (ComputerWinnerException e) {
 						
 						Text cw = new Text(100, mCameraHeight / 2, mFont, "Computer Wins!", new TextOptions(HorizontalAlign.LEFT), getVertexBufferObjectManager());
@@ -734,20 +714,20 @@ public class WarActivity extends SimpleBaseGameActivity implements
 
 	private void checkWar(Card computer, Card human) {
 
-		Log.e("nwice", "add cards to pile" );
+		Log.d("WarActivity", "add cards to pile" );
 		
 		warCardGame.getWarPile().add(computer);
 		warCardGame.getWarPile().add(human);
 		
 		if ( computer.getNumber() == human.getNumber() ) {
 			
-			Log.e("nwice", "war!" );
+			Log.i("WarActivity", "war!" );
 			
 			try {			
-				Log.e("nwice", "play warSound is loaded:" + warSound.isLoaded() );
+				Log.d("WarActivity", "play warSound is loaded:" + warSound.isLoaded() );
 				warSound.play();
 			} catch(Exception e) {
-				Log.e("nwice", "failed to play sound:" + e.toString() );
+				Log.e("WarActivity", "failed to play sound:" + e.toString() );
 			}
 			
 			atWar = true;
@@ -758,42 +738,31 @@ public class WarActivity extends SimpleBaseGameActivity implements
 			
 			if ( computer.getNumber().equals(CardNumber.TWO) && human.getNumber().equals(CardNumber.ACE) ) {
 				try {			
-					Log.e("nwice", "play tbaSound is loaded:" + tbaSound.isLoaded() );
+					Log.i("WarActivity", "play tbaSound is loaded:" + tbaSound.isLoaded() );
 					tbaSound.play();
 				} catch(Exception e) {
-					Log.e("nwice", "failed to play sound:" + e.toString() );
+					Log.e("WarActivity", "failed to play sound:" + e.toString() );
 				}
 				
 				warCardGame.computerWinner();
 				
 			} else if ( human.getNumber().equals(CardNumber.TWO) && computer.getNumber().equals(CardNumber.ACE) ) {
 				try {			
-					Log.e("nwice", "play tbaSound is loaded:" + tbaSound.isLoaded() );
+					Log.i("WarActivity", "play tbaSound is loaded:" + tbaSound.isLoaded() );
 					tbaSound.play();
 				} catch(Exception e) {
-					Log.e("nwice", "failed to play sound:" + e.toString() );
-				}
-				
-				warCardGame.humanWinner();
-				
-			} else if ( Util.getCardValue(computer) > Util.getCardValue(human) ) {
-				
-				Log.e("nwice", "computer wins!" );
-				
-				warCardGame.computerWinner();
-				
-			} else {
-				
-				Log.e("nwice", "human wins!" );
-				
-				warCardGame.humanWinner();
-				
-			}
-			
-			Log.e("nwice", warCardGame.getSummary() );
-			
-		}
-		
+					Log.e("WarActivity", "failed to play sound:" + e.toString() );
+				}				
+				warCardGame.humanWinner();				
+			} else if ( Util.getCardValue(computer) > Util.getCardValue(human) ) {				
+				Log.i("WarActivity", "computer wins!" );				
+				warCardGame.computerWinner();				
+			} else {			
+				Log.i("WarActivity", "human wins!" );				
+				warCardGame.humanWinner();				
+			}			
+			Log.i("WarActivity", warCardGame.getSummary() );			
+		}		
 	}
 		
 }

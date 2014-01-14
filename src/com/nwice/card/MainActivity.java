@@ -25,15 +25,18 @@ public class MainActivity extends Activity {
 	private BroadcastReceiver receiver = new BroadcastReceiver() {		
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			
 			Log.i("MainActivity", "onReceive");
 			if ( intent.getExtras().getString(ConnectIntentService.NOTIFICATION_CONNECT) != null ) {
 	    		MainActivity.mMenu.findItem(R.id.menu_connect).setTitle("Disconnect");
 	    		//MainActivity.mMenu.findItem(R.id.menu_connect).setEnabled(true);
 	    		//Toast.makeText(MainActivity.this, "connected", Toast.LENGTH_LONG).show();
 			} else if ( intent.getExtras().getString(ConnectIntentService.NOTIFICATION_DISCONNECT) != null ) {
+				MainActivity.mMenu.findItem(R.id.menu_connect).setTitle("Connect");
 				Toast.makeText(MainActivity.this, "disconnected!", Toast.LENGTH_LONG).show();
 			}
 		}
+		
 	};
 	
 	@Override

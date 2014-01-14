@@ -28,8 +28,7 @@ public class LoginFragment extends Fragment {
 	   Log.d("LoginFragment", "onCreateView");	   
 	   View view = inflater.inflate(R.layout.fragment_login, container, false);
 	   LoginButton authButton = (LoginButton) view.findViewById(R.id.authButton);
-	   authButton.setReadPermissions(Arrays.asList("basic_info"));
-	   
+	   authButton.setReadPermissions(Arrays.asList("basic_info"));	   
 	   /*
 	   Log.i("MainActivity", "openActiveSession");
 	   Session.openActiveSession(this.getActivity(), true, new Session.StatusCallback() {

@@ -10,7 +10,9 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -32,6 +34,10 @@ public class ConnectFragment extends Fragment {
 			Log.i("ConnectFragment", "onReceive" + intent);
 			if ( intent.getExtras().getString(ConnectIntentService.NOTIFICATION_CONNECT) != null ) {
 				connected();
+				Editor edit = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+	    		   edit.putString("settings_port", mPort.getText().toString().toString());
+	    		   edit.putString("settings_hostname", mHostname.getText().toString().toString());
+	    		   edit.apply();				
 			} else if ( intent.getExtras().getString(ConnectIntentService.NOTIFICATION_DISCONNECT) != null ) {
 				disconnected();
 			}
@@ -43,11 +49,11 @@ public class ConnectFragment extends Fragment {
 		mHostname.setEnabled(false);
 		mPort.setEnabled(false);
 	   	mStart.setOnClickListener(new View.OnClickListener() {
-             public void onClick(View v) {
+             public void onClick(View v) {            	
             	Log.i("ConnectFragment", "calling disconnect");
      			Intent disconnect = new Intent(getActivity(), ConnectIntentService.class);
      			disconnect.setAction(ConnectIntentService.ACTION_DISCONNECT);
-    			getActivity().startService( disconnect );
+    			getActivity().startService(disconnect);
              }
         });
 	}
@@ -58,8 +64,7 @@ public class ConnectFragment extends Fragment {
 		mPort.setEnabled(true);
 	   	mStart.setOnClickListener(new View.OnClickListener() {
              public void onClick(View v) {
-            	 Log.i("ConnectFragment", "calling connect");
-             	Log.i("ConnectFragment", "calling disconnect");
+            	Log.i("ConnectFragment", "calling connect");
       			Intent connect = new Intent(getActivity(), ConnectIntentService.class);
      			connect.setAction(ConnectIntentService.ACTION_CONNECT);
      			getActivity().startService( connect );            	 
@@ -116,7 +121,7 @@ public class ConnectFragment extends Fragment {
     		   edit.apply();
     	   }
      });
-
+    
      return view;
    }
    
