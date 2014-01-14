@@ -1,0 +1,11 @@
+.seat {
+	float:right;
+}
+
+.seat:first-child {
+   background-color: blue;
+}
+
+.hand > img {
+    width:50px;
+}

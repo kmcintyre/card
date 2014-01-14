@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+<head>
+<title>Nwice - Card</title>
+
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+<meta name="description"
+	content="Splash page for my multi-player android/HTML5 card application">
+
+<style>
+html {
+	height: 100%;
+}
+
+body {
+	min-height: 95%;
+}
+
+h3:first-letter {
+	font-size: 150%;
+}
+
+.card {
+	position: absolute;
+	display: none;
+}
+
+.bigred {
+	font-size: 1.5em;
+	text-decoration: underline;
+	color: red
+}
+
+#cardtable { //
+	border: 1px dashed red;
+	position: absolute;
+	top: 20px;
+	right: 20px;
+}
+
+#hidden_card {
+	display: none;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+
+#feelings,#mutual {
+	display: none;
+	position: absolute;
+	cursor: pointer;
+}
+
+#cardlink {
+	cursor: pointer;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	border: 1px solid #000;
+}
+
+#welcome {
+	position: absolute;
+	top: 40px;
+	left: 40px;
+}
+
+#credits {
+	position: absolute;
+	margin:20px;
+	bottom: 0px;
+	left: 0px;
+}
+</style>
+
+<script data-main="index" src="require.js"></script>
+
+</head>
+<body>
+
+	<div id="welcome">
+		<div id="cardlink">
+			<h3 style="margin: 15px">
+				Have you ever <span style="color: red">hated</span> your mobile
+				handheld wireless communication entertainment device so much that
+				you wanted to declare <span style="color: red">war</span>?!				
+			</h3>
+			<div align="center">
+				<button style="font-size:1.5em;padding:5px">DEAL<span style="color: red;margin-left:5px">>></span></button>
+			</div>
+		</div>
+	</div>
+
+	<div id="cardtable">
+		
+		<div id="cards">
+			<img class="card" id="bottom_card">
+			<img class="card" id="middle_card">
+			<img class="card" id="top_card">
+			<img class="card" id="extra_card">
+		</div>
+
+		<div id="feelings">
+			<h1>
+				<span class="bigred">Feelings</span>
+			</h1>
+		</div>
+
+		<div id="mutual">
+			<h1>
+				<span class="bigred">Mutual</span>
+			</h1>
+		</div>
+	</div>
+
+	<div id="credits">
+		<div style="margin-right:20px;float:left">
+			<h3>By:</h3>
+			<p>
+				<a href="mailto:kebin70@gmail.com">Kevin McIntyre</a>
+			</p>
+			<p>
+				<a href="mp.html">Multi-player</a><br>
+				<a href="war.html">HTML version</a><br>
+				<a href="automate.html">Automated</a><br>
+				<a href="margrave.html">Matching pairs</a>
+			</p>		
+			<p>
+				<a href="https://github.com/kmcintyre/card">Source code</a> at github
+			</p>
+		</div>
+		<div style="float:left">
+			<h3>Thanks:</h3>
+			<p>
+				<a href="http://www.andengine.org/">AndEngine</a><br>
+				<a
+					href="https://github.com/nicolasgramlich/AndEngineSVGTextureRegionExtension">AndEngineSVGTextureRegionExtension</a>
+				<br>
+				<a href="http://code.google.com/p/vectorized-playing-cards/">Vector
+					Playing Card Library 1.3</a>
+				<br>
+				<a href="http://requirejs.org/">requirejs</a>
+			</p>
+		</div>
+	</div>
+
+
+</body>
+
+</html>
