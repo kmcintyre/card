@@ -3,9 +3,12 @@ define(["deck"], function(deck) {
 	function shoe(number_of_decks) {
 		this.played = 0;
 		this.penetration = 0;
-		for (var i = 0; i < ( parseInt(number_of_decks) ? parseInt(number_of_decks) - 1 : 5 ); i++) {			
+		this.number_of_decks = (parseInt(number_of_decks) ? parseInt(number_of_decks) - 1 : 5);
+		for (var i = 0; i < this.number_of_decks; i++) {			
 			this.cards = this.cards.concat( new deck().cards );
 		}
+		this.penetration = parseInt(this.cards.length * this.number_of_decks / (this.number_of_decks + 1));
+		console.log('penetration:' + this.penetration);
 		this.shuffle();
 	}
 	

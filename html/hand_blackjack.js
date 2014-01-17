@@ -55,7 +55,7 @@ define(["card", "hand"], function(card, hand) {
 			opts[opts.length] = 'hit';						
 		}
 		opts[opts.length] = 'stay';
-		console.log('player options:' + opts);
+		//console.log('player options:' + opts);
 		return opts;
 	}	
 	

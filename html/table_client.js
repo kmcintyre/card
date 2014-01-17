@@ -4,7 +4,7 @@ define(function() {
 	
 	tablesocket.key = null;	
 	tablesocket.onopen = function(evt) { 
-		console.log('connect:'); 
+		console.log('connect:' + evt); 
 	};
 	tablesocket.onclose = function(evt) { console.log('disconnect:' + evt.code); };
 	tablesocket.onerror = function(evt) { console.log("error:" + evt) };
@@ -21,6 +21,7 @@ define(function() {
 			console.log('error?:' + err);
 			console.log('assuming swkey:' + evt.data);
 			document.cookie = "swkey=" + escape(evt.data);
+			console.log('did the cookie get set');
 		}
 	};
 	

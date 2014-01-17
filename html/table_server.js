@@ -25,7 +25,8 @@ t.addseat();
 t.addseat();
 t.addseat();
 t.addseat();
-t.addseat();
+//t.addseat();
+//t.addseat();
 
 var seats_clients = new Array(t.seats.length);
 var seats_swkeys = new Array(t.seats.length);
@@ -65,15 +66,19 @@ wss.tablecast = function() {
 					if ( f.seats[x] && f.seats[x].options && !verify(x, this.clients[i]) ) {
 						console.log('need to remove options');
 						delete f.seats[x].options;
-					} 
-					if ( f.seats[x] && f.seats[x].hand ) {
+					} 					
+					if ( f.seats[x] ) {
+						var splits = 0;
 						try {
-							f.seats[x].hand = { cards: f.seats[x].hand.cards, bet: f.seats[x].hand.bet, insurance: f.seats[x].hand.insurance   };							
+							while ( f.seats[x]['hand' + splits] ) {
+								var h = { cards: f.seats[x]['hand' + splits].cards, bet: f.seats[x]['hand' + splits].bet, insurance: f.seats[x]['hand' + splits].insurance   };								
+								f.seats[x]['hand' + splits] = h; 							
+								splits++;
+							}
 						} catch (err) {
-							console.log('no cards-' + err);
+							console.log('filter split error:' + err);
 						}
-					}
-					
+					}					
 				}
 				this.clients[i].send(JSON.stringify(f));
 			} else {
@@ -110,7 +115,7 @@ wss.on('connection', function(ws) {
 	}
 	
 	ws.sit = function(seat) {
-		console.info('client sit:' + seat);
+		console.info('client sit:' + seat + ' with key:' + swkey);
 		seats_clients[seat] = ws;
 		seats_swkeys[seat] = swkey;
 	}
@@ -119,7 +124,12 @@ wss.on('connection', function(ws) {
 		for (var x = 0; x < seats_clients.length; x++) {
 			if ( seats_clients[x] == ws ) {
 				console.info('client disconnect:' + t.json() );
-				this.stand(x);				
+				try {
+					t.act( { seat: x, action : 'stand'} );
+					this.stand(x);
+				} catch (err) {
+					console.log('disconnect but cannot stand:' + err);
+				}
 			}
 		}		 		
 		if (true) {
@@ -158,6 +168,7 @@ wss.on('connection', function(ws) {
     
     if ( ws.upgradeReq.headers['cookie'] && ws.upgradeReq.headers['cookie'].match( '(^|;) ?swkey=([^;]*)(;|$)' ) ) {
     	var previous_swkey = unescape( ws.upgradeReq.headers['cookie'].match( '(^|;) ?swkey=([^;]*)(;|$)' )[2] );
+    	console.log('previous_swkey:' + previous_swkey);
     	lost(previous_swkey, swkey, ws);
     }
     ws.send(swkey);
@@ -174,21 +185,11 @@ stdin.on('data', function(message) {
 var wait_a_bit = 0;
 
 dealer = function(delay) { 
-	t.options();
-	console.log('dealer options:' + t.seats[0].options);
-	if (t.seats[0].options.length == 2 && t.seats[0].options[1] == 'deal') {
-		if ( wait_a_bit < 4 ) {
-			wait_a_bit = wait_a_bit + 1;
-		} else {
-			wait_a_bit = 0
-			t.act( { action: 'deal', seat: 0 } );
-			wss.tablecast();
-		}
-	} else if (t.seats[0].options.length == 1  ) {
-		if ( t.seats[0].options[0] == 'sit' ) {
-			console.info( 'bored dealer');
-		} else if ( t.seats[0].options[0] == 'insurance' ) {
-			if ( wait_a_bit < 2 ) {
+	t.options();	
+	if (t.seats[0].options.length == 1  ) {
+		if ( t.seats[0].options[0] == 'insurance' || t.seats[0].options[0] == 'deal' ) {
+			if ( wait_a_bit < 10 ) {
+				console.log("wait for:" + t.seats[0].options[0]);
 				wait_a_bit = wait_a_bit + 1;
 			} else {
 				wait_a_bit = 0
@@ -200,7 +201,7 @@ dealer = function(delay) {
 			wss.tablecast();
 		}
 	} else {
-		console.info( 'bored dealer' );
+		//console.info( 'bored dealer' );
 	}
 	setTimeout( function() { dealer(delay); }, delay );
 }
@@ -209,5 +210,5 @@ keepalive = function(delay) {
 	wss.tablecast();
 	setTimeout( function() { keepalive(delay); }, delay );
 }
-dealer(2000);
+dealer(1000);
 keepalive(60000);

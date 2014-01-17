@@ -2,21 +2,16 @@ define(["jquery", "table_client", "card"], function($, table_client, card) {
 
 	function handy(h) {
 		var handjq = $('<div class="hand"></div>');
-		if ( parseInt(h.insurance) > 0 ) {
-			handjq.append('<div class="insurance">' + 	h.insurance + '</div>');
-		}		
-		if ( h.cards ) {
+		if ( h.cards ) {			
 			for (var y = 0; y < h.cards.length; y++) {
+				console.info('append card');
 				var c = new card();
 				c.card = h.cards[y].card;
 				c.suite = h.cards[y].suite;
 				handjq.append(c.toImg());
 			}
-		}						
-
-		if ( typeof h.bet === 'number' ) {
-			handjq.append('<div class="bet">' + h.bet + '</div>');
-		}
+		}	
+		
 		return handjq;
 	}
 	
@@ -29,25 +24,30 @@ define(["jquery", "table_client", "card"], function($, table_client, card) {
 	}
 	
 	table_ui.prototype.re = function() {		
+		
 		//console.log('re: ' + document.documentElement.clientWidth + ' x ' + document.documentElement.clientHeight + ' seats:' + this.table.seats.length);
 		$("#" + this.table.id).parent().width( document.documentElement.clientWidth );
-		$("#" + this.table.id).parent().height( document.documentElement.clientHeight );		
-		$("#" + this.table.id + " > .seat:first").css({ left:0, top:0, 'margin-left':'auto','margin-right':'auto'});
+		$("#" + this.table.id).parent().height( document.documentElement.clientHeight );
 		
-		//var ratio = .3;
+		var dealer = { left:0, top:0, 
+				'margin-left':'auto',
+				'margin-right':'auto',
+				'-webkit-transform': 'rotate(180deg)',
+				'-moz-transform': 'rotate(180deg)',
+				'-o-transform': 'rotate(180deg)',
+				'-ms-transform': 'rotate(180deg)',
+				'transform': 'rotate(180deg)'					
+				};
 		
-		//$("#" + this.table.id + " > .seat:first").css('margin-left', -$("#" + this.table.id + " > .seat:first").width() / 2);
 		
-		//$(this).after($(this).prev());
-		
-		$("#" + this.table.id + " > .seat:first > .player").empty();
-		//$("#" + this.table.id + " > .seat > .player > span::first").empty();
+		// center dealer remove player
+		$("#" + this.table.id + " > .seat:first").css(dealer);
+		//$("#" + this.table.id + " > .seat:first > .player").empty();
 		
 		var seats = $("#" + this.table.id + " > .seat").not(":first").length;
-		
-		//dealer
-		//$("#" + this.table.id + " > .seat:first").css('left', '50%');
-		//$("#" + this.table.id + " > .seat:first").css('margin-left', -$("#" + this.table.id + " > .seat").first().width() / 2);
+
+		/* don't erase */
+		//$(this).after($(this).prev());
 		
 		$("#" + this.table.id + " > .seat").not(":first").each(function (i) {
 			console.info('check:' + i)
@@ -57,20 +57,17 @@ define(["jquery", "table_client", "card"], function($, table_client, card) {
 
 			console.log('i:' + i + ' half:' + 50 * Math.abs((seats-1)/2-i) );
 			
-			if ( i < (seats - 1) / 2) {
-				console.info('make right:' + i *  document.documentElement.clientWidth / seats);
+			if ( i < (seats - 1) / 2) {				
 				$(this).css('right',  i *  document.documentElement.clientWidth / seats );
-			} else if ( i > (seats - 1) / 2) {
-				console.info('make left');
+			} else if ( i > (seats - 1) / 2) {				
 				$(this).css('left',  (seats - i - 1) * document.documentElement.clientWidth / seats );				
 			} else {
-				console.info('make center');
 				$(this).css({ 'left': 0 , 'right':0, 'bottom': 0, 'margin-left':'auto', 'margin-right':'auto'  });
 			}
 			$(this).find(".hand > img").each(function (j) {
-				$(this).css('position',  'absolute' );
-				$(this).css('bottom', '150px' );
-				$(this).css('left',   15 * j + 'px' );
+				//$(this).css('position',  'absolute' );
+				//$(this).css('bottom', '150px' );
+				//$(this).css('left',   15 * j + 'px' );
 				
 				 
 				//if ( j == 1 ) {
@@ -94,18 +91,6 @@ define(["jquery", "table_client", "card"], function($, table_client, card) {
 				//$(this).css('right', spacing /  );
 			});
 		});		
-		  
-			
-			//$(this).css('position', 'absolute' );
-			//$(this).css('right', 40 * i );			
-			
-			//$(this).css('bottom', 150 );
-		
-		//position:absolute;
-		//left:0px;
-		//top:0px;
-		//z-index:-1;
-		//$("#" + this.table.id + "> .hand > img").width( $(window).width() / 10 );
 	}
 
 	
@@ -133,9 +118,17 @@ define(["jquery", "table_client", "card"], function($, table_client, card) {
 				var seatjq = $('<div class="seat"></div>').attr('seat',x);				
 				if ( typeof this.table.seats[x].bet === 'number' ) {
 					seatjq.append('<div class="bet">' + this.table.seats[x].bet + '</div>');
-				}				
-				if ( this.table.seats[x].hand ) {
-					seatjq.append(handy(this.table.seats[x].hand));
+				}
+				var splits = 0;
+				while ( this.table.seats[x]['hand' + splits] ) {
+					seatjq.append(handy(this.table.seats[x]['hand' + splits]));
+					if ( parseInt(this.table.seats[x]['hand' + splits].insurance) > 0 ) {
+						seatjq.prepend('<div class="insurance">' + 	this.table.seats[x]['hand' + splits].insurance + '</div>');
+					}
+					if ( typeof this.table.seats[x]['hand' + splits].bet === 'number' ) {
+						seatjq.prepend('<div class="bet">' + this.table.seats[x]['hand' + splits].bet + '</div>');
+					}					
+					splits++;
 				}
 				if ( this.table.seats[x].options && this.table.seats[x].options.length > 0 ) {
 					var optionsjq = $('<div class="options"></div>');
@@ -166,33 +159,37 @@ define(["jquery", "table_client", "card"], function($, table_client, card) {
 				 *  remember it's a dom event to trigger an act via dom interpretation
 				 */
 				function(event) {
-					var table = $(event.target).parent().parent().parent().attr('id');
-					var seat = parseInt($(event.target).parent().parent().attr('seat'));
-					var action = $(event.target).val();
-					console.info('table:' + table + ' seat:' + seat + 'action:' + action);
-					var act = { 
-						table: table, 
-						seat: seat, 
-						action: action,							 
-					};
-					if ( action == 'stand' ) {
-						console.info('need to check for active hand');
-						//act.name = prompt($(event.target).find('.label').html() +  " Player", "Anonymous"); 
-					} else if ( action == 'sit' ) { 
-						act.name = prompt($(event.target).find('.label').html() +  " Player", "Anonymous"); 
-					} else if ( action == 'bet' ) { 
-						var cb = parseInt( $(event.target).parent().find('.bet').html() );
-						act.amount = prompt("Bet Amount", cb ? cb : 100 ); 
-					}
-					
-					$("#" + table).data('table')
-					
-					if ( $("#" + table).data('table') ) {
-						console.log('local act');
-						$("#" + table).data('table').act(act);
-					} else {
-						console.log('remote act');
-						new table_client().send(act);
+					try {
+						var table = $(event.target).parent().parent().parent().attr('id');
+						var seat = parseInt($(event.target).parent().parent().attr('seat'));
+						var action = $(event.target).val();
+						console.info('table:' + table + ' seat:' + seat + 'action:' + action);
+						var act = { 
+							table: table, 
+							seat: seat, 
+							action: action,							 
+						};
+						if ( action == 'stand' ) {
+							console.info('need to check for active hand');
+							//act.name = prompt($(event.target).find('.label').html() +  " Player", "Anonymous"); 
+						} else if ( action == 'sit' ) { 
+							act.name = prompt($(event.target).find('.label').html() +  " Player", "Anonymous"); 
+						} else if ( action == 'bet' ) { 
+							var cb = parseInt( $(event.target).parent().find('.bet').html() );
+							act.amount = prompt("Bet Amount", cb ? cb : 100 ); 
+						}
+						
+						$("#" + table).data('table')
+						
+						if ( $("#" + table).data('table') ) {
+							console.log('local act');
+							$("#" + table).data('table').act(act);
+						} else {
+							console.log('remote act');
+							new table_client().send(act);
+						}
+					} catch (err) {
+						console.info('err:' + err);
 					}
 				}
 			);			
