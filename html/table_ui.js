@@ -1,4 +1,24 @@
-define(["jquery", "table_client"], function($, table_client) {
+define(["jquery", "table_client", "card"], function($, table_client, card) {
+
+	function handy(h) {
+		var handjq = $('<div class="hand"></div>');
+		if ( parseInt(h.insurance) > 0 ) {
+			handjq.append('<div class="insurance">' + 	h.insurance + '</div>');
+		}		
+		if ( h.cards ) {
+			for (var y = 0; y < h.cards.length; y++) {
+				var c = new card();
+				c.card = h.cards[y].card;
+				c.suite = h.cards[y].suite;
+				handjq.append(c.toImg());
+			}
+		}						
+
+		if ( typeof h.bet === 'number' ) {
+			handjq.append('<div class="bet">' + h.bet + '</div>');
+		}
+		return handjq;
+	}
 	
 	/*
 	 * can be either table rep or actual table
@@ -7,6 +27,87 @@ define(["jquery", "table_client"], function($, table_client) {
 		console.info('new table ui');
 		this.table = table;
 	}
+	
+	table_ui.prototype.re = function() {		
+		//console.log('re: ' + document.documentElement.clientWidth + ' x ' + document.documentElement.clientHeight + ' seats:' + this.table.seats.length);
+		$("#" + this.table.id).parent().width( document.documentElement.clientWidth );
+		$("#" + this.table.id).parent().height( document.documentElement.clientHeight );		
+		$("#" + this.table.id + " > .seat:first").css({ left:0, top:0, 'margin-left':'auto','margin-right':'auto'});
+		
+		//var ratio = .3;
+		
+		//$("#" + this.table.id + " > .seat:first").css('margin-left', -$("#" + this.table.id + " > .seat:first").width() / 2);
+		
+		//$(this).after($(this).prev());
+		
+		$("#" + this.table.id + " > .seat:first > .player").empty();
+		//$("#" + this.table.id + " > .seat > .player > span::first").empty();
+		
+		var seats = $("#" + this.table.id + " > .seat").not(":first").length;
+		
+		//dealer
+		//$("#" + this.table.id + " > .seat:first").css('left', '50%');
+		//$("#" + this.table.id + " > .seat:first").css('margin-left', -$("#" + this.table.id + " > .seat").first().width() / 2);
+		
+		$("#" + this.table.id + " > .seat").not(":first").each(function (i) {
+			console.info('check:' + i)
+			$(this).css('position', 'absolute' );
+
+			$(this).css('bottom', 50 * Math.abs((seats-1)/2-i)  );
+
+			console.log('i:' + i + ' half:' + 50 * Math.abs((seats-1)/2-i) );
+			
+			if ( i < (seats - 1) / 2) {
+				console.info('make right:' + i *  document.documentElement.clientWidth / seats);
+				$(this).css('right',  i *  document.documentElement.clientWidth / seats );
+			} else if ( i > (seats - 1) / 2) {
+				console.info('make left');
+				$(this).css('left',  (seats - i - 1) * document.documentElement.clientWidth / seats );				
+			} else {
+				console.info('make center');
+				$(this).css({ 'left': 0 , 'right':0, 'bottom': 0, 'margin-left':'auto', 'margin-right':'auto'  });
+			}
+			$(this).find(".hand > img").each(function (j) {
+				$(this).css('position',  'absolute' );
+				$(this).css('bottom', '150px' );
+				$(this).css('left',   15 * j + 'px' );
+				
+				 
+				//if ( j == 1 ) {
+				//	$(this).after($(this).prev());
+				//}
+				
+				//if ( j > 1 ) {
+				//	$(this).prev().height();
+				//	console.log('card:' + j + ' ' + $(this).prev().height() );
+				//	$(this).css('position', 'absolute' );
+				//	$(this).css('right', $(this).prev().width() / 2 );
+				//	$(this).css('bottom', $(this).prev().height() );
+				//	$(this).css('z-index', -1);
+					//$(this).css('bottom', $(this).prev().height() );
+				//} else {
+				//	$(this).css('z-index', -2);
+				//}
+				//$(this).css('width', '4em');
+				//
+				//
+				//$(this).css('right', spacing /  );
+			});
+		});		
+		  
+			
+			//$(this).css('position', 'absolute' );
+			//$(this).css('right', 40 * i );			
+			
+			//$(this).css('bottom', 150 );
+		
+		//position:absolute;
+		//left:0px;
+		//top:0px;
+		//z-index:-1;
+		//$("#" + this.table.id + "> .hand > img").width( $(window).width() / 10 );
+	}
+
 	
 	table_ui.prototype.paint = function(append_to) {
 		console.info('paint ui:' + this.table.id);		
@@ -17,255 +118,87 @@ define(["jquery", "table_client"], function($, table_client) {
 			} else {
 				console.info('create div');
 				$('<div class="table" id="' + this.table.id + '"></div>').appendTo(append_to);
-			}
-			
-			if ( this.table.act ) {
-				console.info('append table');
+			}			
+			if ( this.table['act'] ) {
+				console.info('data to "table"');
 				$("#" + this.table.id).data("table", this.table);
-			}
+			} 
 			
+			$('<div class="nick">' + this.table.nick + '</div>').appendTo("#" + this.table.id);
+			$('<div class="_id">' + this.table.id + '</div>').appendTo("#" + this.table.id);			
 			
 			console.info('seats length:' + this.table.seats.length);
 			for (var x = 0; x < this.table.seats.length; x++) {				
 				console.info('paint seat:' + x);
-				var seatjq = $('<div class="seat" id="seat' + x + '"></div>');
+				var seatjq = $('<div class="seat"></div>').attr('seat',x);				
+				if ( typeof this.table.seats[x].bet === 'number' ) {
+					seatjq.append('<div class="bet">' + this.table.seats[x].bet + '</div>');
+				}				
+				if ( this.table.seats[x].hand ) {
+					seatjq.append(handy(this.table.seats[x].hand));
+				}
+				if ( this.table.seats[x].options && this.table.seats[x].options.length > 0 ) {
+					var optionsjq = $('<div class="options"></div>');
+					for ( var y = 0; y < this.table.seats[x].options.length; y++ ) {
+						optionsjq.append( $('<button value="'+ this.table.seats[x].options[y] + '">' + this.table.seats[x].options[y] + '</button>') );
+					}
+					seatjq.append(optionsjq);
+				}								
+				if ( this.table.seats[x].player ) {
+					var playerjq = $('<div class="player"></div>');
+					if ( typeof this.table.seats[x].player.chips === 'number' ) {
+						playerjq.append('<div class="chips">' + this.table.seats[x].player.chips + '</div>');
+					}					
+					if ( this.table.seats[x].player.name ) {
+						console.info('name:' + this.table.seats[x].player.name);
+						playerjq.append('<div class="name">' + this.table.seats[x].player.name + '</div>');
+					}
+					seatjq.append(playerjq);
+				}												
 				if ( this.table.seats[x].label ) {
 					seatjq.append('<span class="label">' + this.table.seats[x].label + '</span>')
 				}				
-				if ( this.table.seats[x].player ) {
-					var playerjq = $('<div class="player"></div>');
-					if ( this.table.seats[x].player.name ) {
-						console.info('name:' + this.table.seats[x].player.name);
-						playerjq.append('<span class="name">' + this.table.seats[x].player.name + '</span>');
-					}
-					if ( this.table.seats[x].player.chips ) {
-						playerjq.append('<span class="chips">' + this.table.seats[x].player.chips + '</span>');
-					}				
-					seatjq.append(playerjq);
-				}
-				
-				if ( this.table.seats[x].options && this.table.seats[x].options.length > 0 ) {
-					for ( var y = 0; y < this.table.seats[x].options.length; y++ ) {
-						seatjq.append( $('<button>' + this.table.seats[x].options[y] + '</button>') );
-					}
-				}
-
-				if ( this.table.seats[x].hand ) {
-					seatjq.append('<div class="hand">hand</div>');
-				}
-				
-				if ( this.table.seats[x].payout ) {
-					seatjq.append('<div class="payout">payout</div>');
-				}					
-				
 				$("#" + this.table.id).append(seatjq);
-			}			
+			}
 			
 			$("#" + this.table.id).find('button').click(
 				/*
 				 *  remember it's a dom event to trigger an act via dom interpretation
 				 */
 				function(event) {
-					var table = $(event.target).parent().parent().attr('id');
-					var seat = parseInt($(event.target).parent().attr('id').substring(4));
-					var action = $(event.target).text();
+					var table = $(event.target).parent().parent().parent().attr('id');
+					var seat = parseInt($(event.target).parent().parent().attr('seat'));
+					var action = $(event.target).val();
 					console.info('table:' + table + ' seat:' + seat + 'action:' + action);
 					var act = { 
-							table: table, 
-							seat: seat, 
-							action: action,							 
-						};					
-					if ( action == 'sit' ) { 
+						table: table, 
+						seat: seat, 
+						action: action,							 
+					};
+					if ( action == 'stand' ) {
+						console.info('need to check for active hand');
+						//act.name = prompt($(event.target).find('.label').html() +  " Player", "Anonymous"); 
+					} else if ( action == 'sit' ) { 
 						act.name = prompt($(event.target).find('.label').html() +  " Player", "Anonymous"); 
+					} else if ( action == 'bet' ) { 
+						var cb = parseInt( $(event.target).parent().find('.bet').html() );
+						act.amount = prompt("Bet Amount", cb ? cb : 100 ); 
 					}
 					
+					$("#" + table).data('table')
+					
 					if ( $("#" + table).data('table') ) {
-						$("#" + table).data('table').act(act);						
-						//$("#" + table).data('table').paint(append_to);
-						new table_ui( $("#" + table).data('table') ).paint(append_to);
+						console.log('local act');
+						$("#" + table).data('table').act(act);
 					} else {
+						console.log('remote act');
 						new table_client().send(act);
 					}
 				}
-			);				
-			$('<span class="nick">' + this.table.nick + '</span>').appendTo("#" + this.table.id);
-			$('<span class="_id">' + this.table.id + '</span>').appendTo("#" + this.table.id);
-			
+			);			
 		} catch (err) {
 			console.info('cannot paint:' + err);			
 		}
 	}
 	return table_ui;
-});
-
-
-
-/*
-
-if ( this.seats[x].player ) {
-	console.info('paint player:' + this.seats[x].player.name);				
-	
-	var playerjq = $('<div class="player"><div class="name">' + this.seats[x].player.name + '</div></div>'); 				
-	playerjq.find('.name').html( this.seats[x].player.name );
-	
-	if ( this.seats[x].player.chips ) {
-		<div class="chips"><span class="value"></span></div>
-	}
-	
-	
-	
-	playerjq.find('.chips').html( this.seats[x].player.chips );								
-	playerjq.appendTo(seatjq);
-} else {
-	//console.info('empty seat');
-	seatjq.append('Seat ' + x);
-}
-
-if ( this.options(x).length ) {
-	for (var y = 0; y < this.options(x).length; y++) {
-		console.info( 'option:' + this.options(x)[y] );
-		$('<button value="' + this.options(x)[y] + '">' + this.options(x)[y] + '</button>').appendTo(seatjq);
-	}				
-}
-
-//$('<button value="sit">Sit</button>').appendTo( $('<div class="player"></div>') ).appendTo(seatjq);
-//} 
-
-if ( this.seats[x].bet ) {
-	console.info('bet:' + this.seats[x].bet);
-	$('<button value="bet">Minimum Bet:' + this.minimum + '</button>').appendTo(seatjq);
-	if ( parseInt(this.seats[x].bet) ) {
-		seatjq.children().last().text('Current Bet:' + this.seats[x].bet);
-	}
-}
-
-if ( this.seats[x].hand ) {
-	console.info('have a hand');
-	hand = $('<div class="hand">').appendTo(seatjq);
-	for ( var y = 0; y < this.seats[x].hand.cards.length; y++) {
-		hand.append(this.seats[x].hand.cards[y].toImg());
-	}
-	//$('<button value="bet">Minimum Bet:' + this.minimum + '</button>').appendTo(seatjq);
-	//if ( parseInt(this.seats[x].bet) ) {
-	//	seatjq.children().last().text('Current Bet:' + this.seats[x].bet);
-	//}	
-	seatjq.append(hand);
-}
-
-if ( this.seats[x].collect ) {
-	$('(someting to collect)').appendTo(seatjq);
-}
-
-$.find(id).append(seatjq);
-*/
-//$("#" + this.id).append(seatjq);
-//}
-//$('<div class="chips"></div>').appendTo($.find(id));		
-
-/*
-<div class="hand">
-<input type="button" value="backdoor">
-<input type="button" value="expose">
-<input type="button" value="payout">
-
-<input type="button" value="insurance">
-<input type="button" value="hit">
-
-<input type="button" value="double">
-<input type="button" value="even">
-<input type="button" value="split">
-<input type="button" value="stay">
-<input type="button" value="surrender">		
-<div class="value"></div>
-<div class="cards"></div>
-<div class="bet"></div>		
-</div>
-*/
-
-//return table_ui;
-
-/*
-table_ui.prototype.button = function() {
-	console.info('button up:');
-	$.find('button').click( function(event) {
-		try {
-			var seat = parseInt($(event.target).parent().attr('id').substring(4));
-			console.info('seat:' + seat + ' action:' + $(event.target).val() );
-			var t = $(event.target).parent().parent().data('table');
-			console.info('table:' + t);
-			if ( $(event.target).val() == 'sit' ) {
-				t.sit(seat, { name: prompt(" Seat " + (seat+1) + " Player", "Anonymous"), chips: 5000 } );					
-			} else if ( $(event.target).val() == 'stand' ) {
-				t.stand(seat);										
-			} else if ( $(event.target).val() == 'bet' ) {
-				console.info('bet:' + $(event.target).parent().val());
-				t.bet( seat, parseInt( prompt(" Seat " + (seat+1) + " Bet Amount", t.minimum) ) );
-			}
-			
-			var t = $(event.target).parent().parent().parent().data('table');
-					//.attr('id').substring(4));
-			console.info('seat:' + seat + ' action:' + $(event.target).val() );
-			console.info('table:' + t );
-			if ( $(event.target).val() == 'sit' ) {
-				t.sit(seat, new player(prompt(" Seat " + (seat+1) + " Player", "Anonymous"), 5000 ));					
-			} else if ( $(event.target).val() == 'insurance' ) {
-				t.insurance(seat);
-			} else if ( $(event.target).val() == 'backdoor' ) {
-				t.backdoor(seat);
-			} else if ( $(event.target).val() == 'bet' ) {
-				t.bet( seat, prompt(" Seat " + (seat+1) + " Bet Amount", t.minimum) );
-			} else if ( $(event.target).val() == 'deal') {
-				t.deal();					
-			} else if ( $(event.target).val() == 'hit' ) {
-				t.hit(seat);					
-			} else if ( $(event.target).val() == 'payout' ) {
-				t.payout();
-			} else if ( $(event.target).val() == 'stay' ) {
-				t.stay(seat);
-			} else if ( $(event.target).val() == 'double' ) {
-				t.double(seat);
-			} else if ( $(event.target).val() == 'expose' ) {
-				t.expose(seat);										
-			} else if ( $(event.target).val() == 'even' ) {
-				t.even(seat);										
-			} else if ( $(event.target).val() == 'split' ) {
-				t.split(seat);										
-			}			
-		} catch (err) {
-			console.info("error:" + err.toString());
-		}			
-	});		
-}
-*/
-
-//var tc = new table_client();
-
-
-/*
-.click(function(event) {
-	var msg = JSON.stringify({
-		stand : $(event.target).parent().attr('id').substring(4)
-	});
-	console.info('send msg:' + msg);
-	tc.send(msg);
-})
-
-.click(function(event) {
-				var msg = JSON.stringify({
-					bet : $(event.target).parent().attr('id').substring(4),
-					amount : parseInt(prompt("Bet Amount:", $(event.target).val() ))
-				});
-				console.info('send msg:' + msg);
-				tc.send(msg);
-
-.click(function(event) {
-				var n = prompt("Player Name:", "Anonymous");
-				var msg = JSON.stringify({
-					name : n,
-					sit : $(event.target).parent().attr('id').substring(4)
-				});
-				console.info('send msg:' + msg);
-				tc.send(msg);
-			})
-
-*/	
+});	

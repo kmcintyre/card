@@ -47,14 +47,14 @@ define(["jquery", "table", "table_ui", "table_client"], function($, table, table
 			console.info('hmmm:' + err);
 		}
 
-		console.log('seat for 1');
+		console.log('seat0 table');
 				
 		try {
-			blank.id = 'seatfor1';	
+			blank.id = 'seat0';	
 			blank.addseat();						
 			new table_ui(blank).paint("#localtables");
 		} catch (err) {
-			$("#localtables").append( $('<div><span class="error">seat for 1 failure:</span></div>').append(err) );
+			$("#localtables").append( $('<div><span class="error">seat0 failure:</span></div>').append(err) );
 		}		
 		
 		try {
@@ -66,25 +66,7 @@ define(["jquery", "table", "table_ui", "table_client"], function($, table, table
 			new table_ui(seat0kevin).paint("#localtables");
 		} catch (err) {
 			$("#localtables").append( $('<div><span class="error">seat for 1 failure:</span></div>').append(err) );
-		}
-		
-		
-		/*
-		$("#tables").append("<h4>seat tests</h4>");
-		
-		try {			
-			$("#tables").append( $('<div><span class="expo">add seat:</span></div>').append( blank.addseat() ) );
-		} catch (err) {
-			$("#tables").append( $('<div><span class="error">add seat error:</span></div>').append(err) );
-		}
-		
-		try {			
-			blank.sit( 0, { name: 'kevin'} );
-			$("#tables").append( $('<div><span class="expo">sit kevin:</span></div>').append( blank.json() ) );
-		} catch (err) {
-			$("#tables").append( $('<div><span class="error">sit kevin:</span></div>').append(err) );
-		}
-		*/		
+		}		
 
 	});
 	
@@ -96,7 +78,7 @@ define(["jquery", "table", "table_ui", "table_client"], function($, table, table
 			new table_ui(json).paint("#remotetables");
 		}
 		
-		new table_client("#remotetables").set(tablecast);		
+		new table_client().set(tablecast);		
 	});
 	
 });

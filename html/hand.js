@@ -1,23 +1,26 @@
-define(["card"], function(card) {
+define(["deck"], function(deck) {
 
-	function hand() {
+	function hand(bet) {
+		if ( bet != undefined && parseInt(bet) > 0 ) {
+			this.bet = parseInt(bet); 
+		}
 		this.cards = new Array();
 		this.folded = false;
 	}
 	
 	hand.prototype.deal = function(c) {
-		if ( newcard instanceof Array ) {
-			
-		} else if ( newcard instanceof card ) {
-			this.cards[this.cards.length] = newcard;
-		}
+		this.cards[this.cards.length] = c;
 	}
-	
+		
 	hand.prototype.options = function() {
-		return [];
+		if ( this.folded ) {
+			return [];
+		} else {
+			return ['fold'];
+		}		
 	}
 	
-	hand.fold = function() {
+	hand.prototype.fold = function() {
 		this.folded = true;
 	}
 	

@@ -6,39 +6,37 @@ requirejs.config({
     nodeRequire: require
 });
 
-var table = requirejs('table')
-
-//t.deal = function() {
-//	console.log('intercept deal to show card distributed');
-//	var updateseat = table_blackjack.prototype.deal.call(this);
-//	if ( updateseat != null ) {
-//		t.paint("#table_blackjack");					
-//		this.deal();
-//	}
-//}
+var table_blackjack = requirejs('table_blackjack');
 
 console.log('start table');
-var t = new table();
+
+var t = new table_blackjack();
 t.id = 'remote';
+
+//intercept = t.shoe.next;
+//t.shoe.next = function(seat) {
+//	console.log('intercept shoe:' + seat);	
+//	return intercept();
+//} 
+
 console.log('table started');
 
 t.addseat();
 t.addseat();
 t.addseat();
 t.addseat();
+t.addseat();
+
 var seats_clients = new Array(t.seats.length);
 var seats_swkeys = new Array(t.seats.length);
 
-console.log('start standard in');
-var stdin = process.openStdin();
-stdin.on('data', function(message) {
-	var msg = message.toString().substring(0, message.length - 1);	
-	console.log( '(' + wss.clients.length + ' connections) ' +  t.json() );
-});
-
+var verifyDealer = true;
+/*
+ * check seat for client but also allow for no player sitting 
+ */
 verify = function(seat, client) {
-	console.log('verify:' + seat + ' ' + (seats_clients[seat] == client) + ' ' + (!t.seats[seat].player));
-	return seats_clients[seat] == client || !t.seats[seat].player; 		
+	console.log('verify:' + seat + ' ' + (seats_clients[seat] == client) + ' ' + (!t.seats[seat].player)) + ' ' + (!verifyDealer && seat == 0);
+	return seats_clients[seat] == client || !t.seats[seat].player || (!verifyDealer && seat == 0); 		
 }
 
 lost = function(old_key, new_key, client) {
@@ -51,16 +49,64 @@ lost = function(old_key, new_key, client) {
 	}
 }
 
+wss.tablecast = function() {	
+	console.log('tablecast:' + this.clients.length);
+	
+	var filter = true;	
+	var start_with = (verifyDealer ? 0 : 1); // 0 filters dealer;	
+	t.options();	
+	for(var i in this.clients) {
+		console.log('client loop');//this.clients[i]);
+		try {
+			if (filter) {
+				var f = t.json();
+				f = JSON.parse(f);
+				for (var x = start_with; x < f.seats.length; x++ ) {
+					if ( f.seats[x] && f.seats[x].options && !verify(x, this.clients[i]) ) {
+						console.log('need to remove options');
+						delete f.seats[x].options;
+					} 
+					if ( f.seats[x] && f.seats[x].hand ) {
+						try {
+							f.seats[x].hand = { cards: f.seats[x].hand.cards, bet: f.seats[x].hand.bet, insurance: f.seats[x].hand.insurance   };							
+						} catch (err) {
+							console.log('no cards-' + err);
+						}
+					}
+					
+				}
+				this.clients[i].send(JSON.stringify(f));
+			} else {
+				this.clients[i].send(t.json());
+			}
+	    } catch (err) {
+	    	this.clients[i].close();
+	    	console.log('error:' + err);
+	    }        		
+	}    	
+};
+
+t.act = function(step) {
+	console.log('intercept act');
+	table_blackjack.prototype.act.call(this, step);		
+	wss.tablecast();
+}
+
 wss.on('connection', function(ws) {
 	
 	var swkey = ws.upgradeReq.headers['sec-websocket-key'];
 	
-	console.log(ws.upgradeReq.headers);	
+	//console.log(ws);
+	
+	console.log(ws._socket.remoteAddress);
+	console.log(ws.upgradeReq.headers);
 	console.log(this.clients.length + ' connections');
 	
 	ws.stand = function(seat) {		
 		console.info('client stand:' + seat);
-		seats_clients[seat] = null; 
+		if ( !t.seats[seat].player ) {
+			seats_clients[seat] = null;
+		}
 	}
 	
 	ws.sit = function(seat) {
@@ -83,7 +129,9 @@ wss.on('connection', function(ws) {
     
 	ws.on('message', function(message) {
     	console.log('received: %s', message.length == 0 ? '<blank>' : message );    	
+    	
     	var play = JSON.parse(message);
+    	
     	try {
     		if ( play.action == 'sit' ) {
     			t.act(play);
@@ -113,32 +161,53 @@ wss.on('connection', function(ws) {
     	lost(previous_swkey, swkey, ws);
     }
     ws.send(swkey);
-    wss.tablecast();
+    setTimeout( function() { wss.tablecast(); }, 100);
 });
 
+console.log('start standard in');
+var stdin = process.openStdin();
+stdin.on('data', function(message) {
+	var msg = message.toString().substring(0, message.length - 1);	
+	console.log( t.json() );
+});
 
-wss.tablecast = function() {	
-	console.log('tablecast');
-	var filter = true;
-	for(var i in this.clients) {
-		console.log('client loop');//this.clients[i]);
-		try {
-			if (filter) {
-				var f = t.json();
-				f = JSON.parse(f);
-				for (var x = 0; x < f.seats.length; x++ ) {
-					if ( f.seats[x] && f.seats[x].options && !verify(x, this.clients[i]) ) {
-						console.log('need to remove options');
-						delete f.seats[x].options;
-					}
-				}								
-				this.clients[i].send(JSON.stringify(f));
+var wait_a_bit = 0;
+
+dealer = function(delay) { 
+	t.options();
+	console.log('dealer options:' + t.seats[0].options);
+	if (t.seats[0].options.length == 2 && t.seats[0].options[1] == 'deal') {
+		if ( wait_a_bit < 4 ) {
+			wait_a_bit = wait_a_bit + 1;
+		} else {
+			wait_a_bit = 0
+			t.act( { action: 'deal', seat: 0 } );
+			wss.tablecast();
+		}
+	} else if (t.seats[0].options.length == 1  ) {
+		if ( t.seats[0].options[0] == 'sit' ) {
+			console.info( 'bored dealer');
+		} else if ( t.seats[0].options[0] == 'insurance' ) {
+			if ( wait_a_bit < 2 ) {
+				wait_a_bit = wait_a_bit + 1;
 			} else {
-				this.clients[i].send(t.json());
+				wait_a_bit = 0
+				t.act( { action: t.seats[0].options[0], seat: 0 } );
+				wss.tablecast();
 			}
-	    } catch (err) {
-	    	this.clients[i].close();
-	    	console.log('error:' + err);
-	    }        		
-	}    	
-};
+		} else {
+			t.act( { action: t.seats[0].options[0], seat: 0 } );
+			wss.tablecast();
+		}
+	} else {
+		console.info( 'bored dealer' );
+	}
+	setTimeout( function() { dealer(delay); }, delay );
+}
+
+keepalive = function(delay) {
+	wss.tablecast();
+	setTimeout( function() { keepalive(delay); }, delay );
+}
+dealer(2000);
+keepalive(60000);

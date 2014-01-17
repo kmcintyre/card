@@ -1,16 +1,14 @@
 define(["jquery", "table_ui", "table_client"], function($, table_ui, table_client) {
-		
-	
 	$(function() {								
-		function tablecast(evt) {			
-			console.log('tablecast:' + evt.data );			
-			var json = JSON.parse(evt.data);
-			new table_ui(json).paint("#tables");
+		
+		var ui = new table_ui();
+		
+		function tablecast(json) {
+			ui.table = json;
+			ui.paint("#tables");	
+			ui.re();
 		}				
-		
-		console.log('disconnect:' + evt);
-		
-		new table_client().set(tablecast);		
-	});
-	
+		new table_client().set(tablecast);
+		$(window).resize( function() { ui.re(); });		
+	});	
 });

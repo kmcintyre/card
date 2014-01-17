@@ -19,6 +19,7 @@ define(function() {
     card.prototype.toImg = function() {
     	var i = new Image();
     	i.src = '/deck/' + this.card + this.suite + '.png';
+    	i.className = 'card';
     	return i;
     }
     

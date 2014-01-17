@@ -1,32 +1,31 @@
+body {
+	overflow:hidden;
+	font-size: 1.5em;
+}
+
 input, button, select, option, textarea {
-    font-size: 140%;
+    font-size: 1.0em;
 }
 
-.table {	
-	margin-left:auto;
-	margin-right:auto;
-	background-color:green;
-	text-align: center;
+.table, .seat, .options, .hand, .bet, .player, .nick, ._id,  {	
+	position:absolute;
 }
 
-.player {
-	background-color:lightblue;
-}
-
+//
 .seat {
-	margin:2px;
-	padding:2px;
-	border: 1px solid brown;	
+	border: .1em solid brown;
 }
 
-.nick {
-	background-color:blue;
+.hand > .bet {
+	font-size: 2.0em;
 }
 
-.error {
-	background-color:red;
+.options > button {
+	display:inline-table;
 }
 
-._id {
-	background-color:orange;
+
+.card {
+	width: 4.5em;
+	padding:.1em;	
 }

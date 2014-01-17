@@ -10,6 +10,7 @@ define(["deck"], function(deck) {
 	}
 	
 	shoe.prototype = new deck();
+	shoe.prototype.constructor=shoe;	
 	
 	shoe.prototype.burn = function(number_of_cards) {
 		if ( number_of_cards == 1 ) {
@@ -28,7 +29,8 @@ define(["deck"], function(deck) {
 		return "played:" + this.played + " penetrated:" + this.penetrated(); // + " cards length:" + this.cards.length;
 	}
 	
-	shoe.prototype.next = function() {		
+	shoe.prototype.next = function() {
+		console.log('shoe');
 		return this.cards[this.played++];
 	}
 	

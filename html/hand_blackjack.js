@@ -1,4 +1,4 @@
-define(["card"], function(card) {
+define(["card", "hand"], function(card, hand) {
 
 	bjValues = {"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"10":10,"J":10,"Q":10,"K":10,"A":1};
 	
@@ -7,49 +7,38 @@ define(["card"], function(card) {
 	}	
 	
 	function hand_blackjack() {
+		hand.call(this);
 		this.cards = new Array();
 		this.stayed = false;
-		this.soft = false;
+		this.unexposed = null;
+	}	
+	hand_blackjack.prototype = new hand();
+	hand_blackjack.prototype.constructor=hand_blackjack;
+
+	hand_blackjack.prototype.hit = function(c) {
+		this.cards[this.cards.length] = c;
 	}
 	
-	hand_blackjack.prototype.split = function() {
-		if ( this.cards.length == 2 ) {
-			var nh = new hand_blackjack();
-			nh.cards[nh.cards.length] = this.cards.pop();
-			console.log('split hand:' + nh.toString());
-			return [this, nh];
-		}		
+	hand_blackjack.prototype.expose = function() { 
+		this.cards[this.cards.length - 1] = this.unexposed;
+		this.unexposed = null;
 	}	
 
-	hand_blackjack.prototype.card = function(c) {		
-		this.cards[this.cards.length] = c;
+	hand_blackjack.prototype.stay = function() {
+		this.stayed = true;
 	}
 	
 	hand_blackjack.prototype.bust = function() {
 		return this.value() > 21;
 	}
 	
-	hand_blackjack.prototype.stay = function() {
-		this.stayed = true;
-	}	
-	
 	hand_blackjack.prototype.toString = function() {
 		return this.cards.toString() + " bj value:" + this.value() + " options:" + this.options();
 	}
 	
-	hand_blackjack.prototype.option = function(opt) {
-		for (var x = 0; x < this.options().length; x++) {
-			if ( this.options()[x] == opt ) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	hand_blackjack.prototype.options = function() {
-		//console.log('get options:' + this.cards.length);
+	hand_blackjack.prototype.options = function() {		
 		var opts = new Array();
-		if ( this.stayed || this.bust() || this.cards.length < 2 ) { 
+		if ( this.stayed || this.bust() ) { 
 			return opts;
 		} else if ( this.cards.length < 2 ) {		
 			opts[opts.length] = 'deal';
@@ -66,9 +55,10 @@ define(["card"], function(card) {
 			opts[opts.length] = 'hit';						
 		}
 		opts[opts.length] = 'stay';
+		console.log('player options:' + opts);
 		return opts;
 	}	
-			
+	
 	hand_blackjack.prototype.bj = function() {
 		return this.value() == 21 && this.cards.length == 2;
 	}
@@ -93,10 +83,13 @@ define(["card"], function(card) {
 					//console.log('not counting:' + this.cards[x]);
 				}
 			}
-			if ( this.hasAce() && v <= 11 ) { v = v + 10; }
+			if ( this.hasAce() && v <= 11 ) {
+				this.soft = true;
+				v = v + 10; 
+			} 
 			return v;
 		} catch (err) {
-			console.warn("error with hand_blackjack value:" + err);
+			//console.warn("error with hand_blackjack value:" + err);
 			return v;
 		}
 	}

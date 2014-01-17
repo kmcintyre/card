@@ -1,11 +1,25 @@
+.table {
+	text-align: center;
+}
+
+//
 .seat {
-	float:right;
+	position:absolute;		
 }
 
-.seat:first-child {
-   background-color: blue;
+//
+#seat0 {
+	width:100%;
+	left:50%;
+	top:0;
 }
 
+//
+.player > .chips {
+	display:block;	
+}
+
+//
 .hand > img {
-    width:50px;
+    width:100px;
 }
