@@ -1,19 +1,22 @@
 define(["card", "hand"], function(card, hand) {
-
-	bjValues = {"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"10":10,"J":10,"Q":10,"K":10,"A":1};
 	
-	card.prototype.bjValue = function() {
-		return bjValues[this.card];
-	}	
-	
-	function hand_blackjack() {
-		hand.call(this);
-		this.cards = new Array();
+	function hand_blackjack(bet) {
+		hand.call(this, bet);
 		this.stayed = false;
 		this.unexposed = null;
+		this.isBj = false;
 	}	
 	hand_blackjack.prototype = new hand();
 	hand_blackjack.prototype.constructor=hand_blackjack;
+	
+	hand_blackjack.prototype.simple = function() {
+		var j = hand.prototype.simple.call(this);
+		j['stayed'] = this.stayed;
+		j['unexposed'] = (this.unexposed == null?false:true);
+		j['isBj'] = (this.isBj == null?this.bj() : this.isBj);
+		return j;
+	}
+	
 
 	hand_blackjack.prototype.hit = function(c) {
 		this.cards[this.cards.length] = c;
@@ -38,7 +41,7 @@ define(["card", "hand"], function(card, hand) {
 	
 	hand_blackjack.prototype.options = function() {		
 		var opts = new Array();
-		if ( this.stayed || this.bust() ) { 
+		if ( this.stayed || this.bust() || ( this.value() == 21 && this.cards.length > 2 ) ) { 
 			return opts;
 		} else if ( this.cards.length < 2 ) {		
 			opts[opts.length] = 'deal';
@@ -47,7 +50,7 @@ define(["card", "hand"], function(card, hand) {
 		if ( this.cards.length == 2 ) {
 			opts[opts.length] = 'double';
 		}
-		if ( this.cards.length == 2 && this.cards[0].card == this.cards[1].card) {
+		if ( this.cards.length == 2 && this.cards[0].bjValue() == this.cards[1].bjValue()) {
 			opts[opts.length] = 'split';			
 		}
 		
@@ -55,7 +58,6 @@ define(["card", "hand"], function(card, hand) {
 			opts[opts.length] = 'hit';						
 		}
 		opts[opts.length] = 'stay';
-		//console.log('player options:' + opts);
 		return opts;
 	}	
 	

@@ -1,0 +1,65 @@
+body, input, button, select, option, textarea {
+    font-size: 1.4em;
+}
+
+.table, .hand, .options, .player, .bet, .card, .nick, ._id {	
+	position:absolute;
+}
+
+
+
+//
+.hand {
+	background-color:green;
+	text-align:center;	
+	background-color:pink;
+}
+
+//
+.options {
+	padding:.5em;
+	z-index:2;
+}
+
+//
+.options > button {
+	padding:.5em;
+}
+
+//
+.chips {
+	background-color:yellow;	
+}
+
+//
+.player {
+	background-color:lightblue;
+}
+
+//
+.seat {
+	margin:.5em;
+	padding:.5em;
+		
+}
+//
+.nada {
+	border: .1em solid brown;
+}
+
+//
+.nick {
+	text-transform:uppercase;
+	position:absolute;
+	background-color:blue;	
+	padding: 1em;
+}
+//
+.error {
+	background-color:red;
+}
+//
+._id {
+	background-color:orange;
+	width:100%;
+}

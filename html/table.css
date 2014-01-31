@@ -1,41 +1,45 @@
-body {
-	overflow:hidden;
-	font-size: 1.5em;
+body {	
+	font-size: 1.2em;
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#0B5B06), to(#299A0B)); 
+	background: -webkit-linear-gradient(top, #0B5B06, #299A0B); 
+	background: -moz-linear-gradient(top, #0B5B06, #299A0B); 
+	background: -ms-linear-gradient(top, #0B5B06, #299A0B); 
+	background: -o-linear-gradient(top, #0B5B06, #299A0B);
+	color:gold;
 }
 
 input, button, select, option, textarea {
-    font-size: 1.0em;
+	display: inline-block;
+    font-size: 1.75em;
+    margin: 2px!important;
+    color:black;
 }
-
-.table, .seat, .options, .hand, .bet, .player, .nick, ._id,  {	
-	position:absolute;
-}
-
-.hand {
-	border: .1em solid brown;
-	-webkit-transform: rotate(180deg);
-	-moz-transform: rotate(180deg);
-	-o-transform: rotate(180deg);
-	-ms-transform: rotate(180deg);
-	transform: rotate(180deg);			
-}
-
 
 //
-.seat {
+.table {
 	border: .1em solid brown;
 }
 
-.hand > .bet {
-	font-size: 2.0em;
+.minimum:before {
+  	display:inline;
+  	content: "Min:";
 }
 
-.options > button {
-	display:inline-table;
+._id:before {
+  	display:inline;
+  	content: "Id:";
 }
 
+._id {
+	visibility:hidden;
+	float:right;
+}
 
-.card {
-	width: 4.5em;
-	padding:.1em;	
+.chips:before {
+  display:inline;
+  content: "Chips:";
+}
+.name:before {  
+  display:inline;
+  content: "Name:";	
 }

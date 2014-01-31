@@ -1,25 +1,44 @@
-.table {
-	text-align: center;
+body {
+	overflow: hidden;
 }
 
-//
-.seat {
-	position:absolute;		
+.card,.hand,.options,.bet,.insurance,.double,.bj,.chair,.player,.payout {
+	position:absolute;
 }
-
-//
-#seat0 {
-	width:100%;
-	left:50%;
+.options {
+	z-index:22;	
+}
+.table > .options {	
+	clear:both;
+	position:relative;	
+}
+.seat > .options > button {
+	display:inline-block;
+}
+.table > .options {
+	position:absolute;
+	right:0;
 	top:0;
 }
-
-//
-.player > .chips {
-	display:block;	
+.hand > .options > button {
+	display:block;
 }
-
+.table > .options > button {
+	display:block;
+}
+.bet, .insurance, .double, .payout {
+	color:black;
+	background-image:url('/deck/chip.svg');
+	background-size:100%;	
+}
+.seat {
+	position: absolute;	
+}
 //
-.hand > img {
-    width:100px;
+.hand {		
+	-webkit-transform: rotate(180deg);
+	-moz-transform: rotate(180deg);
+	-o-transform: rotate(180deg);
+	-ms-transform: rotate(180deg);
+	transform: rotate(180deg);			
 }

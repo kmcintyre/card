@@ -24,5 +24,9 @@ define(["deck"], function(deck) {
 		this.folded = true;
 	}
 	
+	hand.prototype.simple = function() {
+		return { cards: this.cards, bet: this.bet, options: this.options(), folded: this.folded };
+	}
+	
     return hand;
 });

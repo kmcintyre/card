@@ -1,0 +1,99 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+      #myCanvas {
+      	position:absolute;
+      	top:0;
+      	left:0;
+      	z-index:5;
+      }
+      #burner {
+      	position:absolute;
+      	top:0;
+      	left:0;
+      }      
+    </style>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  </head>
+  <body>
+  	<canvas id="table"></canvas>
+  	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>  	    
+    <script>
+    	$( document ).ready(function() {
+	      var canvas = document.getElementById('table'), 
+    	  $(window).resize(function() {
+    	  		canvas.getContext('2d').clearRect ( 0 , 0 , canvas.width , canvas.height );
+    	  });
+    	  
+		  canvas.width  = document.documentElement.clientWidth;
+  		  canvas.height = document.documentElement.clientHeight;
+    	  
+    	
+    		/
+    	  $("#myCanvas").css({"height": "100%", "width": "100%"});
+
+			function drawTextAlongArc(context, str, hei, centerX, centerY, radius, angle, above) {
+			    var met, wid;
+			    context.save();
+			    context.translate(centerX, centerY);
+			    if (!above) {
+			        radius = -radius;
+			        angle = -angle;
+			    }
+			    else{
+			        hei = 0;
+			    }
+			    context.rotate(-1 * angle / 2);
+			    context.rotate(-1 * (angle / str.length) / 2);
+			
+			    for (var n = 0; n < str.length; n++) {
+			        var char = str[n];
+			        met = context.measureText(char);
+			        wid = met.width;
+			        console.log(met);
+			
+			        context.rotate(angle / str.length);
+			        context.fillText(char, -wid / 2, -radius + hei);
+			        context.strokeText(char, -wid / 2, -radius + hei);
+			    }
+			    context.restore();
+			}
+
+    	    
+
+	        
+	      centerX = document.documentElement.clientWidth / 2,
+	      centerY = document.documentElement.clientHeight / 2,
+	      angle = Math.PI * 7 / 8,
+	      radius = 150;
+
+	      context.strokeStyle = 'black';	      
+	      context.lineWidth = 2;
+	      context.arc(centerX, -centerY / 2 - 50, centerY * 1.5, Math.PI / 8, 7 * Math.PI / 8, false);
+	      context.stroke();
+	      //context.beginPath();
+	      
+	      
+	      //context.arc(centerX, -centerY / 2, centerY * 1.5, Math.PI / 8, 7 * Math.PI / 8, false);
+	      //context.fillStyle = '#0B49DB';
+	      //context.fill();
+	      //context.stroke();
+	      //drawTextAlongArc(context, 'INSURANCE PAYS 2 to 1', centerX, centerY, radius, angle);
+	
+	      // draw circle underneath text
+	      //alert( canvas.height * 3 / 2 + ' '  + canvas.width); 
+	      
+
+          //context.fill();
+          //context.save();	      
+          //drawTextAlongArc(context, "FOOTBALL CLUB", centerX, -centerY, centerY * 2, 100, Math.PI*3/5, false);          
+	      
+	     });
+    </script>
+  </body>
+</html>

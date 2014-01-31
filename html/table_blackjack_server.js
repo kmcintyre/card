@@ -44,10 +44,10 @@ wss.on('connection', function(ws) {
 	        wss.broadcast( JSON.stringify({ "type": "msg", "txt" : "lost 1 player"}) );
 	    });
 	
-	    ws.on('nick', function(json) {
-	    	console.log('nick:' + json.nick);
-	    	wss.broadcast( JSON.stringify({ "type": "user", "nick": json.nick }), this );
-	    });
+	    //ws.on('nick', function(json) {
+	    //	console.log('nick:' + json.nick);
+	    //	wss.broadcast( JSON.stringify({ "type": "user", "nick": json.nick }), this );
+	    //});
 	    
 	    var p = new player(ws);	    	    	    
 	    ws.send( JSON.stringify({ "type": "msg" , "txt" : "welcome, player", "from": "server"}) );

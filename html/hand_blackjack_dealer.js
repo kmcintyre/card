@@ -28,6 +28,7 @@ define(["hand_blackjack", "deck"], function(hand_blackjack, deck) {
 	hand_blackjack_dealer.prototype.backdoor = function() {
 		this.checked = true;		
 		if ( this.unexposed.card == 'A' ) {
+			this.isBj = true;
 			throw "Backdoor Blackjack";
 		} 		
 		console.log('not a blackjack');
@@ -38,6 +39,7 @@ define(["hand_blackjack", "deck"], function(hand_blackjack, deck) {
 	hand_blackjack_dealer.prototype.insurance = function() {
 		this.insured = true;		
 		if ( this.unexposed.bjValue() == 10 ) {
+			this.isBj = true;
 			throw "Blackjack";
 		} 
 	}

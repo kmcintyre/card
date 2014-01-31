@@ -23,9 +23,26 @@ define(["jquery", "card"], function($, card) {
 			});
 			
 			try {
-				var c = new card(NaN).toString();
+				$("#cardtests").append($("<div>").append(new card(NaN).toImg()) );
 			} catch (err) {
-				$("#nullcard").html( err );
+				$("#cardtests").append($("<div>").append("err:" + err) );
+			}
+			
+			
+			
+			try {
+				$("#cardtests").append($("<div>").append( $(new card(1).toImg()).css('position', 'absolute')) );
+				
+				$("#cardtests").append($("<div>").append(new card(0).toImg()) );
+				$("#cardtests").append($("<div>").append($(new card(0).toImg()).css(
+						{ 
+							'-webkit-transform': 'rotate(-90deg)', 
+							'-moz-transform': 'rotate(-90deg)', 
+							'-o-transform': 
+								'rotate(-90deg)', '-ms-transform': 'rotate(-90deg)', 'transform': 'rotate(-90deg)' 
+							})));
+			} catch (err) {
+				$("#cardtests").append($("<div>").append("err:" + err) );
 			}
 			
 			try {

@@ -10,7 +10,7 @@ define(["jquery", "table", "table_ui", "table_client"], function($, table, table
 		$("#localtables").append("<h2>local tests</h2>");
 		
 		try {
-			$("#localtables").append( $('<div><span class="expo">blank table to json:</span></div>').append( blank.json() ) );
+			$("#localtables").append( $('<div><span class="expo">blank table to json:</span></div>').append( JSON.stringify(blank.simple()) ) );
 		} catch (err) {
 			$("#localtables").append( $('<div><span class="error">null table error:</span></div>').append(err) );			
 		}
@@ -27,7 +27,7 @@ define(["jquery", "table", "table_ui", "table_client"], function($, table, table
 			$("#localtables").append( $('<div><span class="error">blank act error:</span></div>').append(err) );			
 		}		
 
-		var json = blank.json()
+		var json = blank.simple()
 		console.info('blank json:' + JSON.stringify(json));
 		var clone = JSON.parse(json);
 		
