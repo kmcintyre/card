@@ -8,6 +8,9 @@ define(["deck"], function(deck) {
 			this.cards = this.cards.concat( new deck().cards );
 		}
 		this.penetration = parseInt(this.cards.length * this.number_of_decks / (this.number_of_decks + 1));
+		if ( this.penetration == 0 ) {
+			this.penetration = 16;
+		}
 		console.log('penetration:' + this.penetration);
 		this.shuffle();
 	}

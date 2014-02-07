@@ -6,23 +6,23 @@ body {
 	background: -ms-linear-gradient(top, #0B5B06, #299A0B); 
 	background: -o-linear-gradient(top, #0B5B06, #299A0B);
 	color:gold;
-}
+} 
 
 input, button, select, option, textarea {
 	display: inline-block;
-    font-size: 1.75em;
-    margin: 2px!important;
+    font-size: 25pt;
     color:black;
+    z-index:23;
+}
+
+input[type='range'] {
+	margin: 0;
+	position: absolute;	
 }
 
 //
 .table {
 	border: .1em solid brown;
-}
-
-.minimum:before {
-  	display:inline;
-  	content: "Min:";
 }
 
 ._id:before {

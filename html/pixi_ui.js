@@ -2,15 +2,15 @@ define(["jquery", "pixi", "table_blackjack"], function($, PIXI, table_blackjack)
 	
 	$(function() {
 		
-		var bj = new table_blackjack();
+		//var bj = new table_blackjack();
 		
-		bj.addseat();
-		bj.addseat();
-		bj.addseat();
-		bj.addseat();
-		bj.addseat();
-		bj.addseat();
-		bj.addseat();
+		//bj.addseat();
+		//bj.addseat();
+		//bj.addseat();
+		//bj.addseat();
+		//bj.addseat();
+		//bj.addseat();
+		//bj.addseat();
 		
 		// create an new instance of a pixi stage
 	    var stage = new PIXI.Stage(0x66FF99);	 	   
@@ -31,8 +31,8 @@ define(["jquery", "pixi", "table_blackjack"], function($, PIXI, table_blackjack)
 	    bunny.anchor.y = 0.5;
 	 
 	    // move the sprite t the center of the screen
-	    bunny.position.x = 200;
-	    bunny.position.y = 150;
+	    bunny.position.x = 400;
+	    bunny.position.y = 300;
 	 
 	    stage.addChild(bunny);
 	 

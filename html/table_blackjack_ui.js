@@ -16,39 +16,32 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 	}
 	
 	function table_blackjack_ui(table, container) {
-		console.log('new blackjack ui');
 		table_ui.call(this, table, container);
 	}
 	
 	table_blackjack_ui.prototype = new table_ui();
 	table_blackjack_ui.prototype.constructor=table_blackjack_ui;	
-	
 
 	table_blackjack_ui.prototype.rules = function() {
-		if ( $(this.container + ' > #' + this.table.id + ' > .seat:first > .hand > .options > button').val() == 'insurance' ) {
-			$(this.container + ' > #' + this.table.id + ' > .seat:not(:first) > .hand > .bet').siblings('.options').empty().append(
-					$(this.container + ' > #' + this.table.id + ' > .seat:first > .hand > .options > button').clone(true)
+		if ( $('#' + this.table.id + ' > .seat:first > .hand > .options > button').val() == 'insurance' ) {
+			$('#' + this.table.id + ' > .seat:not(:first) > .hand > .options').remove();
+			$('#' + this.table.id + ' > .seat:not(:first) > .hand > .bet:parent').append(
+					$('#' + this.table.id + ' > .seat:first > .hand > .options').clone(true).css({"left": -$("#burner").width(), "bottom": $("#burner").height() + $(this).siblings(".bet").length * $("#chip").height() })
 			);
-			$(this.container + ' > #' + this.table.id + ' > .seat:not(:first) > .hand > .bj').parent().find(".options > button").html('Even').val('even');			
-		} else if ( $(this.container + ' > #' + this.table.id + ' > .seat:first > .hand > .options > button').val() == 'backdoor' ) {
-			$(this.container + ' > #' + this.table.id + ' > .seat:not(:first)').find('> .hand > .options').empty();
-		} else if ( $(this.container + ' > #' + this.table.id + ' > .seat:first > .hand > .options > button').val() == 'expose' && $('#' + this.table.id + ' .seat:not(:first) .hand .options').length > 0 ) {
+			$('#' + this.table.id + ' > .seat:first > .hand > .options > button[value="insurance"]').html('insurance close');
+		} else if ( $('#' + this.table.id + ' > .seat:first > .hand > .options > button').val() == 'backdoor' ) {
+			$('#' + this.table.id + ' > .seat:not(:first)').find('> .hand > .options').empty();
+		} else if ( $('#' + this.table.id + ' > .seat:first > .hand > .options > button').val() == 'expose' && $('#' + this.table.id + ' .seat:not(:first) .hand .options').length > 0 ) {
 			$('#' + this.table.id + ' .seat .hand .options').each(function(i) {
 				console.log( $(this).closest(".seat").attr('seat') + ' ' + i );
 				if ( i != 1) {					
 					$(this).remove();
 				} 
 			});
-			//console.log( $('#' + this.table.id + ' .seat .hand .options').length );
-			//$('#' + this.table.id + ' .seat:first .hand .options').remove();
-			//console.log( $('#' + this.table.id + ' .seat .hand .options').length );
-			//$('#' + this.table.id + ' .seat .hand .options')
-			//if ( $('#' + this.table.id + ' .seat .hand .options').length > 1 ) {
-//				$('#' + this.table.id + ' .seat .hand .options:not(:first)').remove();
-	//		}
 		} 
-		$(this.container + ' > #' + this.table.id + ' > .seat:not(:first) > .hand:eq(' + this.table.splitlimit + ')').parent().find("button[value='split']").remove();
-		
+		$('#' + this.table.id + ' .seat').find('.hand:gt('+ (this.table.splitlimit - 1) + ')').each(function() { $(this).parent().find('button[value="split"]').remove(); });
+		$('#' + this.table.id + ' > .seat:not(:first) > .hand > .bj').parent().find(".options > button[value='insurance']").html('Even').val('even');
+		//$('#' + this.table.id + ' > .seat:not(:first) > .hand > .options > button[value='insurance']")
 	}
 	
 	table_blackjack_ui.prototype.re = function() {
@@ -62,14 +55,15 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 		$("#" + this.table.id).css({"overflow":"hidden", "height": "100%", "width": "100%"});
 		var chairwidth = document.documentElement.clientWidth / seats;
 				
-		$("#" + this.table.id).find(".seat").each(function(s) {
-			
+		$("#" + this.table.id).find(".seat").each(function(s) {			
 			if ( s == 0 ) {
-				$(this).css('left', 0 );
-				$(this).width('100%');
+				$(this).css({'left':0, "width": "100%"});
 			} else {
-				$(this).width(chairwidth);
-				$(this).css('bottom', $("#chip").height() );
+				var bot = $(this).find(".player .name").outerHeight() + $(this).find(".player .chips").outerHeight();
+				if ( bot == 0 ) {
+					bot = $(this).find("button").outerHeight() + 10;
+				}
+				$(this).css({"width": chairwidth, "bottom": bot});				
 				if ( (s - 1) / (seats - 1) > .5 ) {					
 					$(this).css('left',  (seats - s) *  chairwidth);
 				} else if ( (s- 1) / (seats - 1) < .5 ) {
@@ -79,41 +73,62 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 				}				
 			}			
 			
+			$(this).children('.player').each(function() {
+				$(this).css({"left": $(this).parent().width() / 2 - $(this).children(".name").outerWidth() / 2});
+			});
+			
 			$(this).children('.options').each(function() {
-				$(this).css({"left" : $(this).parent().outerWidth() / 2 - $(this).outerWidth() / 2 });
+				$(this).css({"left": $(this).parent().width() / 2 - $(this).outerWidth() / 2});
 				if ( s == 0 ) {
 					$(this).css({"margin-top" : $(this).parent().outerHeight() });
-				} else {
-					$(this).css({"margin-top" : -$(this).outerHeight() });
 				}
 			});
 			
 			$(this).find(".hand").each( function(h) {
 
-				if ( s != 0) {			
-					//$(this).css({"bottom": 0 });
-				} else {
-					//$(this).offset({"top": $(this).parent().height() + $("#burner").height() / 8 });
-				}								
-				
 				var splits = $(this).siblings(".hand").length;
 				if ( splits == 0 ) {
 					$(this).css("left", $(this).parent().width() / 2);
 				} else {
 					console.log('splits:' + splits);					
 					var handwidth = $(this).closest('.seat').width() / (splits + 1);
-					$(this).css("left", Math.max( $(this).parent().width() - handwidth * (h + 1), 0 ) + $("#burner").width() / 2);					
+					$(this).css({"left" : $(this).parent().width() - handwidth * (h + 1) +  handwidth / 2, "z-index": $(this).find('.options button').length});					
 				}				
+
+				if ( s == 0 ) {
+					$(this).css({"top": $(this).children(".player").outerHeight()});
+					$(this).children(".options").css({"left":$("#burner").width()/2,"top":$("#chip").height()/2});
+				} else {
+					$(this).children(".options").each( function() {
+						$(this).css({"left": -$("#burner").width(), "bottom": $("#burner").height() + $(this).siblings(".bet").length * $("#chip").height() })
+					});					
+				}
 				
-				//$(this).children('.options').css({'margin-left': $("#burner").width() / 1.5});
-				//if ( s == 0 ) {
-				//	$(this).children('.options').css({'top': $("#burner").height() / 2});	
-				//} else {
-				//	$(this).children('.options').css({'top': -$("#burner").height() / 2});
-				//}
-								
+				$(this).children(".bet").each(function() {
+					$(this).css({"left":-$(this).width()/2, "bottom":$("#chip").height()/2-$(this).height()/2});
+					$(this).append( $('#chip').clone().css({"z-index": "-1", "position": "absolute", "left": -$("#chip").width()/2+$(this).width()/2, "bottom" : -$("#chip").height()/2+$(this).height()/2}).show() );
+				});
+				
+				$(this).children(".double").each(function() {
+					$(this).css({"left":-$(this).width()/2, "bottom":$('#burner').height()});
+					$(this).append( $('#chip').clone().css({"z-index": "-1", "position": "absolute", "left": -$("#chip").width()/2+$(this).width()/2, "bottom" : -$('#chip').height()/2 + $(this).height()/2}).show() );
+				});
+
+				$(this).children(".insurance").each(function() {
+					$(this).css({"left":-$(this).width()/2, "bottom":$('#burner').height() + 2 * $('#chip').height()});
+					$(this).append( $('#chip').clone().css({"z-index": "-1", "position": "absolute", "left": -$("#chip").width()/2+$(this).width()/2, "bottom" : -$('#chip').height()/2 + $(this).height()/2}).show() );
+				});
+				
+				$(this).children(".bj").each(function() {
+					// clear player - bet - cards - style
+					$(this).css(( s == 0 ? "top" : "bottom" ), 
+							$(this).siblings(".bet,.payout").length * $("#chip").height() + $("#burner").height() + $(this).closest(".seat").find(".player").outerHeight() + styleobject.offset 
+					);				
+				});
+				
 				$(this).find(".card").each( function(c) {
 					if ( s == 0 ) {
+						$(this).css("top", $(this).parent().siblings(".player").outerHeight());
 						if ( c == 0 && $(this).siblings(".card").length == 0 ) {
 							$(this).css("left", -$("#burner").width() / 2);
 							$(this).css(getimgstyle($(this).attr('src')));
@@ -125,16 +140,16 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 								var _b = new card();
 								_b.fromSrc( $(this).attr('src') );																				
 								if ( _b.bjValue() ) {								
-									$(this).css("z-index", 2 );
+									$(this).css("zIndex", 2 );
 								} else {
-									$(this).css("z-index", 0 );									
+									$(this).css("zIndex", 0 );									
 								}								
 							}							
 						}  else if ( c == 0 ) {
 							$(this).css("left", -$("#burner").width() / 2 );
 							$(this).css(getimgstyle($(this).attr('src')));
 							if ( $(this).siblings(".card").length == 1 ) {
-								$(this).css("z-index", 1);
+								$(this).css("zIndex", 1);
 							}							
 						} else if ( c > 1) {
 							$(this).css("left", -$("#burner").width() * 3 / 4 - $("#burner").width() / 4 * (c-1) );
@@ -146,31 +161,28 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 						} else {
 							$(this).css(getimgstyle($(this).attr('src')));
 						}
+						var uc = styleobject.offset;
+						if ( $(this).siblings(".bet").length + $(this).parent().siblings(".payout").length > 0 ) {
+							uc = $("#chip").height() + styleobject.offset;
+						}  
+						
 						if ( c > 1 ) {
-							$(this).css("bottom", c * $("#burner").height() / 5);
+							$(this).css("bottom", c * $("#burner").height() / 5 + uc );
 							$(this).css("left", -$("#burner").width() / 2 );
 						} else if ( c == 1 ) {
 							$(this).css("left", -$("#burner").width() * 3 / 4 );
-							$(this).css("bottom", styleobject.offset);
+							$(this).css("bottom",uc);
 						} else {
 							$(this).css("left", -$("#burner").width() / 4 );
-							$(this).css("bottom", styleobject.offset);
-						} 
+							$(this).css("bottom", uc);
+						}
 					}
 				});
 			});
 		});
-		
-		$("#" + this.table.id).find('.bet,.insurance,.double,.payout').css({ "width" : $("#chip").width(), "height" : $("#chip").height()});		
-		$("#" + this.table.id + " > .seat > .chair").each( function() { $(this).css({"left": $(this).parent().width() / 2 - $(this).outerWidth() / 2}) });
-		$("#" + this.table.id + " > .seat > .bet,.payout").each( function() { $(this).css({"left": $(this).parent().width() / 2 - $("#chip").width() / 2 }) });		
-		$("#" + this.table.id + " > .seat > .hand > .bet").each( function() { $(this).css({"left": -$("#chip").width() / 2, "bottom": -$("#chip").height() })});
-		$("#" + this.table.id + " > .seat:not(:first) > .hand > .options").each( function() { $(this).css({"left": -$("#burner").width(), "bottom": $("#burner").height() })});		
-		//$("#" + this.table.id + " > .seat > .hand > .double,.payout").each( function() { $(this).css({"left": -$("#chip").width(), "bottom": $("#chip").height()})});
-		$("#" + this.table.id + " > .seat > .hand > .insurance").each( function() { $(this).css({"left": -$("#chip").width() / 2, "bottom": $("#burner").height() })});
-		$("#" + this.table.id + " > .seat > .hand > .double").each( function() { $(this).css({"left": -$("#chip").width() / 2, "bottom": $("#burner").height() / 4, "z-index": 50 })});		
-		$("#" + this.table.id + " > .seat > .player").each( function() { $(this).css({"left": $(this).parent().width() / 2 + $("#chip").width() / 2 })});
-		//$(this).find('.name').css({"margin-left":"100px"});
+		$(document).unbind('keydown');
+		$(window).unbind('mousewheel DOMMouseScroll');
+		this.bets();		
 	}
 	
 	/*
@@ -188,8 +200,7 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 				if ( obj['hand' + splits].isBj) {
 					console.log('bj');
 					append_to.find(' > .hand:eq(' + splits + ')').prepend('<div class="bj">BJ!</div>');
-				}
-				
+				}				
 				splits++;
 			} else {
 				break;
@@ -205,11 +216,12 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 		console.log('seats:' + this.table.seats.length);
 		for (var x = 1; x < this.table.seats.length; x++) {
 			if ( this.table.seats[x].hand0 && this.table.seats[x].hand0.insurance && !this.table.seats[x].hand0.isBj ) {
-				$(this.container + ' > #' + this.table.id + ' > .seat:eq(' + x + ') > .hand:first').prepend( $('<div class="insurance"/>').append(this.table.seats[x].hand0.insurance) );
+				$('#' + this.table.id + ' > .seat:eq(' + x + ') > .hand:first').prepend( $('<div class="insurance"/>').append(this.table.seats[x].hand0.insurance) );
 			} 
 		}
-		$(this.container + ' > #' + this.table.id + ' .seat:not(:first) .hand .options button[value="deal"]').remove();
-		//$(this.container + ' > #' + this.table.id).find('.bet,.insurance,.double').css({"margin-left": -$("#burner").width()});
+		$('#' + this.table.id + ' .seat:not(:first) .hand .options button[value="deal"]').remove();		
+		//$('#' + this.table.id + ' .seat:first .chair').html( $('#' + this.table.id + ' .seat:first .chair').attr('title') );
+		//$('#' + this.table.id + ' .seat:first .chair').each( function () { $(this).css("top", -$(this).outerHeight() ); });
 	}
 	
 	return table_blackjack_ui;

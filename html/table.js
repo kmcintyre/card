@@ -28,12 +28,8 @@ define(["hand"], function(_hand) {
 			if ( this.player && this.payout ) {
 				opts[opts.length] = 'collect';				
 			} else if ( this.player && !this.hand(true) ) {
-				if ( this.player.chips > 0 ) {
-					opts[opts.length] = 'bet';
-				} else {
-					opts[opts.length] = 'buy-in';
-				}
-								
+				opts[opts.length] = 'bet';
+				opts[opts.length] = 'buy-in';
 				opts[opts.length] = 'stand';
 			}			
 			return opts;
@@ -76,7 +72,8 @@ define(["hand"], function(_hand) {
 		this.locked = false;
 		this.seats = new Array();
 		this.chips = 0;
-		this.minimum = 0;		
+		this.minimum = 0;
+		this.denomination = 1;
 	};
 
 	table.prototype.hand = function(seat, inactive) {
@@ -94,6 +91,7 @@ define(["hand"], function(_hand) {
 				title: this.title, 
 				options: this.options(),
 				minimum: this.minimum,
+				denomination: this.denomination,
 				seats: new Array() 
 		};
 		for (var x = 0; x < this.seats.length; x++) {
@@ -132,7 +130,7 @@ define(["hand"], function(_hand) {
 	table.prototype.options = function() {
 		var opts = [];
 		if ( !this.locked ) {
-			opts[opts.length] = 'addseat';
+			opts[opts.length] = 'add seat';
 		}
 		return opts;
 	}
@@ -150,7 +148,7 @@ define(["hand"], function(_hand) {
     		throw "Seat Unavailable";
     	} else {
     		console.log('welcome:' + person.name );
-			this.seats[seat].player = { name: (person.name?person.name:'Anonymous'), chips: 1000 };			
+			this.seats[seat].player = { name: (person.name?person.name:'Anonymous'), chips: 100 * this.minimum };			
     	}    	
     }
     
@@ -173,11 +171,14 @@ define(["hand"], function(_hand) {
     	if ( !amount ) { amount = 0; }
     	console.info('bet amount:' + amount + ' chips:' + this.seats[seat].player.chips);
     	if ( this.seats[seat].player && amount >= 0 ) {
-    		if ( this.seats[seat].player.chips >= amount ) {
+    		if ( amount % this.denomination > 0 ) {
+    			console.log('tweaking down bet for denomination');
+    			amount = amount - (amount % this.denomination);
+    		}    		
+    		if ( this.seats[seat].player.chips >= amount || this.seats[seat].player.chips + this.seats[seat].bet >= amount  ) {
     			console.log('player has chips:' + this.seats[seat].player.chips);
     		} else {
     			console.log('player lacks chips');
-    			//this.seats[seat].player.chips = 0;
     			return;    			
     		}
     		if ( this.seats[seat].bet || typeof this.seats[seat].bet === 'number'  ) {

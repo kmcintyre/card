@@ -30,9 +30,9 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
     	seats[0].options = function() {    		
     		if ( this.activeseat(true) == null && this.activebet() != null ) {
     			return ['deal'];
-    		} else if ( this.activeseat(true) == null && this.activebet() == null ) {
+    		} else if ( this.activeseat(true) == null && this.activebet() == null ) {    			
+    			//return ['new dealar'];    			
     			return [];
-    			//return ['change'];    			
     		} else {
     			return [];    			
     		}
@@ -59,17 +59,19 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
 	
 	function table_blackjack() {
 		table.call(this);
-		this.shoe = new shoe();
+		this.shoe = new shoe(2);
 		this.shoe.burn(1);
-    	this.minimum = 100;
-    	this.maximum = 1000;    
-    	this.splitlimit = 3;
-    	this.dd = true;
+		this.minimum = 5;
+    	//this.maximum = 1000;    
+    	this.splitlimit = 3;    	
+    	this.forlesssplit = false;
+    	this.forlessdouble = true;
+    	this.downdirty = true;    	
     	this.addseat();
     	this.seats[0].chair = 'Dealer';
     	this.sit(0, { name: 'Dealer'});
     	delete this.seats[0].player.chips;  
-    	this.seats[0] = new dealer(this.seats);
+    	this.seats[0] = new dealer(this.seats);    	
     }
 	
 	table_blackjack.prototype = new table();
@@ -152,6 +154,7 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
 			console.log('deal played in shoe:' + this.shoe.played && this.shoe.penetration)
 			if ( this.shoe.played > this.shoe.penetration ) {
 				this.shoe.shuffle();
+				this.shoe.played = 0;
 				this.shoe.burn(1);
 			} 
 			if ( !this.seats[0].hand(true) ) {
@@ -206,12 +209,16 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
 	    	splits++;
 	    }
     	console.log('split:' + splits);
-    	if ( splits <= this.splitlimit ) {
+    	if ( splits <= this.splitlimit && (this.seats[seat].player.chips >= this.hand(seat).bet || (this.forlesssplit && this.seats[seat].player.chips > 0) ) ) {
     		var splithand = this.hand(seat).split();
     		console.log('split hand:' + splithand);
         	if ( this.hand(seat).bet ) {
         		splithand.bet = this.hand(seat).bet;        
         		this.seats[seat].player.chips -= this.hand(seat).bet;
+        		if ( this.seats[seat].player.chips < 0 ) {
+        			splithand.bet += this.seats[seat].player.chips;
+        			this.seats[seat].player.chips = 0;
+        		}
         	}
         	this.seats[seat]['hand' + splits] = splithand;
         	this.deal( seat );
@@ -229,12 +236,27 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
     
     table_blackjack.prototype.double = function(seat) {
     	if ( this.seats[0].activeseat() == seat ) {
-    		this.seats[seat].player.chips -= (this.hand(seat).bet ? this.hand(seat).bet: 0);
-    		this.hand(seat).doubled = (this.hand(seat).bet ? this.hand(seat).bet: 0);
-    		console.log('double down:' + this.hand(seat).doubled);
-    		this.hand(seat).double( this.shoe.next(), this.dd );
+    		if ( this.seats[seat].player.chips >= this.hand(seat).bet) {
+    			this.seats[seat].player.chips -= (this.hand(seat).bet ? this.hand(seat).bet: 0);
+    			this.hand(seat).doubled = (this.hand(seat).bet ? this.hand(seat).bet: 0);
+    			console.log('double down:' + this.hand(seat).doubled);
+    			this.hand(seat).double( this.shoe.next(), this.downdirty );
+    		} else if ( this.seats[seat].player.chips > 0 && this.forlessdouble ) {
+    			this.hand(seat).doubled = this.seats[seat].player.chips;
+    			this.seats[seat].player.chips = 0;
+    			this.hand(seat).double( this.shoe.next(), this.downdirty );
+    		}
     	}
     }    
+    
+    table_blackjack.prototype.collect = function(seat) {
+    	if ( this.seats[seat].payout ) {
+    		table.prototype.collect.call(this, seat);
+    		if ( this.hand(seat,true) ) {
+    			console.log('hand here');
+    		}
+    	}
+    }
 
     table_blackjack.prototype.payout = function() {
     	console.log('called payout');
@@ -254,7 +276,7 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
 					if ( this.hand(x,true).bj() && !this.hand(x,true).isSplit  && !this.hand(x,true).doubled ) {
 						if ( this.hand(x,true).bet ) {
 							console.log('bj!');
-							this.dispense( x, this.hand(x,true).bet * 2.5 ); 
+							this.dispense( x, parseFloat(this.hand(x,true).bet) * 2.5 ); 
 						}
 					} else {						
 						console.log('straight winner');

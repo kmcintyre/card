@@ -5,7 +5,7 @@
       body {
         overflow:hidden;
       }
-      #myCanvas {
+      #table {
       	position:absolute;
       	top:0;
       	left:0;
@@ -24,30 +24,40 @@
     	$( document ).ready(function() {
 	      var canvas = document.getElementById('table');
     	  
-    	  $(window).resize( function() {    	  	
-    	  	canvas.getContext('2d').clearRect ( 0 , 0 , canvas.width , canvas.height );
-    	  	$("#table").css({"height": "100%", "width": "100%"});
-    	  	canvas.width  = document.documentElement.clientWidth;
-  		  	canvas.height = document.documentElement.clientHeight;
-		    centerX = canvas.width / 2,
-	      	centerY = canvas.height / 2,  		  	
-  		  	canvas.getContext('2d').arc(centerX, -centerY / 2, centerY * 2, Math.PI / 8, 7 * Math.PI / 8, false);
-  		  	canvas.getContext('2d').stroke();
-    	  });
-    	  
-		  canvas.width  = document.documentElement.clientWidth;
-  		  canvas.height = document.documentElement.clientHeight;
-    	  
-	      centerX = canvas.width / 2,
-	      centerY = canvas.height / 2,
-	      angle = Math.PI * 7 / 8,
-	      radius = 150;
+    	  function base(ctx) {
+    	  	console.log(ctx.canvas.width + ' x ' + ctx.canvas.height); 
+	      	ctx.strokeStyle = 'black';	      
+	      	ctx.lineWidth = 2;
+	      	//if ( ctx.canvas.width < ctx.canvas.height ) {    	
+    	  		ctx.arc(ctx.canvas.width / 2, -25, 50, 0, Math.PI);
+    	  		ctx.fill();    	  		
+    	  		ctx.font = "bold 16px Arial";
+  				ctx.fillText(ctx.canvas.width + ' x ' + ctx.canvas.height, ctx.canvas.width / 2, ctx.canvas.height / 2);
+  				
+  				
+  				      // create radial gradient
+      var grd = context.createRadialGradient(238, 50, 10, 238, 50, 300);
+      // light blue
+      grd.addColorStop(0, '#8ED6FF');
+      // dark blue
+      grd.addColorStop(1, '#004CB3');
 
-	      canvas.getContext('2d').strokeStyle = 'black';	      
-	      canvas.getContext('2d').lineWidth = 2;
-	      canvas.getContext('2d').arc(centerX, -centerY / 2, centerY * 1.5, Math.PI / 8, 7 * Math.PI / 8, false);
-	      canvas.getContext('2d').stroke();
-	      
+      context.fillStyle = grd;
+      context.fill();
+  				    	  		
+    	  	//}
+    	  }
+    	  
+    	  $(window).resize( function() {    	  	
+    	  	canvas.getContext('2d').clearRect ( 0, 0, canvas.width, canvas.height);    	  	
+			document.getElementById("table").width  = document.documentElement.clientWidth;
+			document.getElementById("table").height = document.documentElement.clientHeight;			
+			base( document.getElementById("table").getContext('2d') );
+ 		  });
+    	  
+    	  document.getElementById("table").width  = document.documentElement.clientWidth;
+  		  document.getElementById("table").height = document.documentElement.clientHeight;    	  
+    	  base( document.getElementById("table").getContext('2d') ); 	  	      
 	     });
     </script>
   </body>
