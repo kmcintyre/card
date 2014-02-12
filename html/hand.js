@@ -6,6 +6,7 @@ define(["deck"], function(deck) {
 		}
 		this.cards = new Array();
 		this.folded = false;
+		this.ante = 0;
 	}
 	
 	hand.prototype.deal = function(c) {
@@ -25,7 +26,7 @@ define(["deck"], function(deck) {
 	}
 	
 	hand.prototype.simple = function() {
-		return { cards: this.cards, bet: this.bet, options: this.options(), folded: this.folded };
+		return { cards: this.cards, bet: this.bet, options: this.options(), folded: this.folded, ante: this.ante };
 	}
 	
     return hand;

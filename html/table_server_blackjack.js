@@ -119,16 +119,16 @@ wss.on('connection', function(ws) {
     if ( ws.upgradeReq.headers['cookie'] && ws.upgradeReq.headers['cookie'].match( '(^|;) ?swkey=([^;]*)(;|$)' ) ) {
     	var previous_swkey = unescape( ws.upgradeReq.headers['cookie'].match( '(^|;) ?swkey=([^;]*)(;|$)' )[2] );
     	console.log('previous_swkey:' + previous_swkey);
-    	lost(previous_swkey, swkey, ws);
+    	//lost(previous_swkey, swkey, ws);
     }
     ws.send(swkey);
     setTimeout( function() { wss.tablecast(); }, 750);
 	
 	ws.stand = function(seat) {		
 		console.info('client stand:' + seat);
-		if ( !t.seats[seat].player ) {
-			seats_clients[seat] = null;
-		}
+		delete t.seats[seat].player;
+		seats_clients[seat] = null;
+		seats_swkeys[seat] = null;
 	}
 	
 	ws.sit = function(seat) {
@@ -188,8 +188,26 @@ wss.on('connection', function(ws) {
 console.log('start standard in');
 var stdin = process.openStdin();
 stdin.on('data', function(message) {
-	var msg = message.toString().substring(0, message.length - 1);	
-	console.log( t.simple() );
+	var msg = parseInt(message.toString().substring(0, message.length - 1));
+	if ( msg ) {
+		if (t.seats[msg].hand() ) {
+			if ( t.seats[0].activeseat() == msg ) {
+				console.log('staying active hand');
+				t.act({action:"stay", seat:msg});
+				wss.tablecast();
+			} 
+		} else if (t.seats[msg].player) {
+			if ( t.seats[msg].player.chips < t.minimum ) {
+				console.log('stand dead player');
+				t.act({action:"stand", seat:msg});
+				wss.tablecast();
+			}
+		} else {
+			console.log('no one at:' + msg);
+			wss.tablecast();
+		}
+	}
+	//console.log( t.simple() );
 });
 
 var quicktimer = null

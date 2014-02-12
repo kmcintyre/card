@@ -5,7 +5,9 @@
 
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 
 <meta name="description" content="table client page - for tests maybe">
 
@@ -16,8 +18,13 @@
 </head>
 
 <body>
-<img id="chip" style="display:none" src="/deck/chip.svg"/>
-<img id="burner" style="display:none" src="/deck/Blue_Back.png"/>
+<img id="bluechip" class="chip" style="display:none" src="/chip/blue.svg"/>
+<img id="greenchip" class="chip" style="display:none" src="/chip/green.svg"/>
+<img id="whitechip" class="chip" style="display:none" src="/chip/white.svg"/>
+<img id="burner" style="display:none" src="/deck/Blue_Back.svg"/>
 <div id="tables"></div>
+<canvas id="tablecanvas"></canvas>
+<div id="tape">tape</div>
+
 </body>
 </html>

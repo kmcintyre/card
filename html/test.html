@@ -13,7 +13,6 @@
       }
     </style>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.14.1/build/cssreset/cssreset-min.css">
   </head>
   <body>
 	<img id="chip" style="display:none" src="/deck/chip.svg"/>
@@ -26,38 +25,42 @@
     	  
     	  function base(ctx) {
     	  	console.log(ctx.canvas.width + ' x ' + ctx.canvas.height); 
-	      	ctx.strokeStyle = 'black';	      
-	      	ctx.lineWidth = 2;
-	      	//if ( ctx.canvas.width < ctx.canvas.height ) {    	
-    	  		ctx.arc(ctx.canvas.width / 2, -25, 50, 0, Math.PI);
-    	  		ctx.fill();    	  		
-    	  		ctx.font = "bold 16px Arial";
-  				ctx.fillText(ctx.canvas.width + ' x ' + ctx.canvas.height, ctx.canvas.width / 2, ctx.canvas.height / 2);
-  				
-  				
-  				      // create radial gradient
-      var grd = context.createRadialGradient(238, 50, 10, 238, 50, 300);
-      // light blue
-      grd.addColorStop(0, '#8ED6FF');
-      // dark blue
-      grd.addColorStop(1, '#004CB3');
-
-      context.fillStyle = grd;
-      context.fill();
-  				    	  		
-    	  	//}
+	      		      
+	      	//
+	      	//ctx.arc(ctx.canvas.width / 2, -25, 50, 0, Math.PI);
+   	  		//ctx.fill();    	  		
+   	  		//ctx.font = "bold 16px Arial";
+ 			// 			
+      		
+      		//grd.addColorStop(2, 'white');
+      		ctx.fillStyle = grd;
+      		ctx.fill(); 
+      		
+      		ctx.strokeStyle = 'black';
+      		ctx.lineWidth = 2;
+      		
+ 			ctx.fill();
+ 			//
+      		
+      					
     	  }
     	  
     	  $(window).resize( function() {    	  	
     	  	canvas.getContext('2d').clearRect ( 0, 0, canvas.width, canvas.height);    	  	
 			document.getElementById("table").width  = document.documentElement.clientWidth;
-			document.getElementById("table").height = document.documentElement.clientHeight;			
-			base( document.getElementById("table").getContext('2d') );
- 		  });
-    	  
-    	  document.getElementById("table").width  = document.documentElement.clientWidth;
-  		  document.getElementById("table").height = document.documentElement.clientHeight;    	  
-    	  base( document.getElementById("table").getContext('2d') ); 	  	      
+			document.getElementById("table").height = document.documentElement.clientHeight;
+			var ctx = document.getElementById("table").getContext('2d');
+			//ctx.fillText(ctx.canvas.width + ' x ' + ctx.canvas.height, ctx.canvas.width / 2, ctx.canvas.height / 2);			
+			var r = Math.max(document.documentElement.clientWidth, document.documentElement.clientHeight);
+			ctx.strokeStyle = 'gold';
+			ctx.lineWidth = 2;									
+			ctx.arc(ctx.canvas.width / 2, -r/2, r*3/4, 0, Math.PI);
+			ctx.stroke();
+			//var r = Math.max(document.documentElement.clientWidth, document.documentElement.clientHeight);
+			
+			//ctx.arc(ctx.canvas.width / 2, -25, 50, 0, Math.PI);
+ 		  }); 		  
+ 		  $(window).resize();
 	     });
     </script>
   </body>

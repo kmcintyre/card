@@ -73,6 +73,7 @@ define(["hand"], function(_hand) {
 		this.seats = new Array();
 		this.chips = 0;
 		this.minimum = 0;
+		this.ante = 0;
 		this.denomination = 1;
 	};
 
@@ -92,6 +93,7 @@ define(["hand"], function(_hand) {
 				options: this.options(),
 				minimum: this.minimum,
 				denomination: this.denomination,
+				ante: this.ante,
 				seats: new Array() 
 		};
 		for (var x = 0; x < this.seats.length; x++) {
@@ -148,12 +150,12 @@ define(["hand"], function(_hand) {
     		throw "Seat Unavailable";
     	} else {
     		console.log('welcome:' + person.name );
-			this.seats[seat].player = { name: (person.name?person.name:'Anonymous'), chips: 100 * this.minimum };			
+			this.seats[seat].player = { name: (person.name?person.name:'Anonymous'), chips: 10.5 * this.minimum };			
     	}    	
     }
     
     table.prototype.dispense = function(seat, amount) {
-    	amount = parseInt(amount);
+    	amount = parseFloat(amount);
     	if ( !amount ) { console.log('dispense nothing'); return; }
     	if ( !this.seats[seat].payout ) { this.seats[seat].payout = 0; }
     	this.seats[seat].payout += amount;
@@ -167,47 +169,34 @@ define(["hand"], function(_hand) {
     }
     
     table.prototype.bet = function(seat, amount) {
-    	amount = parseInt(amount);
+    	amount = parseFloat(amount);
     	if ( !amount ) { amount = 0; }
-    	console.info('bet amount:' + amount + ' chips:' + this.seats[seat].player.chips);
-    	if ( this.seats[seat].player && amount >= 0 ) {
+    	console.info('bet amount:' + amount + ' chips:' + this.seats[seat].player.chips + ' ante:' + this.ante);
+    	if ( this.seats[seat].bet || typeof this.seats[seat].bet === 'number' ) {
+    		console.log('cancel existing bet');
+    		this.seats[seat].player.chips += this.seats[seat].bet;
+    		delete this.seats[seat].bet;
+    		if ( this.seats[seat].ante ) {
+    			this.seats[seat].player.chips += this.seats[seat].ante;
+    			delete this.seats[seat].ante;
+    		}
+    		if ( amount == 0 || amount < this.minimum ) {
+    			return;
+    		}
+    	}    	
+    	if ( amount >= this.minimum && this.seats[seat].player.chips >= amount + this.ante ) {    		
     		if ( amount % this.denomination > 0 ) {
     			console.log('tweaking down bet for denomination');
     			amount = amount - (amount % this.denomination);
-    		}    		
-    		if ( this.seats[seat].player.chips >= amount || this.seats[seat].player.chips + this.seats[seat].bet >= amount  ) {
-    			console.log('player has chips:' + this.seats[seat].player.chips);
-    		} else {
-    			console.log('player lacks chips');
-    			return;    			
     		}
-    		if ( this.seats[seat].bet || typeof this.seats[seat].bet === 'number'  ) {
-    			var diff = this.seats[seat].bet - amount;
-    			if ( this.seats[seat].bet - diff < this.minimum ) {    				
-    				amount = 0;
-    				diff = this.seats[seat].bet;
-    			}
-    			this.seats[seat].bet = amount;    			
-    			if ( amount == 0 ) {
-    				console.log('remove bet');
-    				delete this.seats[seat].bet;
-    			} else {
-    				console.log('set bet:' + amount);
-    				this.seats[seat].bet = amount;
-    			}
-    			this.seats[seat].player.chips += diff; 
-    		} else if ( amount >= 0 && amount >= this.minimum ) {
-    			if ( amount >= this.seats[seat].chips ) {
-        			console.log('all in');
-        			amount = this.seats[seat].chips;
-        		}    			
-    			this.seats[seat].bet = amount;
-    			this.seats[seat].player.chips -= amount;
-    		} else {
-    			console.log('no bet via 0 or short bet');
+    		this.seats[seat].bet = amount;
+    		this.seats[seat].player.chips -= amount;
+    		if ( this.ante > 0 ) {
+    			this.seats[seat].player.chips -= this.ante;
+    			this.seats[seat].ante = this.ante;
     		}
     	} else {
-    		throw "no bet";
+    		console.log('player lacks chips or under bet table minimum');
     	}
     }
     
@@ -222,7 +211,11 @@ define(["hand"], function(_hand) {
 	    		if ( this.seats[x].player && typeof this.seats[x].bet === 'number' ) {
 	    			console.log('create hand with bet:' + this.seats[x].bet);
     				this.seats[x].hand0 = this.createhand(this.seats[x].bet);
-    				delete this.seats[x].bet;	    			
+    				delete this.seats[x].bet;
+    				if ( this.seats[x].ante ) {
+    					this.seats[x].hand0.ante = this.seats[x].ante;
+    					delete this.seats[x].ante;
+    				}
 	    		}
     		} catch (err) {
     			console.log('skipping seat:' + x);

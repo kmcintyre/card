@@ -5,7 +5,7 @@ define(["hand_blackjack", "deck"], function(hand_blackjack, deck) {
 		hand_blackjack.call(this, bet);
 		this.isSplit = false;
 		this.doubled = null;
-		this.insurance = null;
+		this.insured = null;
 	}
 	
 	hand_blackjack_player.prototype = new hand_blackjack();
@@ -15,7 +15,7 @@ define(["hand_blackjack", "deck"], function(hand_blackjack, deck) {
 		var h = hand_blackjack.prototype.simple.call(this);
 		h['doubled'] = this.doubled;
 		h['isSplit'] = this.isSplit;
-		h['insurance'] = this.insurance;		
+		h['insured'] = this.insured;		
 		return h;
 	}
 	
