@@ -28,13 +28,24 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 		$('#' + this.table.id + ' > .seat > .hand > .options > button[value="insurance"],button[value="backdoor"]').each(function() {
 			$(this).closest('.seat').siblings('.seat').find('.hand .options').remove();			
 			$(this).closest('.options button[value="insurance"]').parent().clone(true).appendTo(
-				$(this).closest('.seat').siblings('.seat').find('.hand')
+				$(this).closest('.seat').siblings('.seat').find('.hand .bet').parent()
 			);	
-			$(this).closest('.options button[value="insurance"]').html('close');			
+			$(this).val() == "insurance" ? $(this).html('close') : console.log('backdoor');			
 		});
 		$('#' + this.table.id + ' .seat').find('.hand:gt('+ (this.table.splitlimit - 1) + ')').each(function() { $(this).parent().find('button[value="split"]').remove(); });
-		$('#' + this.table.id + ' > .seat:not(:first) > .hand > .bj').parent().find(".options > button[value='insurance']").html('even').val('even');
-		
+		if (  $('#' + this.table.id).attr('blackjackpays') == '3-2' ) {
+			$('#' + this.table.id + ' > .seat:not(:first) > .hand > .bj').parent().find(".options > button[value='insurance']").html('even').val('even');
+		}		 
+		$('#' + this.table.id + ' > .seat:first > .hand > .options > button[value="expose"]').each(function() {
+			if ( $(this).closest('.hand').children('.bj').each(function() {
+					$(this).html('Oh no!');
+				}).length == 0 && $(this).closest('.seat').siblings('.seat').find('.hand .options button').length > 0 
+			) { 
+				$(this).closest('.seat').siblings('.seat').find('.hand .options').not(':first').remove();
+				$(this).remove();
+			};
+		});
+				
 		/*
 		$('#' + this.table.id + ' .seat:gt(0)').find('.hand .options button[value="double"],button[value="split"],button[value="insurance"]').each(function() {
 			console.log('check ' + $(this).val() + ':' + ' ' + $(this).closest(".table").attr('forless').indexOf($(this).val()) + ' ' + $(this).closest(".hand").children(".bet").text() + ' ' + $(this).closest('.seat').find('.player .chips').html() );
@@ -85,11 +96,7 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 			if ( s == 0 ) {
 				$(this).css({'left':0, "width": "100%"});
 			} else {
-				var bot = $(this).find(".player .name").outerHeight() + $(this).find(".player .chips").outerHeight();
-				if ( bot == 0 ) {
-					bot = $(this).find("button").outerHeight() + 10;
-				}
-				$(this).css({"width": chairwidth, "bottom": bot});				
+				$(this).css({"width": chairwidth, "bottom": $(this).find(".player .chips").outerHeight()});				
 				if ( (s - 1) / (seats - 1) > .5 ) {					
 					$(this).css('left',  (seats - s) *  chairwidth);
 				} else if ( (s- 1) / (seats - 1) < .5 ) {
@@ -99,9 +106,7 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 				}				
 			}			
 			
-			$(this).children('.player').each(function() {
-				$(this).css({"left": $(this).parent().width() / 2 - $(this).children(".name").outerWidth() / 2});
-			});			
+			$(this).children('.player').children('.name').hide();			
 
 			$(this).children('.payout').each(function () {
 				$(this).css({"left": $(this).closest(".seat").outerWidth()/2-$(this).width()/2, "bottom" : $("#whitechip").height()/2-$(this).height()/2});				
@@ -167,7 +172,7 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 				$(this).children(".bj").each(function() {
 					// clear player - bet - cards - style
 					$(this).css(( s == 0 ? "top" : "bottom" ), 
-							$(this).siblings(".bet,.payout").length * $("#bluechip").height() + $("#burner").height() + $(this).closest(".seat").find(".player").outerHeight() + styleobject.offset 
+							$(this).siblings(".bet,.payout").length * $("#bluechip").height() / 2 + styleobject.offset 
 					);
 					$(this).css("left",$("#bluechip").width()/2);
 				});
@@ -232,7 +237,17 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 				if ( s == 0 ) {									
 					$(this).css({"top" : $(this).siblings('.player').outerHeight() });
 				} else {
-					//$(this).children('button[value="collect"]').each( function() { $(this).css({"bottom":$("#bluechip").width()/2,"left":$("#bluechip").width() * 2 / 3 }) }).remove('~ button[value="bet"]');
+					
+					$(this).find('button[value="stand"]').each(function() {
+						if ( $(this).parent().siblings('.hand,.bet,.payout').length > 0 ) {
+							$(this).remove();
+						} else {
+							$(this).css({'bottom':0, 'left': -$(this).width()-$(this).closest('.seat').find('.player .chips').outerWidth()/2 });
+						}
+												
+					}); 
+					$(this).find('button[value="collect"]').css({'bottom':0,"left":$('#bluechip').width()/2});
+					$(this).find('button[value="rebuy"]').hide();
 					
 					$(document).unbind('keydown dragover');		
 					$(window).unbind('mousewheel DOMMouseScroll');
@@ -252,7 +267,7 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 								sliderjq.attr('max', parseInt(sliderjq.attr('max')) + parseInt($(this).html()));
 							});
 						}
-						$(this).css({"left": $("#bluechip").width() / 2 + styleobject.offset / 2 });
+						$(this).css({"left": $("#bluechip").width() / 2 + styleobject.offset / 2,"bottom" : $(this).closest('.seat').find('.player .chips').outerHeight() });
 						
 						function sliderheight() {
 							return parseInt(sliderjq.val()-sliderjq.attr('min'))/parseInt(sliderjq.attr('max')-sliderjq.attr('min')) * $('#burner').height();
@@ -407,6 +422,14 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 		$("#" + this.table.id).attr("forless" , this.table.forless );
 		$("#" + this.table.id).attr("fornothing" , this.table.fornothing );
 		$("#" + this.table.id).attr("doubleon", this.table.doubleon);
+		$("#" + this.table.id).attr("blackjackpays", this.table.blackjackpays);
+		$("#" + this.table.id).attr("insurancepays", this.table.insurancepays);
+		$("#" + this.table.id).attr("holecards", this.table.holecards);
+		$("#" + this.table.id).attr("downdirty", this.table.downdirty);
+		$("#" + this.table.id).attr("surrender", this.table.surrender);
+		$("#" + this.table.id).attr("soft17", this.table.soft17);
+		
+		$("#" + this.table.id).find('.seat:first .player').hide();
 		
 		console.log('seats:' + this.table.seats.length);
 		//$('#' + this.table.id + ' .seat:not(:first) .hand .options button[value="deal"]').remove();		

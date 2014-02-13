@@ -7,10 +7,10 @@ define(["jquery", "table_blackjack_ui", "table_blackjack", "table_client", "card
 	new table_client().set(tablecast);	
 
 	var bj = new table_blackjack();
-	bj.locked = true;
+	//bj.locked = true;
 	bj.id = 'local';
 	bj.title = '6 deck shoe';
-	
+		
 	function rotatecss(rot) {
 		ang = 'rotate(' + rot + 'deg)';
 		return { '-webkit-transform': ang, '-moz-transform': ang, '-o-transform': ang, '-ms-transform': ang, 'transform': ang };
@@ -42,7 +42,7 @@ define(["jquery", "table_blackjack_ui", "table_blackjack", "table_client", "card
 	}
 		
 	var ui = new table_blackjack_ui(bj, "#tables");
-
+	
 	bj.act = function(step) {
 		console.log(step);
 		if ( step.action == '?'  ) {
@@ -70,16 +70,18 @@ define(["jquery", "table_blackjack_ui", "table_blackjack", "table_client", "card
 			} else if ( parseInt(nm) >= bj.minimum ) {
 				bj.maximum = parseInt(nm);
 			}
-		} else if ( step.action == 'buy-in'  ) {			
+		} else if ( step.action == 'rebuy'  ) {			
 			bj.seats[step.seat].player.chips += 10 * bj.minimum;
 		} else if ( step.action == 'automate'  ) {			
 			bj.automate = true;
+			bj.seats[0].player.name = 'auto';
 			if ( !step.amount ) {
 				step.amount = prompt("dealer delay millis:",1000);
 			}
 			dealer(step.amount);
 		} else if ( step.action == 'manual' ) {
 			if ( quicktimer ) { clearTimeout(quicktimer); }
+			bj.seats[0].player.name = 'manual';
 			delete bj.automate;
 		} else if ( step.action == 'faceup' ) {
 			bj.downdirty = false;					
@@ -94,6 +96,44 @@ define(["jquery", "table_blackjack_ui", "table_blackjack", "table_client", "card
 			}			
 		} else if ( step.action == 'downdirty' ) {
 			bj.downdirty = true;
+		} else if ( step.action == 'blackjackpays' ) {			
+			var blackjackpays = prompt("3-2, 6-5 or 1-1",bj.blackjackpays);
+			if ( blackjackpays == '3-2' || blackjackpays == '6-5' || blackjackpays == '1-1') {
+				bj.blackjackpays = blackjackpays;
+			} else {
+				bj.blackjackpays = '3-2';
+			}
+		} else if ( step.action == 'holecards' ) {			
+			var holecards = prompt("2 or 1",bj.holecards);
+			if ( holecards != 2 || holecards != 1 ) {
+				bj.holecards = 2;
+			} else {
+				bj.holecards = holecards;
+			}
+		} else if ( step.action == 'soft17' ) {			
+			var soft17 = prompt("hit or stay",bj.soft17);
+			if ( soft17 == 'hit' || soft17 == 'stay' ) {
+				bj.soft17 = soft17;
+			} else {
+				bj.soft17 = 'hit';
+			}
+			if ( bj.seats[0].hand0 ) {
+				bj.seats[0].hand0.soft17 = bj.soft17;
+			}
+		} else if ( step.action == 'insurancepays' ) {			
+			var insurancepays = prompt("2-1",bj.insurancepays);
+			if ( insurancepays != '2-1' ) {
+				bj.insurancepays = '2-1';
+			} else {
+				bj.insurancepays = insurancepays;
+			}
+		} else if ( step.action == 'surrender' ) {			
+			var surrender = parseInt( prompt("true or false",bj.surrender) );
+			if ( surrender ) {
+				bj.surrender = true;
+			} else {
+				bj.surrender = false;
+			}					
 		} else if ( step.action == 'doubleon' ) {
 			var doubleon = prompt("double on (blank any 2 cards)",bj.doubleon);
 			bj.doubleon = new Array();
@@ -155,6 +195,9 @@ define(["jquery", "table_blackjack_ui", "table_blackjack", "table_client", "card
 		}	
 		ui.paint();
 		ui.re();
+		if ( step.action == 'addseat' || step.action == 'sit'  || step.action == 'stand' || step.action == 'manual'  || step.action == 'automate' || step.action == 'soft17'  ) {
+			ui.bgcanvas("tablecanvas");
+		}
 		if ( bj.automate ) {			
 			$("#" + bj.id + " > .seat:eq(0)").find(".options").empty();
 		} 		
@@ -162,9 +205,10 @@ define(["jquery", "table_blackjack_ui", "table_blackjack", "table_client", "card
 	
 	bj.options = function() {
 		var opts = table_blackjack.prototype.options.call(bj);
+		opts.pop();
 		if ( !this.locked ) {
-			
-			opts.unshift('?');			
+			opts.unshift('?');
+			opts[opts.length] = 'add player';
 			if ( bj.automate ) {
 				opts[opts.length] = 'manual';
 			} else {
@@ -180,6 +224,10 @@ define(["jquery", "table_blackjack_ui", "table_blackjack", "table_client", "card
 			opts[opts.length] = 'for nothing';
 			opts[opts.length] = 'double on';
 			opts[opts.length] = 'ante';
+			opts[opts.length] = 'soft 17';
+			opts[opts.length] = 'blackjack pays';
+			opts[opts.length] = 'insurance pays';
+			opts[opts.length] = 'hole cards';
 			opts[opts.length] = 'minimum';			
 			opts[opts.length] = 'maximum';
 		}
@@ -187,19 +235,32 @@ define(["jquery", "table_blackjack_ui", "table_blackjack", "table_client", "card
 	}	
 	
 	$(function() {
-		ui.bgcanvas("tablecanvas");
 		$(window).resize( function() {
 			ui.bgcanvas("tablecanvas");
 			ui.paint();
 			ui.re();			
 		});		
-		bj.addseat();
-		bj.act({action: 'sit', seat: 1});
+		bj.act({action: 'sit', seat: 4});
 		bj.act({action: '?'});
-		bj.act({action: 'bet', seat: 1, amount: 25});
+		bj.act({action: 'manual', seat: 0, table: bj.id});
 		
+		bj.act({action: 'bet', seat: 4, amount: 25});
+		
+		bj.shoe.cards[1].card = 'A';
+		bj.shoe.cards[2].card = 'A';
+		bj.shoe.cards[3].card = 'K';
+		bj.shoe.cards[4].card = '6';		
+		bj.act({action: 'deal', seat: 0, table: bj.id});
+		/*
+		bj.shoe.cards[1].card = 'A';
+		bj.shoe.cards[4].card = 'K';
+		
+		bj.shoe.cards[2].card = 'A';
+		bj.shoe.cards[5].card = 'K';
 		
 		bj.shoe.cards[3].card = 'K';
+		bj.shoe.cards[6].card = 'K';
+		*/
 		
 		/*
 		bj.shoe.cards[1].card = '8';
@@ -211,14 +272,14 @@ define(["jquery", "table_blackjack_ui", "table_blackjack", "table_client", "card
 		bj.shoe.cards[7].card = '8';
 		bj.shoe.cards[8].card = '3';
 		bj.shoe.cards[10].card = '8';
-		*/
-
-		bj.addseat();
 		bj.act({action: 'sit', seat: 2, name: "5 x Min" });
 		bj.seats[2].player.chips = bj.minimum * 5;			
 		bj.act({action: 'bet', seat: 2, amount: bj.minimum * 2.5});
+		bj.act({action: 'manual', seat: 0, table: bj.id});
+		*/
+
 		
-		bj.act({action: 'deal', seat: 0, table: bj.id});
+		
 	});	
 	console.log('started');					
 });

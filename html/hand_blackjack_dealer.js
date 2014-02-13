@@ -3,8 +3,8 @@ define(["hand_blackjack", "deck"], function(hand_blackjack, deck) {
 	function hand_blackjack_dealer() {
 		console.log('new hand_blackjack_dealer');
 		hand_blackjack.call(this);
-		this.checked = false;
-		this.insured = false;		
+		this.checked = false;		
+		this.soft17 = 'hit';
 		console.log('does this.cards exist?' + (this.cards instanceof Array))
 	}
 	
@@ -37,7 +37,7 @@ define(["hand_blackjack", "deck"], function(hand_blackjack, deck) {
 	hand_blackjack_dealer.prototype.sum = function() { return 0; }
 	
 	hand_blackjack_dealer.prototype.insurance = function() {
-		this.insured = true;		
+		this.checked = true;		
 		if ( this.unexposed.bjValue() == 10 ) {
 			this.isBj = true;
 			throw "Blackjack";
@@ -50,7 +50,7 @@ define(["hand_blackjack", "deck"], function(hand_blackjack, deck) {
 			opts[opts.length] = "wait";
 			return opts;		
 		} else if (
-				!this.insured
+				!this.checked
 				&& ( ( this.cards.length == 1 && this.unexposed.card == 'A' ) || ( this.cards.length == 2 && this.cards[0].card == 'A' ) ) 
 				) {
 			opts[opts.length] = "insurance";
@@ -61,7 +61,7 @@ define(["hand_blackjack", "deck"], function(hand_blackjack, deck) {
 			opts[opts.length] = "backdoor";
 		} else if (this.unexposed != null) {
 			opts[opts.length] = "expose";
-		} else if ( this.unexposed == null && (this.value() < 17 || (this.value() == 17 && this.soft ))) {
+		} else if ( this.unexposed == null && (this.value() < 17 || (this.value() == 17 && this.soft && this.soft17 == 'hit' ))) {
 			opts[opts.length] = "hit";
 		} else if ( opts.length == 0 ) {
 			opts[opts.length] = "payout";

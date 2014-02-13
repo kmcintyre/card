@@ -7,32 +7,21 @@ requirejs.config({
 });
 
 var table_blackjack = requirejs('table_blackjack');
-
 console.log('start table');
 
 var t = new table_blackjack();
+t.seats[0].player.name = 'Automatic 1-sec Delay';
 t.id = 'remote';
 t.title = '6 deck shoe';
 t.shoe.cards[4].card = 'A';
-
-//intercept = t.shoe.next;
-//t.shoe.next = function(seat) {
-//	console.log('intercept shoe:' + seat);	
-//	return intercept();
-//} 
-
 console.log('table started');
-
-t.addseat();
-t.addseat();
-//t.addseat();
 
 t.locked = true;
 
 var seats_clients = new Array(t.seats.length);
 var seats_swkeys = new Array(t.seats.length);
-
 var verifyDealer = true;
+
 /*
  * check seat for client but also allow for no player sitting 
  */
@@ -119,7 +108,7 @@ wss.on('connection', function(ws) {
     if ( ws.upgradeReq.headers['cookie'] && ws.upgradeReq.headers['cookie'].match( '(^|;) ?swkey=([^;]*)(;|$)' ) ) {
     	var previous_swkey = unescape( ws.upgradeReq.headers['cookie'].match( '(^|;) ?swkey=([^;]*)(;|$)' )[2] );
     	console.log('previous_swkey:' + previous_swkey);
-    	//lost(previous_swkey, swkey, ws);
+    	lost(previous_swkey, swkey, ws);
     }
     ws.send(swkey);
     setTimeout( function() { wss.tablecast(); }, 750);
@@ -235,6 +224,8 @@ dealer = function(delay) {
 	setTimeout( function() { dealer(delay); }, delay );
 	
 }
+
+
 
 keepalive = function(delay) {
 	wss.tablecast();

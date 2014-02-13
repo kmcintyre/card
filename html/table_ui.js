@@ -1,6 +1,11 @@
 define(["jquery", "hand", "card", "table_client"], function($, _hand, _card, table_client) {
 
 	var offset = 11;
+
+	var base_font = "normal normal normal 20px Arial";
+	var felt_font = "normal normal bold 20px Monospace";
+	var odds_font = "italic small-caps bold 14px Arial";
+	var dealer_font = "italic normal normal 16px Monospace";
 	
 	/*
 	 * can be either table rep or actual table
@@ -32,10 +37,6 @@ define(["jquery", "hand", "card", "table_client"], function($, _hand, _card, tab
 		}
 		
 		$(".chip").width( $("#burner").width() * 3 / 4 );
-		//console.log('card width:' + $("#burner").width() + ' ' + $("#burner").height());	
-		//$("#" + this.table.id).find('.seat .options button[value="stand"],button[value="buy-in"]').each(function() { $(this).css({"left": $(this).parent().siblings(".player").children(".name").outerWidth() / 2});});//.hide();
-		//$("#" + this.table.id).find('.seat .options button[value="bet"],button[value="collect"]').each(function (){ $(this).css({"left": -$(this).outerWidth() / 2, "bottom": 0} ); });
-		//$("#" + this.table.id).find('.seat .options button[value="stand"],button[value="buy-in"]').hide();
 	}
 	
 	table_ui.prototype.hands = function(obj, append_to) {
@@ -105,11 +106,8 @@ define(["jquery", "hand", "card", "table_client"], function($, _hand, _card, tab
 				if ( this.table['act'] ) {
 					console.info('data to "table"');
 					$("#" + this.table.id).data("table", this.table);
-				}
-			} else {
-				console.info('clear seats');
-				$("#" + this.table.id).find(".seat").remove();
-			}
+				} 
+			} 
 			
 			$("#" + this.table.id).children(".title").attr("title",this.table.title);
 			$("#" + this.table.id).children("._id").html( this.table.id );
@@ -118,36 +116,40 @@ define(["jquery", "hand", "card", "table_client"], function($, _hand, _card, tab
 			$("#" + this.table.id).attr("denomination" , this.table.denomination );
 						
 			for (var x = 0; x < this.table.seats.length; x++) {
-				//console.log(this.table.seats[x]);
 				var seatjq = $('<div class="seat"></div>').attr('seat',x);
 				this.hands(this.table.seats[x], seatjq);
-				
 				if ( typeof this.table.seats[x].bet === 'number' ) {
 					seatjq.append('<div class="bet">' + this.table.seats[x].bet + '</div>');
 				}
-				
 				if ( this.table.seats[x].ante && this.table.seats[x].ante > 0 ) {
 					seatjq.append('<div class="ante">' + this.table.seats[x].ante + '</div>');
 				}
-				
 				if ( typeof this.table.seats[x].payout === 'number' ) {
 					seatjq.append('<div class="payout">' + this.table.seats[x].payout + '</div>');
 				}
-								
 				if ( this.table.seats[x].player ) {
 					var playerjq = $('<div class="player"></div>');					
 					this.options(this.table.seats[x].player, playerjq);
+					if ( typeof this.table.seats[x].player.chips === 'number' ) {
+						playerjq.append('<div class="chips">' + this.table.seats[x].player.chips + '</div>');
+					}															
 					if ( this.table.seats[x].player.name ) {
 						playerjq.append('<div class="name">' + this.table.seats[x].player.name + '</div>');
 					}
-					if ( typeof this.table.seats[x].player.chips === 'number' ) {
-						playerjq.append('<div class="chips">' + this.table.seats[x].player.chips + '</div>');
-					}										
 					seatjq.append(playerjq);
 				}
 				this.options(this.table.seats[x], seatjq);
 				seatjq.append('<div class="chair" title="' + this.table.seats[x].chair + '"/>');
-				seatjq.appendTo("#" + this.table.id);
+				if ( $("#" + this.table.id).find('.seat[seat="' + x + '"]').length == 0 ) {
+					console.log('thanks!!!!!!!!!!!!!!!!');
+					seatjq.appendTo("#" + this.table.id);
+				} else {
+					if ( seatjq.html() != $("#" + this.table.id).find('.seat[seat="' + x + '"]').html() ) {
+						$("#" + this.table.id).find('.seat[seat="' + x + '"]').replaceWith(seatjq);
+					}
+					//$("#" + this.table.id).find('.seat[seat="' + x + '"]').replaceWith(seatjq);
+					console.log('no thanks');
+				}
 			}			
 			
 			this.options(this.table, $("#" + this.table.id));
@@ -208,11 +210,10 @@ define(["jquery", "hand", "card", "table_client"], function($, _hand, _card, tab
       	
 		var felt_radius = Math.max(document.documentElement.clientWidth, document.documentElement.clientHeight)/2;
 		var offscreen = -felt_radius*3/4;
-				
-		var baseFont = "italic small-caps bold 15px 'Arial Narrow'";		
+								
 		function jquerywidth(s,f) {
 			if ( !s ) s = '';			
-			return parseFloat($("#tape").html("'" + s + "'").css("font", (f?f:baseFont) ).width());			
+			return parseFloat($("#tape").html("'" + s + "'").css("font", (f?f:(ctx.font?ctx.font:base_font)) ).width());			
 		}				
 		function jqueryradian(s,f) {
 			return jquerywidth(s,f) / felt_radius; 				   
@@ -221,42 +222,80 @@ define(["jquery", "hand", "card", "table_client"], function($, _hand, _card, tab
 		ctx.strokeStyle = 'gold';
 		ctx.lineWidth = 3;									
 		ctx.arc(ctx.canvas.width/2,offscreen,felt_radius,Math.PI/3,Math.PI*2/3);
-		ctx.arc(ctx.canvas.width/2,offscreen,felt_radius+jquerywidth("to"),Math.PI*2/3,Math.PI/3,true);
+		ctx.arc(ctx.canvas.width/2,offscreen,felt_radius+jquerywidth("WC"),Math.PI*2/3,Math.PI/3,true);
 		ctx.closePath();
 		ctx.stroke();		
 		ctx.fillStyle = '#57854e';
 		ctx.fill();
 		
-		function textCircle(text,x,y,radius,ang,pos,font,color){
+		function textCircle(text,x,y,radius,ang,pos){
 			   ctx.textAlign = (pos.textAlign?pos.textAlign:"left");
 			   ctx.textBaseline = (pos.textBaseline?pos.textBaseline:'middle');
-			   ctx.lineWidth = 1;			   			  
-			   ctx.font = font;			   
+			   ctx.lineWidth = 1;
+			   ctx.font = ( pos.font ? pos.font : base_font );
 			   for ( var c = 0; c < text.length; c++) {
 				   ctx.save();
-				   var diff = jqueryradian(text.substring(0,c),font);
+				   var diff = jqueryradian(text.substring(0,c),ctx.font);
 				   //console.log('jqueryradian:' + diff + ' ' + ang + ' ' + (x+r*Math.cos(ang - diff)) + ' ' + (y+r*Math.sin(ang - diff)) + ' ' + (ang-diff-Math.PI/2));
 				   if ( !pos.textAlign || pos.textAlign == "left" ) {
 					   ctx.translate(x+felt_radius*Math.cos(ang - diff),y+felt_radius*Math.sin(ang - diff));
 					   ctx.rotate(ang-diff-Math.PI/2);
 				   } else if ( pos.textAlign == "center" ) {
-					   ctx.translate(x+felt_radius*Math.cos( (ang+jqueryradian(text,font)/2) - diff),y+felt_radius*Math.sin(ang+jqueryradian(text,font)/2 - diff));
-					   ctx.rotate((ang+jqueryradian(text,font)/2)-diff-Math.PI/2);
+					   ctx.translate(x+felt_radius*Math.cos( (ang+jqueryradian(text)/2) - diff),y+felt_radius*Math.sin(ang+jqueryradian(text)/2 - diff));
+					   ctx.rotate((ang+jqueryradian(text)/2)-diff-Math.PI/2);
 				   } else if ( pos.textAlign == "right" ) {					   
-					   ctx.translate(x+felt_radius*Math.cos(ang+jqueryradian(text,font)-diff),y+felt_radius*Math.sin(ang+jqueryradian(text,font)-diff));
-					   ctx.rotate((ang+jqueryradian(text,font)/2)-diff-Math.PI/2);
+					   ctx.translate(x+felt_radius*Math.cos(ang+jqueryradian(text)-diff),y+felt_radius*Math.sin(ang+jqueryradian(text)-diff));
+					   ctx.rotate((ang+jqueryradian(text)/2)-diff-Math.PI/2);
 				   }				   
 				   ctx.fillStyle = (pos.color?pos.color:'white');
 				   ctx.fillText(text[c], 0, 0);
 				   ctx.restore();
 			   }
 		}
-		textCircle("2 to 1",ctx.canvas.width/2,offscreen+5,felt_radius/2,Math.PI*2/3,{textAlign:'left',textBaseline:'top'}, "italic small-caps bold 14px arial");
-		textCircle("2 to 1",ctx.canvas.width/2,offscreen+5,felt_radius/2,Math.PI/3,{textAlign:'right',textBaseline:'top'}, "italic small-caps bold 14px arial");
-		textCircle("6 decks",ctx.canvas.width/2,offscreen,felt_radius/2,Math.PI*7/12,{textAlign:'center',textBaseline:'bottom', color:'gold'}, "normal normal normal 16px cursive");
-		//textCircle("6 decks",ctx.canvas.width/2,offscreen,r/2,Math.PI*15/24,{textAlign:'left',textBaseline:'bottom', color:'gold'}, "normal normal normal 16px cursive");
+		textCircle($("#" + this.table.id).attr('insurancepays'),ctx.canvas.width/2,offscreen+5,felt_radius/2,Math.PI*2/3,{textAlign:'left',textBaseline:'top'} );
+		textCircle($("#" + this.table.id).attr('insurancepays'),ctx.canvas.width/2,offscreen+5,felt_radius/2,Math.PI/3,{textAlign:'right',textBaseline:'top'} );
+		textCircle("6 decks",ctx.canvas.width/2,offscreen,felt_radius/2,Math.PI*8/12,{textAlign:'left',textBaseline:'bottom', color:'gold'} );		
 		
-		textCircle("InsurancePays",ctx.canvas.width/2,offscreen+1,felt_radius/2,Math.PI/2,{textAlign:'center',textBaseline:'top', color:'black'}, "bold normal normal 22px monospace");		
+		textCircle( $("#" + this.table.id).attr('soft17') + "s soft 17",ctx.canvas.width/2,offscreen-2,felt_radius/2,Math.PI*2/3-jqueryradian("6 decks"),{textAlign:'left',textBaseline:'bottom', color:'white'} );
+				
+		$("#" + this.table.id).find(".seat:first").each(function() {
+			textCircle($(this).find('.player .name').html(),ctx.canvas.width/2,offscreen,felt_radius/2,Math.PI/3,{textAlign:'right',textBaseline:'bottom', color:'gold'} );			
+		});
+				
+		var meme = Math.PI/3/7;		
+		for (var rays = 1; rays < 8; rays++) {
+		    ctx.beginPath();
+		    ctx.strokeStyle = 'rgba(0,36,0,.66)';
+			ctx.lineWidth = 1;		    
+			ctx.moveTo(
+					ctx.canvas.width/2+(felt_radius+$('#burner').width()/2)*Math.cos(Math.PI/3 + meme * rays - meme / 2),
+					offscreen+(felt_radius+$('#burner').width()/2)*Math.sin(Math.PI/3 + meme * rays - meme / 2)
+					);			
+			ctx.lineTo(
+					ctx.canvas.width/2+(felt_radius+$('#burner').width()*3/2)*Math.cos(Math.PI/3 + meme * rays - meme / 2),
+					offscreen+(felt_radius+$('#burner').width()*3/2)*Math.sin(Math.PI/3 + meme * rays - meme / 2)
+					);
+			ctx.stroke();
+			var name = '(empty)';
+			if ( !this.table.seats[rays] || !this.table.seats[rays].player ) {
+				ctx.fillStyle = 'rgba(192,192,192,.33)';
+			} else {
+				name = this.table.seats[rays].player.name;
+				ctx.fillStyle = 'rgba(212,175,55,.66)';	
+			}			
+			ctx.save();
+			ctx.textAlign = 'left';
+			ctx.translate(
+				ctx.canvas.width/2+(felt_radius+$('#burner').width()*2)*Math.cos(Math.PI/3 + meme * rays - meme / 2),
+				offscreen+(felt_radius+$('#burner').width()*2)*Math.sin(Math.PI/3 + meme * rays - meme / 2)
+				);
+			ctx.rotate(Math.PI/3 + meme * rays - meme / 2);
+			ctx.fillText(name, 0, 0);
+			ctx.restore();
+			
+		}
+		
+		textCircle("Insurance Pays",ctx.canvas.width/2,offscreen+1,felt_radius/2,Math.PI/2,{textAlign:'center',textBaseline:'top', color:'black'}, "bold normal normal 22px monospace");		
 	}
 
 	return table_ui;

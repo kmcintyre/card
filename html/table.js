@@ -20,17 +20,13 @@ define(["hand"], function(_hand) {
 			if ( !this.player ) {
 				if ( this.locked ) {
 					opts[opts.length] = 'unlock';
-				} else {
-					opts[opts.length] = 'sit';
-					//opts[opts.length] = 'lock';
-				}				
+				} 			
 			}		
 			if ( this.player && this.payout ) {
 				opts[opts.length] = 'collect';				
 			} else if ( this.player && !this.hand(true) ) {
 				opts[opts.length] = 'bet';
-				opts[opts.length] = 'buy-in';
-				opts[opts.length] = 'stand';
+				opts[opts.length] = 'rebuy';
 			}			
 			return opts;
 		}
