@@ -78,16 +78,17 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
     	this.fornothing = [];
     	this.doubleon = [];
     	
-    	this.downdirty = true;
+    	this.downdirty = true;    	 
     	
     	for (var x = 0; x < 8;x++) {
     		this.addseat();
     	}
     	this.seats[0].chair = 'Dealer';
-    	this.sit(0, { name: 'Manny'});
+    	this.sit(0, { name: 'manny'});
     	delete this.seats[0].player.chips;
     	this.seats[0] = new dealer(this.seats); 
     	
+    	this.decks = this.shoe.number_of_decks;
     }
 	
 	table_blackjack.prototype = new table();
@@ -106,7 +107,7 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
 		j['holecards'] = this.holecards;
 		j['soft17'] = this.soft17;
 		j['surrender'] = this.surrender;
-		j['decks'] = this.shoe.number_of_decks + 1;
+		j['decks'] = this.decks;
     	return j;
 	}
 	

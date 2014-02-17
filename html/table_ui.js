@@ -1,46 +1,101 @@
 define(["jquery", "card"], function($, card) {
 	
-	styler = {
-		tableradius: Math.min(document.documentElement.clientWidth,document.documentElement.clientHeight)/2;
+	styler = { 
+		tableradius: Math.max(document.documentElement.clientWidth, document.documentElement.clientHeight)/2,
 		cardwidth: 100,
-		canvasfont : { 
-			base: "normal 16px san-serif", 
-			odds: "normal 14px monospace", 
-			player : "normal 18px monospace",
-			dealer : "small-caps 18px monospace",
-			},
+		base_font: "normal 16px san-serif", 
+		insurance_font: "normal 26px san-serif",
+		odds_font: "normal 14px monospace", 
+		player_font: "normal 18px monospace",
+		dealer_font: "small-caps 18px monospace",		
 		offset:5, spinset:20, bottomset:10, topset: 10, buttonset: 10, sideset: 10,
+		arcwidth: 25,
 		scale: 1
 	};
 
-	/*
-	 * can be either table rep or actual table!
-	 */
+	/* either table or rep */
 	function table_ui(table, container_id, canvas_id) {
 		console.info('new table ui');
 		this.table = table;
 		this.container_id =  container_id;
 		this.canvas_id =  canvas_id;
 	}
+
+	table_ui.prototype.canvas = function() {		
+		if ( $(this.canvas_id).length == 0 ) {
+			console.info('create canvas:' + this.canvas_id.substring(1));
+			var canvasjq = $('<canvas id="' + this.canvas_id.substring(1) + '"></canvas>');
+			canvasjq.appendTo($(this.container_id));
+		}
+		var ctx = document.getElementById(this.canvas_id.substring(1)).getContext('2d');		
+		ctx.canvas.width = document.documentElement.clientWidth;
+		ctx.canvas.height = document.documentElement.clientHeight + 1;
+		
+		var ctx = document.getElementById(this.canvas_id.substring(1)).getContext('2d');
+		ctx.clearRect(0,-1,document.documentElement.clientWidth,document.documentElement.clientHeight+1);
+		$("#" + this.table.id + ' .options button[value="configure"]').each(function() {
+			console.log('YO MONEY CREATE A GEAR');
+		});	
+		var grd = ctx.createRadialGradient(
+	  			document.documentElement.clientWidth/2, 
+	  			styler.tableradius*3/2,	  		
+	  			Math.max(document.documentElement.clientHeight,document.documentElement.clientWidth)/2,	  			
+	  			document.documentElement.clientWidth/2,	  			
+	  			-document.documentElement.clientHeight/3, 
+	  			Math.max(document.documentElement.clientHeight,document.documentElement.clientWidth)/2
+	  			); 
+	  	grd.addColorStop(1, 'rgba(0,87,0,1)');
+	  	grd.addColorStop(0, 'rgba(0,36,0,1)');
+	  	ctx.fillStyle = grd;
+	  	ctx.fillRect(0,0,document.documentElement.clientWidth,document.documentElement.clientHeight+1);		
+	}	
 	
-	//note - sets the measuring stick and applies static filtering
-	table_ui.prototype.ruler = function(resize) {
+	table_ui.prototype.measure = function() {
 		console.log(
 			' seats:' + $("#" + this.table.id).children('.seat').length +
 			' players:' + $("#" + this.table.id).children('.seat').children('.player').length +
-			' bets:' + $("#" + this.table.id).find(".seat .bet").length +
-			' tableradius:' + resize
+			' bets:' + $("#" + this.table.id).find(".seat .bet").length			
 		);
-		
+		styler.tableradius = Math.max(document.documentElement.clientWidth, document.documentElement.clientHeight)/2;
 		styler.cardwidth = Math.min(150,Math.max(75,parseInt(document.documentElement.clientWidth * document.documentElement.clientHeight / 52 / 52 / 2.4 )));			
-		console.log('resize  width:' + styler.cardwidth);
-		$(this.container_id + " .card").width({width:styler.cardwidth * styler.scale});
-		$(this.container_id + " .chip").width({width:styler.cardwidth * styler.scale * .54});
-		$('#' + this.table.id).find(".card").css({width:styler.cardwidth * styler.scale}); 
-		$('#' + this.table.id).find(".chip").css({width:styler.cardwidth * styler.scale * .54});
+		console.log(styler.tableradius + ' radius card width:' + styler.cardwidth);
+		$(this.container_id).find(".card").css({width:styler.cardwidth * styler.scale}); 
+		$(this.container_id).find(".chip").css({width:styler.cardwidth * styler.scale * .54});
 	}
 	
-	//comb options
+	table_ui.prototype.rules = function() {
+		$('#' + this.table.id).find('.seat:not(:has(.player)) > .options button').each(function () {
+			$(this).clone().appendTo($(this).closest('.table').children(
+				'.options:not(:has(button[value="'+$(this).val()+'"]))'
+			));
+		}).remove();
+		$("#" + this.table.id + ' ._id').hide();
+	}
+	
+	table_ui.prototype.wire = function() {
+		$(this).children('.payout').each(function () {
+			$(this).css({"left":-$(this).width()/2, "bottom": document.documentElement.clientHeight/2-$(this).height()/2}).not( $(this).children('.chip') ).append(
+				$('.yellowchip:first').clone().css(
+						{"z-index":-1, "position": "absolute", "left": -$(".yellowchip:first").width()/2+$(this).width()/2, "bottom": -$(".yellowchip:first").height()/2+$(this).height()/2 }
+					).show()
+			);
+		});
+		$(this).children('.bet').each(function () {
+			$(this).css({"left":-$(this).width()/2, "bottom": document.documentElement.clientHeight/2-$(this).height()/2}).not( $(this).children('.chip') ).append(				
+				$('.bluechip:first').clone().css(
+						{"z-index":-1, "position": "absolute", "left": -$(".bluechip:first").width()/2+$(this).width()/2, "bottom": -$(".bluechip:first").height()/2+$(this).height()/2 }
+				).show()											
+			);
+		});			
+		$(this).children('.ante').each(function () {
+			$(this).css({"left":-$(this).width()/2, "bottom": document.documentElement.clientHeight/2-$(this).height()/2}).not( $(this).children('.chip') ).append(				
+				$('.whitechip:first').clone().css(
+						{"z-index":-1, "position": "absolute", "left": +$(".whitechip:first").width()/2+$(this).width()/2, "bottom": -$(".whitechip:first").height()/2+$(this).height()/2 }
+				).show()											
+			);
+		});
+	}
+	
 	table_ui.prototype.options = function(obj, append_to) {
 		if ( obj['options'] ) {
 			var opts = (obj['options'] instanceof Array ? obj['options'] : obj.options() );
@@ -67,12 +122,6 @@ define(["jquery", "card"], function($, card) {
 		return append_to.children('button');
 	}	
 	
-	function rotatecss(rot, trans) {
-		//ang = 'rotate(' + rot + 'deg) scale(1.75)';
-		ang = 'rotate(' + rot + 'deg) scaleY(1.75)';
-		return { '-webkit-transform-origin':trans, '-webkit-transform': ang, '-moz-transform-origin':trans, '-moz-transform': ang, '-o-transform-origin':trans, '-o-transform': ang, '-ms-transform-origin':trans, '-ms-transform': ang, 'transform-origin':trans, 'transform': ang };
-	}
-	
 	table_ui.prototype.paint = function() {
 			console.info('paint ui:' + this.table.id);
 			if ( $("#" + this.table.id).length == 0 ) {
@@ -84,8 +133,6 @@ define(["jquery", "card"], function($, card) {
 					$("#" + this.table.id).data("table", this.table);
 					this.options(this.table, tablejq);
 				}
-				// probably not necessary
-				this.ruler(true);
 			} 			
 			$("#" + this.table.id).children(".title").attr("title",this.table.title);
 			$("#" + this.table.id).children("._id").html( this.table.id );
@@ -178,7 +225,7 @@ define(["jquery", "card"], function($, card) {
 	}
 	
 	table_ui.prototype.arm = function() {
-		var ba = $("#" + this.table.id).find('button').not( $(this).bind('click') ).bind('click', function(event) {
+		var ba = $("#" + this.table.id).find('button').not( $(this).bind('click') ).unbind('click').bind('click', function(event) {
 			console.log('acting');
 			var act = { 
 				table: $(event.target).closest(".table").find("._id").html(),  
@@ -202,20 +249,7 @@ define(["jquery", "card"], function($, card) {
 		}).length;
 		console.log('buttons armed:' + ba);		
 	}
-		
-	table_ui.prototype.canvas = function() {		
-		if ( $(this.canvas_id).length == 0 ) {
-			console.info('create canvas');
-			var canvasjq = $('<canvas id="' + this.canvas_id.substring(1) + '"></canvas>');
-			canvasjq.appendTo($(this.container_id));
-		}
-		var ctx = document.getElementById(this.canvas_id.substring(1)).getContext('2d');
-		$(this.canvas_id).width( document.documentElement.clientWidth );
-		$(this.canvas_id).height( document.documentElement.clientHeight + 1 );		
-		ctx.clearRect(0,0,$(this.canvas_id).width(),$(this.canvas_id).height()+1);	
-		ctx.fillText(JSON.stringify(styler).split(','), 0, $(this.canvas_id).height()/2);		
-		$('#' + this.table.id).find("button,img").css("position", "relative");
-	}	
+
 	return table_ui;
 				
 });	

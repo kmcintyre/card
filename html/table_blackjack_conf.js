@@ -44,8 +44,9 @@ define(function() {
 			} else {
 				this.configureable_table[step.action] = 0;
 			}					
-		} else if ( step.action == 'rebuy'  ) {			
-			this.configureable_table.seats[step.seat].player.chips += 10 * this.configureable_table.minimum;
+		} else if ( step.action == 'dealer'  ) {
+			clearTimeout(this.quicktimer);
+			return this.act( step['name'] = prompt("otto or manny:" + step.action,this.configureable_table[step.action]))
 		} else if ( step.action == 'manaul'  ) {			
 			this.configureable_table.automate = true;
 			this.configureable_table.seats[0].player.name = 'auto';
@@ -53,10 +54,6 @@ define(function() {
 				step.amount = prompt("dealer delay millis:",1000);
 			}
 			dealer(step.amount);
-		} else if ( step.action == 'automate' ) {
-			if ( this.quicktimer ) { clearTimeout(this.quicktimer); }
-			this.configureable_table.seats[0].player.name = 'manual';
-			delete this.configureable_table.automate;
 		} else if ( step.action == 'faceup' ) {
 			this.configureable_table.downdirty = false;					
 		} else if ( step.action == 'ante' ) {

@@ -9,7 +9,6 @@ define(["jquery", "table_blackjack_ui", "table_blackjack", "table_blackjack_conf
 	var table_conf = new table_blackjack_conf(bj);
 	
 	bj.act = function(step) {
-		console.log( parseInt(step.seat) );
 		if ( isNaN(parseInt(step.seat)) ) {
 			if ( step.action == 'paint'  ) {
 				ui.paint();
@@ -46,21 +45,19 @@ define(["jquery", "table_blackjack_ui", "table_blackjack", "table_blackjack_conf
 	
 	$(function() {
 		$(window).resize( function() {
-			ui.ruler(true);	
-		});		
-		ui.paint();
-		
+			ui.measure();
+			bj.act({action: 'paint'});
+		});
 		bj.shoe.cards[1].card = 'A';
 		bj.shoe.cards[2].card = 'A';
 		bj.shoe.cards[3].card = 'A';
 		bj.shoe.cards[4].card = '6';
 		bj.shoe.cards[5].card = 'A';
-		bj.shoe.cards[6].card = 'A';
-		
+		bj.shoe.cards[6].card = 'A';-		
 		bj.act({action: 'sit', seat: 4});
-		//bj.act({action: '?'});
-		bj.act({action: 'bet', seat: 4, amount: 25});
-		bj.act({action: 'deal', seat: 0, table: bj.id});
+		bj.act({action: 'paint'});
+		//bj.act({action: 'bet', seat: 4, amount: 25});
+		//bj.act({action: 'deal', seat: 0, table: bj.id});
 
 		//setTimeout( function() { 
 		//	bj.act({action: 'deal', seat: 0, table: bj.id}); }, 
