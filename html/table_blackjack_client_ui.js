@@ -1,13 +1,15 @@
 define(["jquery", "table_blackjack_ui", "table_client"], function($, table_blackjack_ui, table_client) {
 	$(function() {										
+		
 		function tablecast(json) {
-			var ui = new table_blackjack_ui(json, "#tables");
+			var ui = new table_blackjack_ui(json, "#tables", "tablecanvas");
 			ui.paint(); 
 			ui.re();
-			ui.bgcanvas("tablecanvas");
-			$(window).resize( function() { ui.paint(); ui.re(); ui.bgcanvas("tablecanvas"); } );
+			ui.bgtable();
+			$(window).resize( function() { ui.paint(); ui.re(); ui.bgtable(); } );
 		}
 		
-		new table_client().set(tablecast);	
+		new table_client().set(tablecast);
+		
 	});	
 });

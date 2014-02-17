@@ -4,10 +4,11 @@ define(function() {
 	
 	tablesocket.key = null;	
 	tablesocket.onopen = function(evt) { 
-		console.log('connect:' + evt); 
+		console.log('open')
+		console.log(evt); 
 	};
-	tablesocket.onclose = function(evt) { console.log('disconnect:' + evt.code); };
-	tablesocket.onerror = function(evt) { console.log("error:" + evt) };
+	tablesocket.onclose = function(evt) { console.log('disconnect:' + evt.code); console.log(evt); };
+	tablesocket.onerror = function(evt) { console.log("error"); console.log(evt); };
 	
 	tablesocket.tablecast = function(o) {
 		console.warn('should override')		

@@ -17,17 +17,23 @@ define(["hand"], function(_hand) {
 		this.locked = false;
 		this.options = function() {
 			var opts = [];
+			if ( this.locked ) {
+				opts[opts.length] = 'unlock';
+			} else {
+				opts[opts.length] = 'lock';
+			}
 			if ( !this.player ) {
-				if ( this.locked ) {
-					opts[opts.length] = 'unlock';
-				} 			
-			}		
-			if ( this.player && this.payout ) {
-				opts[opts.length] = 'collect';				
-			} else if ( this.player && !this.hand(true) ) {
-				opts[opts.length] = 'bet';
-				opts[opts.length] = 'rebuy';
+				opts[opts.length] = 'sit';
 			}			
+			if ( this.payout ) {
+				opts[opts.length] = 'collect';				
+			}			
+			if ( !this.hand(true) ) {
+				opts[opts.length] = 'bet';
+			}		
+			if ( this.bet ) {
+				opts[opts.length] = 'cancel';
+			}
 			return opts;
 		}
 		this.simplehands = function(obj) {
@@ -126,9 +132,9 @@ define(["hand"], function(_hand) {
 	}
 	
 	table.prototype.options = function() {
-		var opts = [];
+		var opts = new Array('about');
 		if ( !this.locked ) {
-			opts[opts.length] = 'add seat';
+			opts[opts.length] = 'configure';
 		}
 		return opts;
 	}
@@ -146,7 +152,7 @@ define(["hand"], function(_hand) {
     		throw "Seat Unavailable";
     	} else {
     		console.log('welcome:' + person.name );
-			this.seats[seat].player = { name: (person.name?person.name:'Anonymous'), chips: 10.5 * this.minimum };			
+			this.seats[seat].player = { name: (person.name?person.name:'Anonymous'), chips: 10 * this.minimum };			
     	}    	
     }
     
@@ -162,7 +168,7 @@ define(["hand"], function(_hand) {
     		this.seats[seat].player.chips += this.seats[seat].payout;
     		delete this.seats[seat].payout;
     	}
-    }
+    }    
     
     table.prototype.bet = function(seat, amount) {
     	amount = parseFloat(amount);

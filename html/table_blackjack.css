@@ -1,20 +1,5 @@
-body {
-	overflow: hidden;
-}
-button:disabled {
-	color:red;
-}
-#tablecanvas {
-	position:absolute;
-	top:0;
-	left:0;
-	z-index:-2;
-}
-.card,.hand,.options,.bet,.insurance,.double,.bj,.chair,.player,.payout,.title,.chips,.ante {
+.insurance,.double,.bj,.split {
 	position:absolute;	
-}
-.bet {
-	text-align:center;
 }
 .bj {
 	font-size: 1.66em;
@@ -22,48 +7,8 @@ button:disabled {
 	border:2px solid;
 	border-radius:12px;
 }
-.chips {
-	font-size: 1em;
-	color:white;
-	z-index:23;
-}
-.payout,.bet,.double,.insurance {	
+.double,.insurance {	
 	font-size: 1.2em;
 	color:black;
 	z-index:23;
-}
-.player {
-	z-index:0;
-}
-//
-.seat {
-	border: .1em solid brown;
-}
-.options {
-	z-index:22;	
-}
-.table > .options {
-	left:0;
-	top:0;
-}
-.seat > .options > button {
-	position:absolute;
-	white-space:nowrap;
-}
-.hand > .options > button {
-	display:block;	
-}
-.table > .options > button {
-	display: block;
-}
-.seat {
-	position: absolute;	
-}
-//
-.hand {		
-	-webkit-transform: rotate(180deg);
-	-moz-transform: rotate(180deg);
-	-o-transform: rotate(180deg);
-	-ms-transform: rotate(180deg);
-	transform: rotate(180deg);			
 }

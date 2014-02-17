@@ -1,43 +1,43 @@
-body {	
-	font-size: 1.2em;	
-	color:gold;
-} 
+body {
+	overflow: hidden;	
+}
 input, button, select, option, textarea {
-	display: inline-block;
+	position:absolute;
     font-size: 22pt;
     color:black;
     z-index:23;
 }
-input[type='range'] {
-	margin: 0;
-	position: absolute;	
+button:disabled {
+	color:red;
+}
+.seat,.card,.hand,.options,.bet,.chair,.player,.payout,.title,.chips,.ante,._id {
+	position:absolute;	
 }
 #tape {
 	visibility: visible;
     display:none;
 }
-//
-.table {
-	border: .1em solid brown;
+#tablecanvas {
+	position:absolute;
+	top:0;
+	left:0;
+	z-index:-2;
 }
-._id:before {
-  	display:inline;
-  	content: "Id:";
-}
-
 ._id {
-	visibility:hidden;
-	float:right;
+	bottom:0;
 }
-.chips:before {
-  display:inline;
-  content: "Chips:";
+.title {
+	right:0;
 }
-
-#notused {
-	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#0B5B06), to(#299A0B)); 
-	background: -webkit-linear-gradient(top, #0B5B06, #299A0B); 
-	background: -moz-linear-gradient(top, #0B5B06, #299A0B); 
-	background: -ms-linear-gradient(top, #0B5B06, #299A0B); 
-	background: -o-linear-gradient(top, #0B5B06, #299A0B);
+.bet {
+	text-align:center;
+}
+.payout,.bet,.chips {	
+	font-size: 1.2em;
+	color:black;
+	z-index:23;
+}
+.table > .options > button {
+	position:relative;
+	display:none;
 }

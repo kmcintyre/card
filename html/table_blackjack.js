@@ -59,25 +59,24 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
 	
 	function table_blackjack() {
 		table.call(this);
-		this.shoe = new shoe(2);
+		this.shoe = new shoe(1);
 		this.shoe.burn(1);
 
 		this.minimum = 25;
     	this.maximum = 750;    
     	
     	this.splitlimit = 3;
-    	this.blackjackpays = '3-2';
-    	this.insurancepays = '2-1';
+    	this.blackjackpays = '3 to 2';
+    	this.insurancepays = '2 to 1';
     	this.holecards = 2;
     	this.soft17 = 'hit';
-    	this.surrender = false;
-    	
+    	this.surrender = true;    	
     	//this.forless = new Array('split','double','insurance');
     	//this.fornothing = new Array('split','double');
     	//this.doubleon = new Array(9,10,11);
-    	this.forless = new Array('double');
-    	this.fornothing = new Array();
-    	this.doubleon = new Array();
+    	this.forless = ['double'];
+    	this.fornothing = [];
+    	this.doubleon = [];
     	
     	this.downdirty = true;
     	
@@ -85,7 +84,7 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
     		this.addseat();
     	}
     	this.seats[0].chair = 'Dealer';
-    	this.sit(0, { name: 'Dealer'});
+    	this.sit(0, { name: 'Manny'});
     	delete this.seats[0].player.chips;
     	this.seats[0] = new dealer(this.seats); 
     	
@@ -107,6 +106,7 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
 		j['holecards'] = this.holecards;
 		j['soft17'] = this.soft17;
 		j['surrender'] = this.surrender;
+		j['decks'] = this.shoe.number_of_decks + 1;
     	return j;
 	}
 	
@@ -182,7 +182,7 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
 	table_blackjack.prototype.deal = function(seat) {
 		if ( seat == 0 && this.seats[0].activeseat() == null ) {
 			console.log('deal played in shoe:' + this.shoe.played && this.shoe.penetration)
-			if ( this.shoe.played > this.shoe.penetration ) {
+			if ( this.shoe.played > this.shoe.penetration ) {				
 				this.shoe.shuffle();
 				this.shoe.played = 0;
 				this.shoe.burn(1);
@@ -225,7 +225,7 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
 			console.log('remove insurance');
 			this.seats[seat].player.chips += (this.seats[seat].hand0.insurance ? this.seats[seat].hand0.insurance : 0);
 			this.seats[seat].hand0.insured = null;
-		} else if ( !this.seats[seat].hand0.bj() || (this.seats[seat].hand0.bj() && this.blackjackpays != '3-2' ) ) {
+		} else if ( !this.seats[seat].hand0.bj() || (this.seats[seat].hand0.bj() && this.blackjackpays != '3 to 2' ) ) {
 			console.log('buy insurance');
 			var ins = this.seats[seat].hand0.bet / 2;
 			if ( this.forless.indexOf('insurance') >= 0 && amount > 0 && ins > amount ) {
@@ -335,11 +335,11 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
 					if ( this.hand(x,true).bj() && !this.hand(x,true).isSplit  && !this.hand(x,true).doubled ) {
 						if ( this.hand(x,true).bet ) {
 							console.log('bj!');
-							if ( this.blackjackpays == '3-2' ) {
+							if ( this.blackjackpays == '3 to 2' ) {
 								this.dispense( x, parseFloat(this.hand(x,true).bet) * 5 / 2 );
-							} else if ( this.blackjackpays == '6-5' ) {
+							} else if ( this.blackjackpays == '6 to 5' ) {
 								this.dispense( x, parseFloat(this.hand(x,true).bet) * 11 / 5 );
-							} else if ( this.blackjackpays == '1-1' ) {
+							} else if ( this.blackjackpays == '1 to 1' ) {
 								this.dispense( x, parseFloat(this.hand(x,true).bet) * 2 );
 							}
 						}
