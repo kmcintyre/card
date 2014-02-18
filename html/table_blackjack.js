@@ -59,9 +59,7 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
 	
 	function table_blackjack() {
 		table.call(this);
-		this.shoe = new shoe(1);
-		this.shoe.burn(1);
-
+		this.shoe = new shoe();
 		this.minimum = 25;
     	this.maximum = 750;    
     	
@@ -158,10 +156,6 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
 			} else {
 				table.prototype.act.call(this, step);
 			}
-						
-			//if ( (step.action == 'hit' || step.action == 'double' || step.action == 'stay') && this.seats[0].activeseat() == step.seat && this.hand(step.seat) && this.hand(step.seat).options()[0] == 'deal' ) {
-			//	this.deal(step.seat);
-			//} 
 		} catch (err) {
 			if ( err == 'Active Hand' ) {
 				console.log('Active Hand Error');
@@ -182,12 +176,14 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
 	
 	table_blackjack.prototype.deal = function(seat) {
 		if ( seat == 0 && this.seats[0].activeseat() == null ) {
-			console.log('deal played in shoe:' + this.shoe.played && this.shoe.penetration)
+			console.log('deal played in shoe:' + this.shoe.played  + ' ' + this.shoe.penetration)
 			if ( this.shoe.played > this.shoe.penetration ) {				
 				this.shoe.shuffle();
-				this.shoe.played = 0;
-				this.shoe.burn(1);
+				this.shoe.played = 0;				
 			} 
+			if ( this.shoe.played == 0 ) {
+				this.shoe.burn(1);
+			}
 			if ( !this.seats[0].hand(true) ) {
 				this.seats[0].hand0 = new hand_blackjack_dealer();
 				this.seats[0].hand0.soft17 = this.soft17;

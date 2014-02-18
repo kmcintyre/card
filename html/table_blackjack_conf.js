@@ -1,31 +1,32 @@
 define(function() {
 
+	var quicktimer = null;
+	var autodealer = function(delay, auto_table) { 
+		if ( quicktimer == null ) {
+			try {
+				if ( auto_table.seats[0].activeseat() == null && auto_table.seats[0].options().length > 0 && auto_table.seats[0].options()[0] == 'deal' && !quicktimer ) {
+					quicktimer = setTimeout( function() { quicktimer = null; if ( auto_table.seats[0].activeseat() > 0 ) { return; } auto_table.act({ action: auto_table.seats[0].options()[0], seat: 0 }); }, 1000 * auto_table.seats.length);
+				} else if ( auto_table.seats[0].activeseat() == 0 && !quicktimer ) {
+					if ( auto_table.seats[0].hand0.options()[0] == 'insurance' ) {
+						quicktimer = setTimeout( function() { quicktimer = null; if ( auto_table.seats[0].activeseat() > 0 ) { return; } auto_table.act({ action: auto_table.seats[0].hand0.options()[0], seat: 0 }); quicktimer = null; }, 4 * delay);
+					} else {
+						quicktimer = setTimeout( function() { quicktimer = null; if ( auto_table.seats[0].activeseat() > 0 ) { return; } auto_table.act({ action: auto_table.seats[0].hand0.options()[0], seat: 0 }); }, delay);
+					}
+				} else {
+					console.log(auto_table.seats[0].options().length + ' options as:' + auto_table.seats[0].activeseat());
+				}
+			} catch (err) {
+				console.log(err);
+			}			
+		}
+		if ( auto_table.seats[0].player.name == 'otto' ) {
+			setTimeout( function() { autodealer(delay, auto_table); }, delay );
+		}
+	}	
+	
 	function table_blackjack_conf(t) {
 		this.configureable_table = t;
 		this.quicktimer = null;
-		this.dealer = function(delay) { 
-			if ( quicktimer == null ) {
-				try {
-					if ( this.configureable_table.seats[0].activeseat() == null && this.configureable_table.seats[0].options().length > 0 && this.configureable_table.seats[0].options()[0] == 'deal' && !quicktimer ) {
-						quicktimer = setTimeout( function() { quicktimer = null; if ( this.configureable_table.seats[0].activeseat() > 0 ) { return; } this.configureable_table.act({ action: this.configureable_table.seats[0].options()[0], seat: 0 }); }, 1000 * this.configureable_table.seats.length);
-					} else if ( this.configureable_table.seats[0].activeseat() == 0 && !quicktimer ) {
-						if ( this.configureable_table.seats[0].hand0.options()[0] == 'insurance' ) {
-							quicktimer = setTimeout( function() { quicktimer = null; if ( this.configureable_table.seats[0].activeseat() > 0 ) { return; } this.configureable_table.act({ action: this.configureable_table.seats[0].hand0.options()[0], seat: 0 }); quicktimer = null; }, 4 * delay);
-						} else {
-							quicktimer = setTimeout( function() { quicktimer = null; if ( this.configureable_table.seats[0].activeseat() > 0 ) { return; } this.configureable_table.act({ action: this.configureable_table.seats[0].hand0.options()[0], seat: 0 }); }, delay);
-						}
-					} else {
-						console.log(this.configureable_table.seats[0].options().length + ' options as:' + this.configureable_table.seats[0].activeseat());
-					}
-				} catch (err) {
-					console.log(err);
-				}
-				
-			}
-			if ( configurable_table.automate ) {
-				setTimeout( function() { dealer(delay); }, delay );
-			}
-		}
 	}
 	
 	table_blackjack_conf.prototype.act = function(step) {
@@ -38,22 +39,20 @@ define(function() {
 			this.configureable_table.splitlimit = nl;
 		} else if ( step.action == 'minimum' || step.action == 'maximum'  ) {
 			var nm = prompt("table " + step.action,this.configureable_table[step.action]);
-			if ( parseInt(nm) > 0 && parseInt(nm) < Number.MAX_VALUE ) {
-				console.log(Number.MAX_VALUE);
+			if ( parseInt(nm) > 0 ) {
 				this.configureable_table[step.action] = parseInt(nm);
 			} else {
 				this.configureable_table[step.action] = 0;
 			}					
 		} else if ( step.action == 'dealer'  ) {
-			clearTimeout(this.quicktimer);
-			return this.act( step['name'] = prompt("otto or manny:" + step.action,this.configureable_table[step.action]))
-		} else if ( step.action == 'manaul'  ) {			
-			this.configureable_table.automate = true;
-			this.configureable_table.seats[0].player.name = 'auto';
-			if ( !step.amount ) {
-				step.amount = prompt("dealer delay millis:",1000);
+			clearTimeout(quicktimer);
+			var nd = prompt("manny or milli delay", this.configureable_table.seats[0].player.name);
+			if ( parseInt(nd) >= 0  ) {
+				this.configureable_table.seats[0].player.name = 'otto';
+				autodealer(parseInt(nd),this.configureable_table);
+			} else {
+				this.configureable_table.seats[0].player.name = 'manny';
 			}
-			dealer(step.amount);
 		} else if ( step.action == 'faceup' ) {
 			this.configureable_table.downdirty = false;					
 		} else if ( step.action == 'ante' ) {

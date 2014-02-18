@@ -1,6 +1,3 @@
-body {
-	overflow: hidden;	
-}
 input, button, select, option, textarea {
 	position:absolute;
     font-size: 22pt;
@@ -8,12 +5,12 @@ input, button, select, option, textarea {
     z-index:23;
 }
 button:disabled {
-	color:red;
+	color:red;	
 }
 .seat,.card,.hand,.options,.bet,.chair,.player,.payout,.title,.chips,.ante,._id {
 	position:absolute;	
 }
-#tape {
+#tape,.player,._id {
 	visibility: visible;
     display:none;
 }
@@ -39,5 +36,5 @@ button:disabled {
 }
 .table > .options > button {
 	position:relative;
-	display:none;
+	display:block;
 }

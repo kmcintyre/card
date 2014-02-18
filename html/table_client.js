@@ -2,7 +2,9 @@ define(function() {
 	
 	var tablesocket = new WebSocket("ws://dev.nwice.com:8080");
 	
-	tablesocket.key = null;	
+	tablesocket.waitingMessage = null;
+	tablesocket.key = null;
+	
 	tablesocket.onopen = function(evt) { 
 		console.log('open')
 		console.log(evt); 
@@ -11,7 +13,8 @@ define(function() {
 	tablesocket.onerror = function(evt) { console.log("error"); console.log(evt); };
 	
 	tablesocket.tablecast = function(o) {
-		console.warn('should override')		
+		console.warn('should override');
+		waitingMessage = o;
 	}
 
 	tablesocket.onmessage = function(evt) { 
@@ -34,7 +37,11 @@ define(function() {
 	
 	table_client.prototype.set = function(f) {
 		tablesocket.tablecast = f; 		
-	}
+		if ( tablesocket.waitingMessage ) {
+			tablesocket.waitingMessage = null;
+			tablesocket.tablecast(tablesocket.waitingMessage);
+		} 
+	}	
 	
 	return table_client;
 	

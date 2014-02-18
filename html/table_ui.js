@@ -3,13 +3,14 @@ define(["jquery", "card"], function($, card) {
 	styler = { 
 		tableradius: Math.max(document.documentElement.clientWidth, document.documentElement.clientHeight)/2,
 		cardwidth: 100,
-		base_font: "normal 16px san-serif", 
-		insurance_font: "normal 26px san-serif",
-		odds_font: "normal 14px monospace", 
-		player_font: "normal 18px monospace",
-		dealer_font: "small-caps 18px monospace",		
+		base_font: "normal 14pt 'Courier'", 
+		insurance_font: "italic small-caps 20pt 'Arial Narrow'",
+		odds_font: "normal normal 10pt monospace", 
+		player_font: "normal normal 120pt 'Arial'",
+		soft17_font: "normal normal 15pt 'Arial'",
+		dealer_font: "normal italic 120pt 'Arial'",
 		offset:5, spinset:20, bottomset:10, topset: 10, buttonset: 10, sideset: 10,
-		arcwidth: 25,
+		flowerarc: 25, 
 		scale: 1
 	};
 
@@ -30,12 +31,9 @@ define(["jquery", "card"], function($, card) {
 		var ctx = document.getElementById(this.canvas_id.substring(1)).getContext('2d');		
 		ctx.canvas.width = document.documentElement.clientWidth;
 		ctx.canvas.height = document.documentElement.clientHeight + 1;
-		
 		var ctx = document.getElementById(this.canvas_id.substring(1)).getContext('2d');
 		ctx.clearRect(0,-1,document.documentElement.clientWidth,document.documentElement.clientHeight+1);
-		$("#" + this.table.id + ' .options button[value="configure"]').each(function() {
-			console.log('YO MONEY CREATE A GEAR');
-		});	
+		
 		var grd = ctx.createRadialGradient(
 	  			document.documentElement.clientWidth/2, 
 	  			styler.tableradius*3/2,	  		
@@ -47,7 +45,32 @@ define(["jquery", "card"], function($, card) {
 	  	grd.addColorStop(1, 'rgba(0,87,0,1)');
 	  	grd.addColorStop(0, 'rgba(0,36,0,1)');
 	  	ctx.fillStyle = grd;
-	  	ctx.fillRect(0,0,document.documentElement.clientWidth,document.documentElement.clientHeight+1);		
+	  	ctx.fillRect(0,0,document.documentElement.clientWidth,document.documentElement.clientHeight+1);
+	  	ctx.fill();
+	  	
+	  	
+		$("#" + this.table.id + ' .options button[value="configure2"]').each(function() {			
+			ctx.save();
+			ctx.translate(500,500);
+			ctx.move(50,0);
+			
+			ctx.beginPath();
+			var teeth = 30;
+			var around = 0;			
+			while ( around < Math.PI * 4) {
+				ctx.arc(0,0,150,around,2*Math.PI/teeth);
+				console.log(ctx.strokeStyle);
+				ctx.strokeStyle = 'black';
+								
+				around += 2*Math.PI/teeth;
+				ctx.rotate(around);
+			}
+			ctx.stroke();
+			ctx.restore();
+		});	  	
+		$("#" + this.table.id + ' .options button[value="about"]').first(function() {			
+			console.log('YO MONEY CREATE ABOUT');
+		});			
 	}	
 	
 	table_ui.prototype.measure = function() {
@@ -59,8 +82,13 @@ define(["jquery", "card"], function($, card) {
 		styler.tableradius = Math.max(document.documentElement.clientWidth, document.documentElement.clientHeight)/2;
 		styler.cardwidth = Math.min(150,Math.max(75,parseInt(document.documentElement.clientWidth * document.documentElement.clientHeight / 52 / 52 / 2.4 )));			
 		console.log(styler.tableradius + ' radius card width:' + styler.cardwidth);
-		$(this.container_id).find(".card").css({width:styler.cardwidth * styler.scale}); 
-		$(this.container_id).find(".chip").css({width:styler.cardwidth * styler.scale * .54});
+		$(this.container_id).children(".card").css({width:styler.cardwidth * styler.scale}); 
+		$(this.container_id).children(".chip").css({width:styler.cardwidth * styler.scale * .54});		
+	}
+	
+	table_ui.prototype.cards_and_chips = function() {
+		$("#" + this.table.id).find(".card").css({width:styler.cardwidth * styler.scale}); 
+		$("#" + this.table.id).find(".chip").css({width:styler.cardwidth * styler.scale * .54});
 	}
 	
 	table_ui.prototype.rules = function() {
@@ -69,31 +97,34 @@ define(["jquery", "card"], function($, card) {
 				'.options:not(:has(button[value="'+$(this).val()+'"]))'
 			));
 		}).remove();
-		$("#" + this.table.id + ' ._id').hide();
 	}
 	
 	table_ui.prototype.wire = function() {
-		$(this).children('.payout').each(function () {
+		console.log('')
+		$("#" + this.table.id).find('.payout').each(function () {
 			$(this).css({"left":-$(this).width()/2, "bottom": document.documentElement.clientHeight/2-$(this).height()/2}).not( $(this).children('.chip') ).append(
 				$('.yellowchip:first').clone().css(
 						{"z-index":-1, "position": "absolute", "left": -$(".yellowchip:first").width()/2+$(this).width()/2, "bottom": -$(".yellowchip:first").height()/2+$(this).height()/2 }
 					).show()
 			);
 		});
-		$(this).children('.bet').each(function () {
+		$("#" + this.table.id).find('.bet').each(function () {
 			$(this).css({"left":-$(this).width()/2, "bottom": document.documentElement.clientHeight/2-$(this).height()/2}).not( $(this).children('.chip') ).append(				
 				$('.bluechip:first').clone().css(
 						{"z-index":-1, "position": "absolute", "left": -$(".bluechip:first").width()/2+$(this).width()/2, "bottom": -$(".bluechip:first").height()/2+$(this).height()/2 }
 				).show()											
 			);
 		});			
-		$(this).children('.ante').each(function () {
+		$("#" + this.table.id).find('.ante').each(function () {
 			$(this).css({"left":-$(this).width()/2, "bottom": document.documentElement.clientHeight/2-$(this).height()/2}).not( $(this).children('.chip') ).append(				
 				$('.whitechip:first').clone().css(
 						{"z-index":-1, "position": "absolute", "left": +$(".whitechip:first").width()/2+$(this).width()/2, "bottom": -$(".whitechip:first").height()/2+$(this).height()/2 }
 				).show()											
 			);
 		});
+		
+		$("#" + this.table.id).children('.options button[value="sit"]').show();
+		
 	}
 	
 	table_ui.prototype.options = function(obj, append_to) {
@@ -120,7 +151,7 @@ define(["jquery", "card"], function($, card) {
 			append_to.children(".options").remove();
 		}
 		return append_to.children('button');
-	}	
+	}
 	
 	table_ui.prototype.paint = function() {
 			console.info('paint ui:' + this.table.id);
@@ -145,40 +176,55 @@ define(["jquery", "card"], function($, card) {
 					$('<div class="seat"><div class="chair" title="' + this.table.seats[x].chair + '"/></div>').attr('seat',x).appendTo("#" + this.table.id);
 				}					
 				var seatjq = $("#" + this.table.id).find('.seat[seat="' + x + '"]');
+				
 				this.options(this.table.seats[x], seatjq);
-				if ( typeof this.table.seats[x].bet === 'number' ) {
-					if (seatjq.children('.bet').length == 0) {
-						seatjq.append('<div class="bet"/>');
+
+				var regions = ['bet','ante','lock','payout'];
+				for (var spot = 0; spot < regions.length;spot++) {
+					if ( typeof this.table.seats[x][regions[spot]] === 'number' ) {
+						console.log(seatjq.children().hasClass(regions[spot]).length);
+					} else {
+						console.log('clean up:' + seatjq.children('.'  + regions[spot]).remove().length );
 					}
-					seatjq.children('.bet').html(this.table.seats[x].bet);					
-				} else if ( typeof this.table.seats[x].bet !== 'number' ) {
-					seatjq.children('.bet').remove();
-				} 
-				if ( typeof this.table.seats[x].ante === 'number' ) {
-					if (seatjq.children('.ante').length == 0) {
-						seatjq.append('<div class="ante"/>');
-					}
-					seatjq.children('.ante').html(typeof this.table.seats[x].ante);					
+				}
+
+				//if ( .length == 0 && this.table.seats[x].player != null ) {
+				//	seatjq.append('<div class="player"><div class="name">' + this.table.seats[x].player.name + '</div><div class="chips"/></div>');
+				//	this.options(this.table.seats[x].player, seatjq.children('.player'));
+				//}  
+				if ( !this.table.seats[x].player ) { seatjq.children('.player').remove(); } else {
+					seatjq.not(':has(.player)').append('<div class="player"><div class="name"/><div class="chips"/></div>');
+					seatjq.find('.player .name').html(this.table.seats[x].player.name);
+					seatjq.find('.player .chips').html(this.table.seats[x].player.chips);
+				}			
+				
+				/*
+				if ( typeof this.table.seats[x].ante === 'number' && seatjq.children('.ante').length == 0) {
+					seatjq.append('<div class="ante"/>');
 				} else if ( typeof this.table.seats[x].bet !== 'number' ) {
 					seatjq.children('.ante').remove();
-				}				
+				}
+				seatjq.children('.ante').html(typeof this.table.seats[x].ante);
 				
-				if ( seatjq.children('.payout').length == 0 && typeof this.table.seats[x].payout === 'number' ) {
-					seatjq.append('<div class="payout">' + this.table.seats[x].payout + '</div>');
+				if ( typeof this.table.seats[x].lock === 'number' && seatjq.children('.lock').length == 0) {
+					seatjq.append('<div class="lock"/>');														
+				} else if ( typeof this.table.seats[x].bet !== 'number' ) {
+					
+				}				
+				seatjq.children('.lock').html(typeof this.table.seats[x].ante);
+				
+				if ( typeof this.table.seats[x].payout === 'number' && seatjq.children('.lock').length == 0 ) {
+					seatjq.append('<div class="payout"/>');
 				} else if ( seatjq.children('.payout').length == 1 && typeof this.table.seats[x].payout !== 'number' ) {
 					seatjq.children('.payout').remove();
 				}
 				
-				if ( seatjq.children('.player').length == 0 && this.table.seats[x].player != null ) {
-					seatjq.append('<div class="player"><div class="name">' + this.table.seats[x].player.name + '</div><div class="chips"/></div>');
-					this.options(this.table.seats[x].player, seatjq.children('.player'));
-				} else if ( seatjq.children('.player').length == 1 && typeof this.table.seats[x].player == null  ) {
-					seatjq.children('.player').remove();
-				}
+
 
 				if ( this.table.seats[x].player && typeof this.table.seats[x].player.chips === 'number' ) {
 					seatjq.children('.player').children('.chips').html(this.table.seats[x].player.chips);
 				}
+				*/
 				
 				for (var h = 0;; h++) {			
 					if ( this.table.seats[x]['hand' + h] ) {
@@ -225,6 +271,10 @@ define(["jquery", "card"], function($, card) {
 	}
 	
 	table_ui.prototype.arm = function() {
+		$("#" + this.table.id).siblings(this.canvas_id).bind('click', function(e) {
+			console.log(e);
+		});
+		
 		var ba = $("#" + this.table.id).find('button').not( $(this).bind('click') ).unbind('click').bind('click', function(event) {
 			console.log('acting');
 			var act = { 

@@ -59,6 +59,11 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 							handjq.append('<div class="bj">' + this.table.seats[s]['hand' + h].bj + '</div>');
 						}
 					}					
+					if ( this.table.seats[s]['hand' + h].payout ) {
+						if ( handjq.children('.payout').length == 0 ) {
+							handjq.append('<div class="payout">' + this.table.seats[s]['hand' + h].payout + '</div>');
+						}
+					}					
 				}				
 			}			
 		}
@@ -69,9 +74,11 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 		this.wire();
 		
 		this.arm();
+		
+		this.cards_and_chips();
 	}
 	
-	table_blackjack_ui.prototype.rules = function() {
+	table_blackjack_ui.prototype.rules = function() {		
 		table_ui.prototype.rules.call(this);
 		$('#' + this.table.id).children('.seat:first').find('.hand .options button[value="insurance"],button[value="backdoor"]').each(function() {
 			$(this).closest('.seat').siblings('.seat').find('.hand .options button').remove();			
@@ -92,7 +99,6 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 				$(this).remove();
 			};
 		});
-		$("#" + this.table.id + ' .seat:first .player').hide();
 	}
 		
 	table_blackjack_ui.prototype.wire = function() {
@@ -125,43 +131,10 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 					$(this).children('button').each(function(b){
 						$(this).css({"left": -$(this).width()/2});
 						$(this).not( s != 0 ).css({"bottom": ($(this).height() + styler.buttonset) * b});
-						//if ( s == 0 ) {
-						//$(this).css(
-						//		function() {
-						//			var t_or_b = "bottom";
-						//			
-						//				return { "top": ($(this).height() + syleobject.buttonset) * b}
-						//				 
-						//			} else { 
-						//				return {"bottom": ($(this).height() + syleobject.buttonset) * b}
-						//			}
-						//		}
-						//);
-						//if ( s == 0 ) { $(this).css({
-						//	"top":  ($(this).height() + syleobject.buttonset) * b}); } else { $(this).css({"bottom": $("#burner").height()});}
 					});					
 				});
-					//var maxbuttonwidth = 0;
-					//var	buttonheight = 0
-					//
 					
-						
-					//} else {
-					//	$(this).css({"bottom": 
-					//		2 * styler.offset +
-					//		$("#burner").height() + 							
-					//		buttonheight +
-					//		$(this).siblings(".card:gt(1)").length * $("#burner").height() / 5 
-					//	});
-					//}
-				//})
-					
-				$(this).children(".bet").each(function() {
-					$(this).css({"left":-$(this).width()/2, "bottom": document.documentElement.clientHeight/2-$(this).height()/2});
-					$(this).append( $('.bluechip').clone().css({"z-index" : -1, "position": "absolute", "left": -$(".bluechip").width()/2+$(this).width()/2, "bottom": -$(".bluechip").height()/2+$(this).height()/2 }).show());
-				});
-				
-				$(this).children(".double").each(function() {
+				$(this).find(".double").each(function() {
 					$(this).css({"left":-$(this).width()/2, "bottom":$('#burner').height()});
 					$(this).append( $('.bluechip').clone().css({"z-index": "-1", "position": "absolute", "left": -$(".bluechip").width()/2+$(this).width()/2, "bottom" : -$('.bluechip').height()/2 + $(this).height()/2}).show() );
 				});
@@ -242,6 +215,9 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 				} else {
 					$(this).css({"margin-left" : -$(this).children('button:first').outerWidth()/2 });
 					
+					$(this)
+					
+					
 					$(this).find('button[value="stand"]').each(function() {
 						if ( $(this).parent().siblings('.hand,.bet,.payout').length > 0 ) {
 							$(this).hide();
@@ -252,16 +228,12 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 					}); 					
 					$(this).find('button[value="collect"]').css({'bottom':0,"left":$('.bluechip').width()/2});
 					
-					$(this).find('button[value="rebuy"]').hide();
-					
 					$(document).unbind('keydown dragover');		
 					$(window).unbind('mousewheel DOMMouseScroll');
 					
 					switch(														
 						$(this).children('button[value="bet"]').not( $(this).bind('amount') ).unbind('amount').on('amount', function() {
-							
-							/*
-							var ctx = $(this).closest('.table').parent().siblings('canvas')[0].getContext('2d');
+							var ctx = $(this).closest('.table').siblings('canvas')[0].getContext('2d');
 							var id = ctx.getImageData(0,0,document.documentElement.clientWidth,document.documentElement.clientHeight);
 							for (var i=0; i<id.data.length; i+=4) {
 								var r = id.data[i];
@@ -271,7 +243,7 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 								id.data[i] = id.data[i+1] = id.data[i+2] = v;
 							}
 							ctx.putImageData(id,0,0);
-							*/
+							
 							var min = parseInt($(this).closest('.table').attr('minimum'));
 							var denom = parseInt($(this).closest('.table').attr('denomination'));
 							
@@ -371,43 +343,35 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 								console.log('adjacent value:' + adjacent_value);								
 								sliderjq.val(adjacent_value);								
 								sliderjq.trigger('change');
-				            });
+				});
 							$(document).bind('keydown' ,function(e) {
-				                switch (e.keyCode) {
-				                	case 38: sliderjq.val( Math.max(min, parseInt(sliderjq.val()) + 1)); sliderjq.triggerHandler('input'); break;
-				                	case 40: sliderjq.val( parseInt(sliderjq.val()) - 1); sliderjq.triggerHandler('input'); break;
-				                	default: {
-				                		console.log('which key:' + e.keyCode);
-				                		e.preventDefault();
-				                	}
-				                }
+				 switch (e.keyCode) {
+				 	case 38: sliderjq.val( Math.max(min, parseInt(sliderjq.val()) + 1)); sliderjq.triggerHandler('input'); break;
+				 	case 40: sliderjq.val( parseInt(sliderjq.val()) - 1); sliderjq.triggerHandler('input'); break;
+				 	default: {
+				 		console.log('which key:' + e.keyCode);
+				 		e.preventDefault();
+				 	}
+				 }
 							});			
-							
-							
-							
 							var slide = css3transform('translateY(-200px)');
-							
-							//css3transform('translate(-50%,50%) rotate(-90deg) translateX(100%) scale(1.5)');//rotate(-90deg)							
-							
 							slide['width'] = document.documentElement.clientHeight / 3;
 							slide['bottom'] = 0;
 							slide['left'] = 0;
 							sliderjq.css(slide);
-							//$(this).parent().prepend(sliderjq);
-							console.log( $(this).closest('.seat').children('.bet').text() );
 							sliderjq.val(parseFloat($(this).closest('.seat').children('.bet').text()));
 							sliderjq.triggerHandler('change');
 						}).length					
 					) {
 					case 0:
-					  console.log('no bets can be made');
+					  //console.log('either wired or not an option');
 					  break;
 					case 1:
 					  console.log('trigger amount seat:' + s);
 					  $(this).children('button[value="bet"]').triggerHandler('amount');
 					  break;
 					default:
-					   console.log('default number of bets to make');
+					console.log('default number of bets to make');
 					}
 				}
 			});			
@@ -415,10 +379,51 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 		});		
 	}
 	
+	
 	table_blackjack_ui.prototype.canvas = function() {
+		console.info('blackjack canvas');
 		table_ui.prototype.canvas.call(this);
 		var offscreen = -styler.tableradius*4/5;
+		function textCircle(ctx,text,x,y,radius,ang,pos,clockwise){
+			ctx.save();
+			ctx.translate(x,y);						
+			if ( !text ) text = 'undef';
+			ctx.textAlign = (pos.textAlign?pos.textAlign:"left");
+			ctx.textBaseline = (pos.textBaseline?pos.textBaseline:'middle');
+			ctx.font = (pos.font?pos.font:styler.base_font); 
+			ctx.fillStyle = (pos.color?pos.color:'white');		
+			if ( pos.align == "center" && clockwise ) {				  
+				ctx.rotate(ang+Math.PI/2-ctx.measureText(text).width/radius/2);
+			} else if ( pos.align == "center" ) {				  
+				ctx.rotate(ang-Math.PI/2+ctx.measureText(text).width/radius/2);
+			} else if ( pos.align == "right" && clockwise ) {
+				  ctx.rotate(ang+Math.PI/2-ctx.measureText(text).width/radius);
+			} else if ( pos.align == "right") {
+				  ctx.rotate(ang-Math.PI/2+ctx.measureText(text).width/radius);
+			} else if ( clockwise ) {
+				ctx.rotate(ang+Math.PI/2);
+			} else {
+				ctx.rotate(ang-Math.PI/2);
+			}
+			for ( var c = 0; c < text.length; c++) {
+				if ( clockwise ) {
+					ctx.fillText(text[c], 0, -radius);
+				} else {
+					ctx.fillText(text[c], 0, radius);
+				}
+				var rot = ctx.measureText(text[c]).width/radius;
+				if ( clockwise ) {
+					ctx.rotate(+rot);
+				} else {
+					ctx.rotate(-rot);
+				}				
+			}
+			ctx.restore();
+		}
+		
 		var ctx = document.getElementById(this.canvas_id.substring(1)).getContext('2d');
+
+		ctx.font = styler.base_font;
 		ctx.beginPath();
 		ctx.arc(document.documentElement.clientWidth/2,offscreen,styler.tableradius,Math.PI/3,Math.PI*2/3);
 		ctx.arc(document.documentElement.clientWidth/2,offscreen,styler.tableradius+25,Math.PI*2/3,Math.PI/3,true);
@@ -429,87 +434,89 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 		ctx.fillStyle = '#57854e';
 		ctx.fill();
 		
-		function textCircle(text,x,y,radius,ang,pos,clockwise){
-			if ( !text ) text = 'undef';
-			ctx.save();
-			ctx.textAlign = (pos.textAlign?pos.textAlign:"left");
-			ctx.textBaseline = (pos.textBaseline?pos.textBaseline:'middle');
-			ctx.font = (pos.font?pos.font:styler.base_font); 
-			ctx.fillStyle = (pos.color?pos.color:'white');			   			   			   
-			ctx.translate(x,y);
-			if ( pos.align == "center" && clockwise ) {				  
-				   ctx.rotate(ang+Math.PI/2-ctx.measureText(text).width/radius/2);
-			   } else if ( pos.align == "center" ) {				  
-				   ctx.rotate(ang-Math.PI/2+ctx.measureText(text).width/radius/2);
-			   } else if ( pos.align == "right" && clockwise ) {
-				  ctx.rotate(ang+Math.PI/2-ctx.measureText(text).width/radius);
-			   } else if ( pos.align == "right") {
-				  ctx.rotate(ang-Math.PI/2+ctx.measureText(text).width/radius);
-			   } else if ( clockwise ) {
-				   ctx.rotate(ang+Math.PI/2);
-			   } else {
-				   ctx.rotate(ang-Math.PI/2);
-			   }
-			   ctx.save();
-			   for ( var c = 0; c < text.length; c++) {				  
-				   
-				   if ( clockwise ) {
-					   ctx.fillText(text[c], 0, -radius);
-				   } else {
-					   ctx.fillText(text[c], 0, radius);
-				   }
-				   var rot = ctx.measureText(text[c]).width/radius;
-				   if ( clockwise ) {
-					   ctx.rotate(+rot);
-				   } else {
-					   ctx.rotate(-rot);
-				   }				   
-			   }
-			   ctx.restore();
-			   ctx.restore();
-		}
-		
-		textCircle("Insurance Pays",
-				document.documentElement.clientWidth/2,offscreen,styler.tableradius,Math.PI/2,
+		textCircle(ctx, "Insurance Pays",document.documentElement.clientWidth/2,offscreen,styler.tableradius,Math.PI/2,
 				{font:styler.insurance_font, align:'center',textBaseline:'top', color:'black'}
 		);
-
-		textCircle($("#" + this.table.id).attr('insurancepays'),document.documentElement.clientWidth/2,offscreen,styler.tableradius+4,Math.PI*2/3,
-				{font: styler.odds_font, align:'left',textBaseline:'hanging'} 
+		textCircle(ctx, $("#" + this.table.id).attr('insurancepays'),document.documentElement.clientWidth/2,offscreen,styler.tableradius+4,Math.PI*2/3,
+				{font: styler.odds_font, align:'left',textBaseline:'top'} 
 		);
-		textCircle($("#" + this.table.id).attr('insurancepays'),document.documentElement.clientWidth/2,offscreen,styler.tableradius+4,Math.PI/3,
-				{ font: styler.odds_font, align:'right',textBaseline:'hanging'} 
-		);
+		textCircle(ctx, $("#" + this.table.id).attr('insurancepays'),document.documentElement.clientWidth/2,offscreen,styler.tableradius+4,Math.PI/3,
+				{ font: styler.odds_font, align:'right',textBaseline:'top'} 
+		);				
 		
+		var soft17 = $("#" + this.table.id).attr('soft17') + "s soft 17";		
+		var dealername = $("#" + this.table.id).find(".seat:first").find('.player .name').html();
 		
-		var soft17 = $("#" + this.table.id).find(".seat:first").find('.player .name').html() + ' ' + $("#" + this.table.id).attr('soft17') + "s soft 17";
+		ctx.font = styler.soft17_font;
+		var sr = ctx.measureText(soft17+'-').width/styler.tableradius;
 		
-		textCircle(soft17,document.documentElement.clientWidth/2,offscreen,styler.tableradius,Math.PI/3,
-				{font: styler.dealer_font, align:'right',textBaseline:'bottom', color:'white'}
-		);
+		textCircle(ctx,dealername,document.documentElement.clientWidth/2,offscreen,styler.tableradius,Math.PI/3+sr,
+				{font:styler.soft17_font, align:'right',textBaseline:'bottom', color:'white'}
+		);		
+		textCircle(ctx,soft17,document.documentElement.clientWidth/2,offscreen,styler.tableradius,Math.PI/3,
+				{font:styler.soft17_font, align:'right',textBaseline:'bottom', color:'white'}
+		);		
 		
-		console.log(document.documentElement.clientWidth/2 + styler.tableradius * Math.cos(Math.PI*2/3));
-		textCircle("BJ Pays " + $("#" + this.table.id).attr('blackjackpays'),
-				document.documentElement.clientWidth/2 + (styler.tableradius+styler.arcwidth-50) * Math.cos(Math.PI*.583),
-				offscreen + (styler.tableradius+styler.arcwidth-50) * Math.sin(Math.PI*.583),90,
-				Math.PI*.583,
+		textCircle(ctx, "BJ Pays " + $("#" + this.table.id).attr('blackjackpays'),
+				document.documentElement.clientWidth/2 + (styler.tableradius+styler.flowerarc-50) * Math.cos(Math.PI*.583),
+				offscreen + (styler.tableradius+styler.flowerarc-50) * Math.sin(Math.PI*.583),
+				80,Math.PI*.583,
 				{font: styler.odds_font, align:'center', color:'gold'},false
-		);
-		
-		textCircle($("#" + this.table.id).attr('splitlimit') + " Splits",
-				document.documentElement.clientWidth/2 + (styler.tableradius+styler.arcwidth) * Math.cos(Math.PI*.583),
-				offscreen + (styler.tableradius+styler.arcwidth) * Math.sin(Math.PI*.583),50,
-				Math.PI*.583+Math.PI,
+		);		
+		textCircle(ctx, $("#" + this.table.id).attr('splitlimit') + " Splits",
+				document.documentElement.clientWidth/2 + (styler.tableradius+styler.flowerarc-20) * Math.cos(Math.PI*.583),
+				offscreen + (styler.tableradius+styler.flowerarc-20) * Math.sin(Math.PI*.583),			
+				30,Math.PI*.583+Math.PI,
+				{font: styler.odds_font, align:'center', color:'gold'},true
+		);		
+		textCircle(ctx, $("#" + this.table.id).attr('decks') + " decks",
+				document.documentElement.clientWidth/2 + (styler.tableradius+styler.flowerarc) * Math.cos(Math.PI/2),
+				offscreen + (styler.tableradius+styler.flowerarc) * Math.sin(Math.PI/2),				
+				45, -Math.PI/2,
 				{font: styler.odds_font, align:'center', color:'gold'},true
 		);
+		var doubleon = $("#" + this.table.id).attr('doubleon') ? $("#" + this.table.id).attr('doubleon') : 'Any 2';
+		textCircle(ctx, "Double " + doubleon,
+				document.documentElement.clientWidth/2 + (styler.tableradius+styler.flowerarc-60) * Math.cos(Math.PI*.416),
+				offscreen + (styler.tableradius+styler.flowerarc-60) * Math.sin(Math.PI*.416),
+				90,Math.PI*.416,{font: styler.odds_font, align:'center', color:'gold'},false);
+				
 		
-		textCircle($("#" + this.table.id).attr('decks') + " decks",
-				document.documentElement.clientWidth/2 + (styler.tableradius+styler.arcwidth) * Math.cos(Math.PI/2),
-				offscreen + (styler.tableradius+styler.arcwidth) * Math.sin(Math.PI/2),50,
-				-Math.PI/2,
-				{font: styler.odds_font, align:'center', color:'gold'},true
-		);
-		
+	  	ctx.save();
+	  	ctx.translate(document.documentElement.clientWidth,0);	  	
+	  	ctx.rotate(Math.PI/4);
+	  	ctx.drawImage( $('#burner')[0], -styler.cardwidth/2, -styler.cardwidth*1.4/2, styler.cardwidth, styler.cardwidth * 1.4);
+	  	ctx.restore();
+	  	
+	  	
+	  	ctx.beginPath();
+	  	ctx.moveTo(document.documentElement.clientWidth-styler.cardwidth*2/3,0);	  	
+	  	ctx.lineTo(document.documentElement.clientWidth,styler.cardwidth*2/3);
+	  	ctx.lineTo(document.documentElement.clientWidth,0);
+	  	ctx.closePath();
+	  	ctx.strokeStyle = 'black';
+	  	ctx.stroke();
+	  	ctx.fillStyle = 'rgba(190,0,0,.75)';
+	  	ctx.fill();	  	
 	}	
 	return table_blackjack_ui;
 });	
+
+
+//ctx.save();
+//ctx.beginPath();
+//ctx.translate(document.documentElement.clientWidth/2,offscreen);
+//console.log(ctx);
+//ctx.rotate(Math.PI/2);
+
+
+
+
+//ctx.font = styler.dealer_font;
+//ctx.textBaseline = 'hanging';
+//ctx.align = 'right';
+//ctx.fillStyle = 'gold';
+//ctx.font = styler.dealer_font;
+//ctx.fillText(dealername,document.documentElement.clientWidth/2 + Math.cos(Math.PI/3) * styler.tableradius - ctx.measureText(dealername).width,styler.offset);
+
+//ctx.closePath();

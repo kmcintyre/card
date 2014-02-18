@@ -14,6 +14,7 @@ define(["deck"], function(deck) {
 			// we're adding too so 
 			this.cards = this.cards.concat( new deck().cards );
 		}
+		this.shuffle();
 		this.penetration = parseInt(this.cards.length * this.number_of_decks / (this.number_of_decks + 1));
 		if ( this.penetration == 0 ) {
 			this.penetration = 16;
@@ -25,6 +26,7 @@ define(["deck"], function(deck) {
 	shoe.prototype.constructor=shoe;	
 	
 	shoe.prototype.burn = function(number_of_cards) {
+		console.log('burn');
 		if ( isNaN(parseInt(number_of_cards)) ) {
 			return this.next();
 		} else if ( number_of_cards == 1 ) {
