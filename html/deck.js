@@ -10,7 +10,8 @@ define(["card"], function(card) {
 		}
 	};
 	
-	deck.prototype.shuffle = function() { 
+	deck.prototype.shuffle = function() {
+		console.log('shuffle')
 		var shuffledcards = new Array();
 		while ( this.cards.length > 0 ) {
 			var rand_no = Math.floor(Math.random() * this.cards.length);

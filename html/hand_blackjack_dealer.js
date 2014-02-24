@@ -5,7 +5,6 @@ define(["hand_blackjack", "deck"], function(hand_blackjack, deck) {
 		hand_blackjack.call(this);
 		this.checked = false;		
 		this.soft17 = 'hit';
-		console.log('does this.cards exist?' + (this.cards instanceof Array))
 	}
 	
 	hand_blackjack_dealer.prototype = new hand_blackjack();
@@ -46,7 +45,7 @@ define(["hand_blackjack", "deck"], function(hand_blackjack, deck) {
 	
 	hand_blackjack_dealer.prototype.options = function() {
 		var opts = [];
-		if ( this.cards.length < 1 ) {		
+		if ( this.cards.length < 2 ) {		
 			opts[opts.length] = "wait";
 			return opts;		
 		} else if (

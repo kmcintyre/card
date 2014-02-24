@@ -1,6 +1,6 @@
 define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], function(table, shoe, hand_blackjack_dealer, hand_blackjack_player) {
 	
-	function dealer(seats) {
+	function dealer(seats, shoe) {
 		
 		seats[0].activeseat = function(inactive) {
 				if ( seats[0].hand0 ) {
@@ -27,9 +27,12 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
 		};     		
     		
     		
+		seats[0].spinset = 20;
+		
     	seats[0].options = function() {    		
     		if ( this.activeseat(true) == null && this.activebet() != null ) {
     			return ['deal'];
+    			
     		} else if ( this.activeseat(true) == null && this.activebet() == null ) {    			
     			//return ['new dealar'];    			
     			return [];
@@ -57,7 +60,7 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
     	return seats[0];		
 	}
 	
-	function table_blackjack() {
+	function table_blackjack(seats) {
 		table.call(this);
 		this.shoe = new shoe();
 		this.minimum = 25;
@@ -78,15 +81,16 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
     	
     	this.downdirty = true;    	 
     	
-    	for (var x = 0; x < 8;x++) {
+    	for (var x=0;x<(seats>1?seats:1);x++) {
     		this.addseat();
     	}
     	this.seats[0].chair = 'Dealer';
     	this.sit(0, { name: 'manny'});
     	delete this.seats[0].player.chips;
-    	this.seats[0] = new dealer(this.seats); 
+    	this.seats[0] = new dealer(this.seats, this.shoe); 
     	
     	this.decks = this.shoe.number_of_decks;
+    	this.maxseats = 8;    	
     }
 	
 	table_blackjack.prototype = new table();
@@ -115,11 +119,11 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
     }
 	
 	table_blackjack.prototype.createhand = function(bet) {
-    	return new hand_blackjack_player(bet);
+		return new hand_blackjack_player(bet);
     }
 	
 	table_blackjack.prototype.act = function(step) {
-		console.log('blackjack act:' + step.action + ' seat:' + step.seat + ' active' + this.seats[0].activeseat());
+		console.info(step);
 		try {
 			if ( step.action == 'hit' && this.seats[0].activeseat() == step.seat ) {
 				this.hand(step.seat).hit( this.shoe.next() );					
@@ -145,9 +149,9 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
 			} else if ( step.action == 'backdoor' && step.seat == 0 ) {
 				console.log('check hole card backdoor');
 				this.seats[step.seat].hand0.backdoor();			
-			} else if ( step.action == 'deal' && step.seat == 0) {
+			} else if ( step.action == 'deal' || step.action == 'wait'  && step.seat == 0) {
 				this.deal(step.seat);
-			} else if ( step.action == 'deal' && this.seats[0].activeseat() == step.seat) {
+			} else if ( step.action == 'deal' || step.action == 'wait' && this.seats[0].activeseat() == step.seat) {
 				this.deal(step.seat);
 			} else if ( step.action == 'payout' && step.seat == 0 ) {
 				this.payout();
@@ -157,58 +161,72 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
 				table.prototype.act.call(this, step);
 			}
 		} catch (err) {
+			console.warn('blackjack act error:' + err);
 			if ( err == 'Active Hand' ) {
 				console.log('Active Hand Error');
 				return;
 			} else if ( err == 'Seat Not Taken' ) {
 				console.log('Seat Not Taken');
 				return;
-			}
-			console.log('we must have a blackjack:' + err);
-			for (var x = 1; x < this.seats.length; x++) {
-				if ( this.hand(x) ) {
-					console.log('auto stay');
-					this.hand(x).stay();
-				}
-			}
+			} else if ( err.toString().indexOf('Blackjack') > 0 ) {
+				for (var x = 1; x < this.seats.length; x++) {
+					if ( this.hand(x) ) {
+						console.log('auto stay for blackjack - should we check all slots i.e. carribean');
+						this.hand(x).stay();
+					}
+				}				
+			}			
 		}
 	}
 	
 	table_blackjack.prototype.deal = function(seat) {
-		if ( seat == 0 && this.seats[0].activeseat() == null ) {
-			console.log('deal played in shoe:' + this.shoe.played  + ' ' + this.shoe.penetration)
+		if ( seat == 0 && this.seats[0].activeseat() == null  ) {
 			if ( this.shoe.played > this.shoe.penetration ) {				
 				this.shoe.shuffle();
-				this.shoe.played = 0;				
-			} 
-			if ( this.shoe.played == 0 ) {
-				this.shoe.burn(1);
-			}
-			if ( !this.seats[0].hand(true) ) {
-				this.seats[0].hand0 = new hand_blackjack_dealer();
-				this.seats[0].hand0.soft17 = this.soft17;
+				this.shoe.played = 0;
+				return;
+			} else if ( this.shoe.played == 0 ) {
+				this.shoe.burn();
+				return;
+			}			
+			this.freeze();
+			return;
+		}		
+		if ( this.hand(seat) ) {
+			this.hand(seat).deal( this.shoe.next(seat) );
+		}
+	}
+	table_blackjack.prototype.deal2 = function(seat) {
+		
+		if ( seat == 0 && this.seats[0].activeseat() == null ) {
+			console.log('deal played in shoe:' + this.shoe.played  + ' ' + this.shoe.penetration)
+			 
 
-				table.prototype.deal.call(this);			
-				
-				for (var y = 1; y <= 2; y++) {
-		    		for (var x = 0; x < this.seats.length; x++) {
-		    			var bump = ( x == this.seats.length - 1 ? 0 : x + 1);
-		    			if ( this.seats[bump].hand0 ) {
-		        			if ( !this.seats[bump].hand0.cards ) {
-		    					var replacement = new hand_blackjack_player();
-		    					if ( this.seats[bump].hand0.bet ) {
-		    						replacement.bet = this.seats[bump].hand0.bet;
-		    					}    			
-		    					this.seats[bump].hand0 = replacement;
-		        			}
-		        			console.log('card ' + y + ' to ' + bump);
-		        			this.hand(bump).deal( this.shoe.next(bump) );	        			
-		    			}
-		    		}
-		    	}				
-			} else {
-				console.log('not okay');
+			if ( !this.seats[0].hand(true) ) {
+				table.prototype.deal.call(this);
+				return;
 			}
+			
+			this.seats[0].hand0 = new hand_blackjack_dealer();
+			this.seats[0].hand0.soft17 = this.soft17;
+				
+			for (var y = 1; y <= 2; y++) {
+	    		for (var x = 0; x < this.seats.length; x++) {
+	    			var bump = ( x == this.seats.length - 1 ? 0 : x + 1);
+	    			if ( this.seats[bump].hand0 ) {
+	        			if ( !this.seats[bump].hand0.cards ) {
+	    					var replacement = new hand_blackjack_player();
+	    					if ( this.seats[bump].hand0.bet ) {
+	    						replacement.bet = this.seats[bump].hand0.bet;
+	    					}    			
+	    					this.seats[bump].hand0 = replacement;
+	        			}
+	        			console.log('card ' + y + ' to ' + bump);
+	        			this.hand(bump).deal( this.shoe.next(bump) );	        			
+	    			}
+	    		}
+	    	}
+				
 		} else if ( this.hand(seat) && this.hand(seat).options().length == 1 ) {
 			console.log( 'deal split' );
 			this.hand(seat).deal( this.shoe.next(seat) );
@@ -236,6 +254,17 @@ define(["table", "shoe", "hand_blackjack_dealer", "hand_blackjack_player"], func
 			}
 		}
     }
+    
+    table_blackjack.prototype.freeze = function() {
+    	table.prototype.freeze.call(this);
+    	if ( this.seats[0].activeseat() > 0 ) {
+    		this.seats[0].hand0 = new hand_blackjack_dealer();
+    	} else {
+    		console.log('no hands to match dealer')
+    	}
+    }
+    
+    
     
     table_blackjack.prototype.bet = function(seat, amount) {
     	if ( this.maximum && this.maximum <= amount ) {

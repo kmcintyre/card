@@ -10,7 +10,7 @@ var table_blackjack = requirejs('table_blackjack')
 
 var stdin = process.openStdin();
 
-var t = new table_blackjack();
+var t = new table_blackjack(8);
 
 wss.on('connection', function(ws) {
 	

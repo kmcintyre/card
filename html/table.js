@@ -1,4 +1,4 @@
-define(["hand"], function(_hand) {
+define(function() {
 
 	function s4() {
 		return Math.floor((1 + Math.random()) * 0x10000)
@@ -17,17 +17,18 @@ define(["hand"], function(_hand) {
 		this.locked = false;
 		this.options = function() {
 			var opts = [];
-			if ( this.locked ) {
-				opts[opts.length] = 'unlock';
-			} else {
-				opts[opts.length] = 'lock';
-			}
 			if ( !this.player ) {
 				opts[opts.length] = 'sit';
-			}			
+			} else {
+				if ( this.locked ) {
+					opts[opts.length] = 'unlock';
+				} else {
+					opts[opts.length] = 'lock';
+				}
+			}
 			if ( this.payout ) {
 				opts[opts.length] = 'collect';				
-			}			
+			}
 			if ( !this.hand(true) ) {
 				opts[opts.length] = 'bet';
 			}		
@@ -77,6 +78,7 @@ define(["hand"], function(_hand) {
 		this.minimum = 0;
 		this.ante = 0;
 		this.denomination = 1;
+		this.maxseats = 10; // so 0-9 otherwise some matching fails
 	};
 
 	table.prototype.hand = function(seat, inactive) {
@@ -105,9 +107,12 @@ define(["hand"], function(_hand) {
 	}
 	
 	table.prototype.act = function(step) {
-		console.log('table act:' + step.action);
 		if ( step.action == 'sit' ) {
 			this.sit(step.seat, step);
+		} else if ( step.action == 'dispense' ) {
+			this.dispense(step.seat, step.amount);									
+		} else if ( step.action == 'deal' ) {
+			this.deal(step.seat);				
 		} else if ( step.action == 'stand' ) {
 			this.stand(step.seat);
 		} else if ( step.action == 'bet' ) {
@@ -122,12 +127,12 @@ define(["hand"], function(_hand) {
 			this.unlock = false;
 		} else if ( step.action == 'unlock' && step.seat ) {
 			this.seats[step.seat].locked = false;
-		} else if ( step.action == 'addseat' ) {
+		} else if ( step.action == 'addseat' && ( this.seats.length < this.maxseats || !this.maxseats  )) {
 			this.addseat();
 		} else if ( step.action == 'fold' ) {
 			this.seats[step.seat].hand().fold();
 		} else {
-			console.log('unknown act');
+			throw 'Unknown Act'
 		}
 	}
 	
@@ -135,6 +140,9 @@ define(["hand"], function(_hand) {
 		var opts = new Array('about');
 		if ( !this.locked ) {
 			opts[opts.length] = 'configure';
+			if ( this.seats.length < this.maxseats || this.maxseats == 0 ) {
+				opts[opts.length] = 'add seat';
+			}			
 		}
 		return opts;
 	}
@@ -152,7 +160,7 @@ define(["hand"], function(_hand) {
     		throw "Seat Unavailable";
     	} else {
     		console.log('welcome:' + person.name );
-			this.seats[seat].player = { name: (person.name?person.name:'Anonymous'), chips: 10 * this.minimum };			
+			this.seats[seat].player = { name: (person.name?person.name:'Anonymous'), chips: (person.chips?person.chips:5000) };			
     	}    	
     }
     
@@ -203,18 +211,19 @@ define(["hand"], function(_hand) {
     }
     
     table.prototype.createhand = function(bet) {
-    	return new _hand(this.seats[x].bet);
+    	throw "Not Implemented";
     }
         
-    table.prototype.deal = function() {
+    table.prototype.freeze = function() {
     	console.log('deal!');
     	for (var x = 0; x < this.seats.length; x++) {
     		try {
-	    		if ( this.seats[x].player && typeof this.seats[x].bet === 'number' ) {
-	    			console.log('create hand with bet:' + this.seats[x].bet);
+	    		if ( this.seats[x].player && typeof this.seats[x].bet === 'number') {
+	    			console.log('create hand with bet:' + this.seats[x].bet + ' at seat:' + x);
     				this.seats[x].hand0 = this.createhand(this.seats[x].bet);
     				delete this.seats[x].bet;
     				if ( this.seats[x].ante ) {
+    					console.log('add ante');
     					this.seats[x].hand0.ante = this.seats[x].ante;
     					delete this.seats[x].ante;
     				}

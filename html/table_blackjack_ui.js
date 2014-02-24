@@ -11,6 +11,7 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 	}
 	
 	function table_blackjack_ui(table, container_id, canvas_id) {
+		console.log('new blackjack ui:' + container_id + ' ' + canvas_id);
 		table_ui.call(this, table, container_id, canvas_id);
 	}
 	
@@ -75,7 +76,7 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 		
 		this.arm();
 		
-		this.cards_and_chips();
+		//this.cards_and_chips();
 	}
 	
 	table_blackjack_ui.prototype.rules = function() {		
@@ -92,13 +93,16 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 		}
 		$('#' + this.table.id + ' > .seat:first > .hand > .options > button[value="expose"]').each(function() {
 			if ( $(this).closest('.hand').children('.bj').each(function() {
+					console.log('blackjack I think');
 					$(this).html('Oh no!');
 				}).length == 0 && $(this).closest('.seat').siblings('.seat').find('.hand .options button').length > 0 
 			) { 
 				$(this).closest('.seat').siblings('.seat').find('.hand .options').not(':first').remove();
 				$(this).remove();
 			};
-		});
+		});		
+		
+		$('#' + this.table.id).find('.seat:has(.player) .options button[value="lock"]').hide();
 	}
 		
 	table_blackjack_ui.prototype.wire = function() {
@@ -107,11 +111,10 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 		var chairwidth = document.documentElement.clientWidth / ($("#" + this.table.id + ' .seat').length - 1);
 				
 		$("#" + this.table.id).find(".seat").each(function(s) {			
-			if ( s == 0 ) {
+			if ( s == 0 ) {				
 				$(this).css({"width": "100%", "top": styler.topset});
 			} else {
-				$(this).css({"left": document.documentElement.clientWidth - chairwidth * s + chairwidth / 2});
-				$(this).css({"bottom": styler.bottomset});  
+				$(this).css({"left": styler.seating[s][0], "bottom": styler.seating[s][1] - styler.tableradius/5});  
 			}									
 						
 			$(this).children(".hand").each( function(h) {
@@ -215,8 +218,6 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 				} else {
 					$(this).css({"margin-left" : -$(this).children('button:first').outerWidth()/2 });
 					
-					$(this)
-					
 					
 					$(this).find('button[value="stand"]').each(function() {
 						if ( $(this).parent().siblings('.hand,.bet,.payout').length > 0 ) {
@@ -230,19 +231,8 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 					
 					$(document).unbind('keydown dragover');		
 					$(window).unbind('mousewheel DOMMouseScroll');
-					
 					switch(														
 						$(this).children('button[value="bet"]').not( $(this).bind('amount') ).unbind('amount').on('amount', function() {
-							var ctx = $(this).closest('.table').siblings('canvas')[0].getContext('2d');
-							var id = ctx.getImageData(0,0,document.documentElement.clientWidth,document.documentElement.clientHeight);
-							for (var i=0; i<id.data.length; i+=4) {
-								var r = id.data[i];
-								var g = id.data[i+1];
-								var b = id.data[i+2];
-								var v = 0.2126*r + 0.7152*g + 0.0722*b;
-								id.data[i] = id.data[i+1] = id.data[i+2] = v;
-							}
-							ctx.putImageData(id,0,0);
 							
 							var min = parseInt($(this).closest('.table').attr('minimum'));
 							var denom = parseInt($(this).closest('.table').attr('denomination'));
@@ -266,7 +256,7 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 							sliderjq['previousValueAsNumber'] = null;							
 							sliderjq.unbind('change').on('change', function(e) {
 								//console.log(e);								
-								var chips = $(e.target).closest('.seat').find('.player').children('.chips')[0].firstChild.data;
+								var chips = $(e.target).closest('.seat').find('.player').children('.chips');
 								
 								if ( e.target.valueAsNumber > $(e.target).closest('.seat').find('.player').children('.chips')[0].firstChild.data) {
 									console.log('TO BIG A BET:' + $(e.target).closest('.seat').find('.player').children('.chips')[0].firstChild.data);
@@ -309,33 +299,7 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 							
 							$(this).closest(".seat").children(".bet").each(function () {																							
 								var dragy = 0;
-								var dragval = 0;
-								
-								//$(document).bind('dragover' ,function(e) {								
-								//	var up_or_down = dragy - e.originalEvent.screenY;
-								//	console.log('up or d:' + up_or_down + ' ' + dragval);
-								//	var nv = (sliderjq.attr('max') - sliderjq.attr('min')) * up_or_down/sliderjq.width()+Math.max(dragval,sliderjq.attr('min'));
-								//	console.log('going to:' + nv);
-								//	sliderjq.val(nv);
-								//	sliderchipbet();								
-								//});i.prototype.canvas
-								//$(this).bind({				
-								//	dragend : function(e) { console.log('dragend:' + e.originalEvent.screenY + ' ' + sliderjq.val()); dragval = sliderjq.val();},
-								//	dragstart : function(e) { dragy = e.originalEvent.screenY; dragval = sliderjq.val();console.log('dragstart:' + e.originalEvent.screenY + ' ' + dragval);},
-								//});
-								
-								
-								//if ( $(this).hasClass('emptybet') ) {
-								//	$('.greenchip').clone().css({"z-index":-1, "position": "absolute", 
-								//		"left": -$(".greenchip").width()/2+$(this).width()/2, 
-								//		"bottom":-$(".greenchip").height()/2+$(this).height()/2}).
-										//show().appendTo($(this).attr('dragable',true));
-								//		show().appendTo($(this));
-								//} else {
-								//$(this).css({"bottom": sliderheight()-$(".bluechip").height()/2+$(this).height()/2 });
-								//	console.log('MOVE THIS SHIT');
-								//}				
-															
+								var dragval = 0;																						
 							});
 							
 							$(window).unbind('mousewheel DOMMouseScroll').bind('mousewheel DOMMouseScroll', function(e) {
@@ -379,144 +343,264 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 		});		
 	}
 	
-	
-	table_blackjack_ui.prototype.canvas = function() {
-		console.info('blackjack canvas');
-		table_ui.prototype.canvas.call(this);
-		var offscreen = -styler.tableradius*4/5;
-		function textCircle(ctx,text,x,y,radius,ang,pos,clockwise){
-			ctx.save();
-			ctx.translate(x,y);						
-			if ( !text ) text = 'undef';
-			ctx.textAlign = (pos.textAlign?pos.textAlign:"left");
-			ctx.textBaseline = (pos.textBaseline?pos.textBaseline:'middle');
-			ctx.font = (pos.font?pos.font:styler.base_font); 
-			ctx.fillStyle = (pos.color?pos.color:'white');		
-			if ( pos.align == "center" && clockwise ) {				  
-				ctx.rotate(ang+Math.PI/2-ctx.measureText(text).width/radius/2);
-			} else if ( pos.align == "center" ) {				  
-				ctx.rotate(ang-Math.PI/2+ctx.measureText(text).width/radius/2);
-			} else if ( pos.align == "right" && clockwise ) {
-				  ctx.rotate(ang+Math.PI/2-ctx.measureText(text).width/radius);
-			} else if ( pos.align == "right") {
-				  ctx.rotate(ang-Math.PI/2+ctx.measureText(text).width/radius);
-			} else if ( clockwise ) {
-				ctx.rotate(ang+Math.PI/2);
-			} else {
-				ctx.rotate(ang-Math.PI/2);
-			}
-			for ( var c = 0; c < text.length; c++) {
-				if ( clockwise ) {
-					ctx.fillText(text[c], 0, -radius);
-				} else {
-					ctx.fillText(text[c], 0, radius);
-				}
-				var rot = ctx.measureText(text[c]).width/radius;
-				if ( clockwise ) {
-					ctx.rotate(+rot);
-				} else {
-					ctx.rotate(-rot);
-				}				
-			}
-			ctx.restore();
+	table_blackjack_ui.prototype.textCircle = function(text,x,y,radius,ang,pos,clockwise){
+		this.context().save();
+		this.context().translate(x,y);						
+		if ( !text ) text = 'undef';
+		this.context().textAlign = (pos.textAlign?pos.textAlign:"left");
+		this.context().textBaseline = (pos.textBaseline?pos.textBaseline:'middle');
+		this.context().font = (pos.font?pos.font:styler.font('base')); 
+		this.context().fillStyle = (pos.color?pos.color:'white');		
+		if ( pos.align == "center" && clockwise ) {				  
+			this.context().rotate(ang+Math.PI/2-this.context().measureText(text).width/radius/2);
+		} else if ( pos.align == "center" ) {				  
+			this.context().rotate(ang-Math.PI/2+this.context().measureText(text).width/radius/2);
+		} else if ( pos.align == "right" && clockwise ) {
+			  this.context().rotate(ang+Math.PI/2-this.context().measureText(text).width/radius);
+		} else if ( pos.align == "right") {
+			  this.context().rotate(ang-Math.PI/2+this.context().measureText(text).width/radius);
+		} else if ( clockwise ) {
+			this.context().rotate(ang+Math.PI/2);
+		} else {
+			this.context().rotate(ang-Math.PI/2);
 		}
+		for ( var c = 0; c < text.length; c++) {
+			if ( clockwise ) {
+				this.context().fillText(text[c], 0, -radius);
+			} else {
+				this.context().fillText(text[c], 0, radius);
+			}
+			var rot = this.context().measureText(text[c]).width/radius;
+			if ( clockwise ) {
+				this.context().rotate(+rot);
+			} else {
+				this.context().rotate(-rot);
+			}				
+		}
+		this.context().restore();
+  	}
+	
+	table_blackjack_ui.prototype.betregion = function(seat) {
+  		this.context().beginPath();
+  		this.context().arc(0,0,styler.betradius,0,Math.PI*2);
+  		this.context().closePath();
+  		this.context().strokeStyle = 'white';
+  		this.context().font = styler.font('seat');
+  		this.context().stroke();
+  		this.context().lineTo(100, 0);
+  		this.context().stroke();
+  		this.context().closePath();
+  		for (var x = 0; x < styler.betregions.length; x++) {
+  			if ( seat[styler.betregions[x][0]] ) {
+  				this.context().fillStyle='white';
+  				this.context().fillText(styler.betregions[x][0] + ':' + seat[styler.betregions[x][0]] + ':' + styler.betregions[x][1], 0, 20 * x);
+  			}
+  		}  	  		
+  	}
+	
+	table_blackjack_ui.prototype.shoe = function(decks) {
+		this.context().save();
+		this.context().translate(document.documentElement.clientWidth-styler.cardwidth,0);
+		this.context().rotate(-Math.PI/4);
+		this.context().drawImage( $('#burner')[0], 0, 0, styler.cardwidth, styler.cardwidth * 1.4);
+		this.context().restore();
+	  
+		this.context().save();
+		this.context().beginPath();
+		this.context().moveTo(document.documentElement.clientWidth-styler.cardwidth*2/3,0);	  	
+		this.context().lineTo(document.documentElement.clientWidth,styler.cardwidth*2/3);		
+		this.context().lineTo(document.documentElement.clientWidth,0);
+		this.context().closePath();
+	  	this.context().strokeStyle = 'black';
+	  	this.context().stroke();
+	  	this.context().fillStyle = 'rgba(255,255,255,.75)';
+	  	this.context().fill();
+	  	this.context().translate(document.documentElement.clientWidth-styler.cardwidth*2/3,0);
+	  	this.context().rotate(Math.PI/4);
+		this.context().fillStyle = 'gold';  		
+		this.context().font = styler.font('odds');
+		this.context().textAlign = "center";
+		this.context().fillText(decks + " deck",styler.cardwidth/2,0);
+		this.context().restore();
+  	}	
+	
+	table_blackjack_ui.prototype.insurancearc = function(table) {
+  		this.context().save();
+		this.context().beginPath();
+		this.context().arc(document.documentElement.clientWidth/2,styler.offscreen(),styler.tableradius,Math.PI/3,Math.PI*2/3);
+		this.context().arc(document.documentElement.clientWidth/2,styler.offscreen(),styler.tableradius+styler.insurancewidth,Math.PI*2/3,Math.PI/3,true);
+		this.context().closePath();
+		this.context().lineWidth = 3;	
+		this.context().strokeStyle = 'gold';
+		this.context().stroke();
+		this.context().fillStyle = '#57854e';
+		this.context().fill();
 		
-		var ctx = document.getElementById(this.canvas_id.substring(1)).getContext('2d');
-
-		ctx.font = styler.base_font;
-		ctx.beginPath();
-		ctx.arc(document.documentElement.clientWidth/2,offscreen,styler.tableradius,Math.PI/3,Math.PI*2/3);
-		ctx.arc(document.documentElement.clientWidth/2,offscreen,styler.tableradius+25,Math.PI*2/3,Math.PI/3,true);
-		ctx.closePath();
-		ctx.lineWidth = 3;	
-		ctx.strokeStyle = 'gold';
-		ctx.stroke();
-		ctx.fillStyle = '#57854e';
-		ctx.fill();
-		
-		textCircle(ctx, "Insurance Pays",document.documentElement.clientWidth/2,offscreen,styler.tableradius,Math.PI/2,
-				{font:styler.insurance_font, align:'center',textBaseline:'top', color:'black'}
-		);
-		textCircle(ctx, $("#" + this.table.id).attr('insurancepays'),document.documentElement.clientWidth/2,offscreen,styler.tableradius+4,Math.PI*2/3,
-				{font: styler.odds_font, align:'left',textBaseline:'top'} 
-		);
-		textCircle(ctx, $("#" + this.table.id).attr('insurancepays'),document.documentElement.clientWidth/2,offscreen,styler.tableradius+4,Math.PI/3,
-				{ font: styler.odds_font, align:'right',textBaseline:'top'} 
-		);				
-		
-		var soft17 = $("#" + this.table.id).attr('soft17') + "s soft 17";		
-		var dealername = $("#" + this.table.id).find(".seat:first").find('.player .name').html();
-		
-		ctx.font = styler.soft17_font;
-		var sr = ctx.measureText(soft17+'-').width/styler.tableradius;
-		
-		textCircle(ctx,dealername,document.documentElement.clientWidth/2,offscreen,styler.tableradius,Math.PI/3+sr,
-				{font:styler.soft17_font, align:'right',textBaseline:'bottom', color:'white'}
+		if ( table.attr('insurancepays') ) {
+  			this.textCircle("Insurance Pays",document.documentElement.clientWidth/2,styler.offscreen(),styler.tableradius,Math.PI/2,
+  					{font:styler.font('insurance'), align:'center',textBaseline:'top', color:'black'}
+  			);
+  			this.textCircle(table.attr('insurancepays'),document.documentElement.clientWidth/2,styler.offscreen(),styler.tableradius+4,Math.PI*2/3,
+  					{font:styler.font('odds'), align:'left',textBaseline:'top'} 
+  			);
+  			this.textCircle(table.attr('insurancepays'),document.documentElement.clientWidth/2,styler.offscreen(),styler.tableradius+4,Math.PI/3,
+  					{font:styler.font('odds'), align:'right',textBaseline:'top'} 
+  			);
+		}  			
+		var soft17 = table.attr('soft17') + "s soft 17";		  			
+		this.textCircle(soft17,document.documentElement.clientWidth/2,styler.offscreen(),styler.tableradius,Math.PI/3,
+				{font: styler.font('soft17'), align:'right',textBaseline:'bottom', color:'white'}
+		);		  			
+		this.textCircle( "BJ Pays " + table.attr('blackjackpays'),
+				document.documentElement.clientWidth/2, styler.offscreen(), styler.tableradius+styler.insurancewidth + 5, Math.PI*.583,
+				{font: styler.font('odds'), align:'center', textBaseline:'top', color:'gold'},false
 		);		
-		textCircle(ctx,soft17,document.documentElement.clientWidth/2,offscreen,styler.tableradius,Math.PI/3,
-				{font:styler.soft17_font, align:'right',textBaseline:'bottom', color:'white'}
-		);		
-		
-		textCircle(ctx, "BJ Pays " + $("#" + this.table.id).attr('blackjackpays'),
-				document.documentElement.clientWidth/2 + (styler.tableradius+styler.flowerarc-50) * Math.cos(Math.PI*.583),
-				offscreen + (styler.tableradius+styler.flowerarc-50) * Math.sin(Math.PI*.583),
-				80,Math.PI*.583,
-				{font: styler.odds_font, align:'center', color:'gold'},false
-		);		
-		textCircle(ctx, $("#" + this.table.id).attr('splitlimit') + " Splits",
+		this.textCircle( table.attr('splitlimit') + " Splits",
 				document.documentElement.clientWidth/2 + (styler.tableradius+styler.flowerarc-20) * Math.cos(Math.PI*.583),
-				offscreen + (styler.tableradius+styler.flowerarc-20) * Math.sin(Math.PI*.583),			
+				styler.offscreen() + (styler.tableradius+styler.flowerarc-20) * Math.sin(Math.PI*.583),			
 				30,Math.PI*.583+Math.PI,
-				{font: styler.odds_font, align:'center', color:'gold'},true
-		);		
-		textCircle(ctx, $("#" + this.table.id).attr('decks') + " decks",
-				document.documentElement.clientWidth/2 + (styler.tableradius+styler.flowerarc) * Math.cos(Math.PI/2),
-				offscreen + (styler.tableradius+styler.flowerarc) * Math.sin(Math.PI/2),				
-				45, -Math.PI/2,
-				{font: styler.odds_font, align:'center', color:'gold'},true
+				{font: styler.font('odds'), align:'center', color:'gold'},true
 		);
-		var doubleon = $("#" + this.table.id).attr('doubleon') ? $("#" + this.table.id).attr('doubleon') : 'Any 2';
-		textCircle(ctx, "Double " + doubleon,
-				document.documentElement.clientWidth/2 + (styler.tableradius+styler.flowerarc-60) * Math.cos(Math.PI*.416),
-				offscreen + (styler.tableradius+styler.flowerarc-60) * Math.sin(Math.PI*.416),
-				90,Math.PI*.416,{font: styler.odds_font, align:'center', color:'gold'},false);
-				
 		
-	  	ctx.save();
-	  	ctx.translate(document.documentElement.clientWidth,0);	  	
-	  	ctx.rotate(Math.PI/4);
-	  	ctx.drawImage( $('#burner')[0], -styler.cardwidth/2, -styler.cardwidth*1.4/2, styler.cardwidth, styler.cardwidth * 1.4);
-	  	ctx.restore();
-	  	
-	  	
-	  	ctx.beginPath();
-	  	ctx.moveTo(document.documentElement.clientWidth-styler.cardwidth*2/3,0);	  	
-	  	ctx.lineTo(document.documentElement.clientWidth,styler.cardwidth*2/3);
-	  	ctx.lineTo(document.documentElement.clientWidth,0);
-	  	ctx.closePath();
-	  	ctx.strokeStyle = 'black';
-	  	ctx.stroke();
-	  	ctx.fillStyle = 'rgba(190,0,0,.75)';
-	  	ctx.fill();	  	
-	}	
+		
+		var doubleon = table.attr('doubleon') ? table.attr('doubleon') : 'Any 2';
+		this.textCircle( "Double " + doubleon,
+				document.documentElement.clientWidth/2 + (styler.tableradius+styler.flowerarc-60) * Math.cos(Math.PI*.416),
+				styler.offscreen() + (styler.tableradius+styler.flowerarc-60) * Math.sin(Math.PI*.416),
+				90,Math.PI*.416,{font: styler.font('odds'), align:'center', color:'gold'},false); 
+		this.context().restore();
+  	}
+
+  	table_blackjack_ui.prototype.canvas = function() {	
+
+  		table_ui.prototype.canvas.call(this);						
+		this.insurancearc($("#" + this.table.id));
+		this.shoe($("#" + this.table.id).attr('decks'));
+		
+		
+	  	//ctx.save();
+	  	//ctx.translate(document.documentElement.clientWidth/2,styler.betradius);
+	  	//ctx.rotate(Math.PI/2);
+	  	//betregion(ctx, seats[0]);
+	  	//ctx.restore();
+		
+	  	var start_ang = Math.PI/3;
+	  	var ang_per = Math.PI/3 / (seats.length - 1);	  	
+	  	for (var s = 1; s < seats.length; s++) {	  		
+	  		var ang = start_ang + ang_per/2 + (ang_per*(s-1));
+	  		var x = document.documentElement.clientWidth/2+Math.cos(ang)*styler.tableradius;
+	  		var y = styler.offscreen()+Math.sin(ang)*styler.tableradius+styler.betradius*2+styler.insurancewidth;
+	  		styler.seating[s] = [x,y];
+	  		ctx.save();
+	  		ctx.translate(x,y);
+	  		ctx.rotate(Math.PI+ang);
+	  		drawseat(ctx,seats[s]);
+	  		ctx.restore();
+	  	}		  	  		  	  		  	
+
+	}
+  	
+	table_blackjack_ui.prototype.dealcard = function(src, seat) {
+		var ctx = document.getElementById(this.canvas_id.substring(1)).getContext('2d');
+		var d2s = Math.pow(
+				document.documentElement.clientWidth-styler.cardwidth-styler.seating[seat][0],2) + 
+				Math.pow(document.documentElement.clientHeight-styler.seating[seat][1],2
+				);
+		function cardtoseat(x) {
+			ctx.save();
+  	  		ctx.translate(styler.seating[seat][0],styler.seating[seat][1]);
+  		  	ctx.drawImage( $('#burner')[0], 0, 0, styler.cardwidth, styler.cardwidth * 1.4);
+  		  	ctx.restore();
+	    }
+					
+	    function cardpull(x) {
+  	  		ctx.save();
+  	  		ctx.translate(document.documentElement.clientWidth-styler.cardwidth,0);
+  	  		ctx.rotate(-Math.PI/4);
+  		  	ctx.drawImage( $('#burner')[0], -x, 0, styler.cardwidth/3+x, styler.cardwidth * 1.4);
+  		  	ctx.restore();
+  		  	if ( x < styler.cardwidth*2/3 ) {
+  		  		requestAnimFrame(function() {
+  		  			cardpull(x+3);
+		        });
+  		  	} else {
+  		  		cardtoseat(0);
+  		  	}
+	    }	    
+	    cardpull(0);
+	}  	
+	
+  	
+	table_blackjack_ui.prototype.arm = function() {
+		table_ui.prototype.arm.call(this);
+		
+		$("#" + this.table.id).siblings(this.canvas_id).not( $(this).bind('click') ).unbind('click').bind('click', function(event) {
+			console.info(event.target.id);
+			console.info('clientX:' + event.clientX + ' screenX:' + event.screenX);
+			//console.info('clientX:' + event.clientX + ' screenX:' + event.screenX);
+			//$(event.target).siblings('.table').data('table').act({action:"paint"});
+			var ctx = document.getElementById(event.target.id).getContext('2d');
+			
+			window.requestAnimFrame = (function(callback) {
+		        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+		        function(callback) {
+		          window.setTimeout(callback, 1000 / 60);
+		        };
+		    })();
+						
+		    function cardpull(x) {
+	  	  		ctx.save();
+	  	  		ctx.translate(document.documentElement.clientWidth-styler.cardwidth,0);
+	  	  		ctx.rotate(-Math.PI/4);
+	  		  	ctx.drawImage( $('#burner')[0], -x, 0, styler.cardwidth/3+x, styler.cardwidth * 1.4);
+	  		  	ctx.restore();
+	  		  	if ( x < styler.cardwidth*2/3 ) {
+	  		  		requestAnimFrame(function() {
+	  		  			cardpull(x+3);
+			        });
+	  		  	}
+		    }
+		    cardpull(0);
+		});
+		
+		
+	}
+
 	return table_blackjack_ui;
-});	
+});
+
+//var ctx = $(this).closest('.table').siblings('canvas')[0].getContext('2d');
+//var id = ctx.getImageData(0,0,document.documentElement.clientWidth,document.documentElement.clientHeight);
+//for (var i=0; i<id.data.length; i+=4) {
+//	var r = id.data[i];
+//	var g = id.data[i+1];
+//	var b = id.data[i+2];
+//	var v = 0.2126*r + 0.7152*g + 0.0722*b;
+//	id.data[i] = id.data[i+1] = id.data[i+2] = v;
+//}
+//ctx.putImageData(id,0,0);
+
+//$(document).bind('dragover' ,function(e) {								
+//	var up_or_down = dragy - e.originalEvent.screenY;
+//	console.log('up or d:' + up_or_down + ' ' + dragval);
+//	var nv = (sliderjq.attr('max') - sliderjq.attr('min')) * up_or_down/sliderjq.width()+Math.max(dragval,sliderjq.attr('min'));
+//	console.log('going to:' + nv);
+//	sliderjq.val(nv);
+//	sliderchipbet();								
+//});i.prototype.canvas
+//$(this).bind({				
+//	dragend : function(e) { console.log('dragend:' + e.originalEvent.screenY + ' ' + sliderjq.val()); dragval = sliderjq.val();},
+//	dragstart : function(e) { dragy = e.originalEvent.screenY; dragval = sliderjq.val();console.log('dragstart:' + e.originalEvent.screenY + ' ' + dragval);},
+//});
 
 
-//ctx.save();
-//ctx.beginPath();
-//ctx.translate(document.documentElement.clientWidth/2,offscreen);
-//console.log(ctx);
-//ctx.rotate(Math.PI/2);
-
-
-
-
-//ctx.font = styler.dealer_font;
-//ctx.textBaseline = 'hanging';
-//ctx.align = 'right';
-//ctx.fillStyle = 'gold';
-//ctx.font = styler.dealer_font;
-//ctx.fillText(dealername,document.documentElement.clientWidth/2 + Math.cos(Math.PI/3) * styler.tableradius - ctx.measureText(dealername).width,styler.offset);
-
-//ctx.closePath();
+//if ( $(this).hasClass('emptybet') ) {
+//	$('.greenchip').clone().css({"z-index":-1, "position": "absolute", 
+//		"left": -$(".greenchip").width()/2+$(this).width()/2, 
+//		"bottom":-$(".greenchip").height()/2+$(this).height()/2}).
+		//show().appendTo($(this).attr('dragable',true));
+//		show().appendTo($(this));
+//} else {
+//$(this).css({"bottom": sliderheight()-$(".bluechip").height()/2+$(this).height()/2 });
+//	console.log('MOVE THIS SHIT');
+//}				

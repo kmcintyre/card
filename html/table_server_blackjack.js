@@ -9,7 +9,7 @@ requirejs.config({
 var table_blackjack = requirejs('table_blackjack');
 console.log('start table');
 
-var remote_bj = new table_blackjack();
+var remote_bj = new table_blackjack(8);
 remote_bj.seats[0].player.name = 'otto';
 remote_bj.id = 'remote';
 remote_bj.title = '6 deck shoe';

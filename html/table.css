@@ -7,7 +7,7 @@ input, button, select, option, textarea {
 button:disabled {
 	color:red;	
 }
-.seat,.card,.hand,.options,.bet,.chair,.player,.payout,.title,.chips,.ante,._id {
+.options,.seat,.chair,.player,.chips,.bet,.payout,.lock,.ante,.hand {
 	position:absolute;	
 }
 #tape,.player,._id {
@@ -35,6 +35,10 @@ button:disabled {
 	z-index:23;
 }
 .table > .options > button {
+	position:relative;
+	display:block;
+}
+.seat > .options > button {
 	position:relative;
 	display:block;
 }

@@ -23,11 +23,31 @@ define(function() {
 			setTimeout( function() { autodealer(delay, auto_table); }, delay );
 		}
 	}	
-	
+		
 	function table_blackjack_conf(t) {
 		this.configureable_table = t;
 		this.quicktimer = null;
 	}
+
+	
+	table_blackjack_conf.prototype.options = function() {
+		var opts = new Array();
+		opts[opts.length] = 'dealer';		
+		opts[opts.length] = 'splits';
+		opts[opts.length] = 'for less';			
+		opts[opts.length] = 'for nothing';
+		opts[opts.length] = 'double on';
+		opts[opts.length] = 'ante';
+		opts[opts.length] = 'soft 17';
+		opts[opts.length] = 'blackjack pays';
+		opts[opts.length] = 'insurance pays';
+		opts[opts.length] = 'hole cards';
+		opts[opts.length] = 'minimum';			
+		opts[opts.length] = 'maximum';
+		opts[opts.length] = 'denom';
+		return opts;
+	}
+
 	
 	table_blackjack_conf.prototype.act = function(step) {
 		console.log(step);

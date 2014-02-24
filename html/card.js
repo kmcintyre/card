@@ -5,7 +5,7 @@ define(function() {
 	
 	var bjValues = {"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"10":10,"J":10,"Q":10,"K":10,"A":1};
 		
-	function card(c) {
+	function card(c) {		
 	    this.card = cardorder[ Math.floor( c % 13 ) ];
 	    this.suite = suitorder[ Math.floor( c / 13 ) ];    	
     }
@@ -22,6 +22,11 @@ define(function() {
 		return bjValues[this.card];
 	}
 	
+	card.prototype.fromBox = function() {
+		//console.log(this.card + ' ' + this.suite + ' ' + cardorder.indexOf(this.card) + ' ' + suitorder.indexOf(this.suite)) + ' ' + (cardorder.indexOf(this.card) + 1) * (suitorder.indexOf(this.suite) + 1);
+		return (cardorder.indexOf(this.card)+1) + suitorder.indexOf(this.suite) * 13;
+	}
+	
 	card.prototype.fromSrc = function(src) {
 		src = src.substring(src.lastIndexOf("/") + 1);
 		src = src.substring(0,src.length -  4);
@@ -29,6 +34,10 @@ define(function() {
 		this.suite = src.substring(src.length - 1);
 	}
     
+	card.prototype.underscore = function() {
+		return '_' + this.card + this.suite;
+	}
+	
 	card.prototype.toSrc = function() {
 		return '/deck/' + this.card + this.suite + '.png';
 	}

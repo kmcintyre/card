@@ -25,17 +25,9 @@ define(["deck"], function(deck) {
 	shoe.prototype = new deck();
 	shoe.prototype.constructor=shoe;	
 	
-	shoe.prototype.burn = function(number_of_cards) {
+	shoe.prototype.burn = function() {
 		console.log('burn');
-		if ( isNaN(parseInt(number_of_cards)) ) {
-			return this.next();
-		} else if ( number_of_cards == 1 ) {
-			return this.next();
-		} else if ( number_of_cards > 1 ) { 
-    		number_of_cards--;
-    		return this.next() + this.burn(number_of_cards);
-    	}
-		
+		return this.next();		
     }	
 
 	shoe.prototype.penetrated = function() {		

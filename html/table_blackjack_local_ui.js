@@ -1,23 +1,32 @@
 define(["jquery", "table_blackjack_ui", "table_blackjack", "table_blackjack_conf","card", "shoe"], function($, table_blackjack_ui, table_blackjack, table_blackjack_conf, card, shoe) {
+
+	if(typeof(Storage)!=="undefined") {
+		//no storage
+	} else {
+		alert('goodbye');
+	}	
 	
-	var bj = new table_blackjack();
+	var bj = new table_blackjack(8);
 	//bj.locked = true;
 	bj.id = 'local';
 	bj.title = '6 deck shoe';
-		
+	bj.shoe.shuffle();
+	bj.shoe.burn();
+	
+	var table_conf = new table_blackjack_conf(bj);			
 	var ui = new table_blackjack_ui(bj, "#tables", "#tablecanvas");	
-	var table_conf = new table_blackjack_conf(bj);
 	
 	bj.act = function(step) {
-		if ( isNaN(parseInt(step.seat)) ) {
-			if ( step.action == 'paint'  ) {
-				ui.paint();
-			} else { 
-				console.log('configure');
-				table_conf.act(step);
-			}
+		if ( step.conf ) {
+			console.log('configure');
+			table_conf.act(step);
+		} else if ( step.action == 'paint' ) {
+			ui.paint();
 		} else {
 			table_blackjack.prototype.act.call(this, step);
+			if ( step.action == 'addseat' ) {
+				ui.measure();
+			}
 		}
 		ui.paint();
 	}	
@@ -25,30 +34,36 @@ define(["jquery", "table_blackjack_ui", "table_blackjack", "table_blackjack_conf
 	bj.options = function() {
 		var opts = table_blackjack.prototype.options.call(bj);
 		if ( !this.locked ) {			
-			opts[opts.length] = 'add seat';
-			opts[opts.length] = 'dealer';		
-			opts[opts.length] = 'splits';
-			opts[opts.length] = 'for less';			
-			opts[opts.length] = 'for nothing';
-			opts[opts.length] = 'double on';
-			opts[opts.length] = 'ante';
-			opts[opts.length] = 'soft 17';
-			opts[opts.length] = 'blackjack pays';
-			opts[opts.length] = 'insurance pays';
-			opts[opts.length] = 'hole cards';
-			opts[opts.length] = 'minimum';			
-			opts[opts.length] = 'maximum';
-			opts[opts.length] = 'denom';
-		}
+			//opts = opts.concat(table_conf.options());
+		}		
 		return opts;
 	}	
 	
 	$(function() {
-		ui.measure();
 		$(window).resize( function() {
 			ui.measure();
 			bj.act({action: 'paint'});
 		});
+		try {
+			ui.measure();
+		} catch (err) {
+			setTimeout(function() {
+				ui.measure();
+			}, 300);			
+		}
+		//bj.seats[1].bet = 100;
+		//bj.seats[1].ante = 100;
+		//bj.seats[1].payout = 100;
+		//bj.seats[1].lock = 100;		
+		//bj.act({action: 'addseat'});
+		//bj.seats[2].bet = 100;
+		//bj.seats[2].ante = 100;
+		//bj.seats[2].payout = 100;
+		//bj.seats[2].lock = 100;	
+		//bj.act({action: 'paint'});
+		//
+		//bj.act({action: 'sit', seat: 4});
+		//bj.act({action: 'dispense', amount: 100, seat: 1});
 		/*bj.shoe.cards[1].card = 'A';
 		bj.shoe.cards[2].card = 'A';
 		bj.shoe.cards[3].card = 'A';
@@ -57,12 +72,11 @@ define(["jquery", "table_blackjack_ui", "table_blackjack", "table_blackjack_conf
 		bj.shoe.cards[6].card = 'A';-		
 		 * 
 		 */
-		bj.act({action: 'sit', seat: 4});
-		//bj.act({action: 'paint'});
+		//bj.act({action: 'sit', seat: 4});
+		//bj.act({action: 'dispense', seat: 4, amount: bj.minimum});
+		//
 		//bj.act({action: 'bet', seat: 4, amount: 150});
 		//bj.act({action: 'deal', seat: 0, table: bj.id});		
-
-
 		//setTimeout( function() { 
 		//	bj.act({action: 'deal', seat: 0, table: bj.id}); }, 
 		//	1000

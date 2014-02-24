@@ -44,7 +44,7 @@ define(["card", "hand"], function(card, hand) {
 		if ( this.stayed || this.bust() || ( this.value() == 21 && this.cards.length > 2 ) ) { 
 			return opts;
 		} else if ( this.cards.length < 2 ) {		
-			opts[opts.length] = 'deal';
+			opts[opts.length] = 'wait';
 			return opts;
 		}		
 		if ( this.cards.length == 2 ) {
