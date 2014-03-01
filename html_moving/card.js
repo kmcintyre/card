@@ -23,7 +23,7 @@ define(function() {
 	}
 	
 	card.prototype.fromBox = function() {
-		return cardorder.indexOf(this.card) + suitorder.indexOf(this.suite) * 13;
+		return (cardorder.indexOf(this.card)+1) + suitorder.indexOf(this.suite) * 13;
 	}
 	
 	card.prototype.fromSrc = function(src) {
@@ -38,7 +38,7 @@ define(function() {
 	}
 	
 	card.prototype.toSrc = function() {
-		return '/deck/' + this.card + this.suite + '.svg';
+		return '/deck/' + this.card + this.suite + '.png';
 	}
 	
     card.prototype.toImg = function() {

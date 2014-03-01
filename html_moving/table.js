@@ -86,6 +86,10 @@ define(function() {
 		return this.seats[seat].hand(inactive);
 	}	
 	
+	table.prototype.paint = function() {
+		throw "Paint Shit";
+	}
+	
 	table.prototype.simple = function() {
 		var t = { 
 				id: this.id, 

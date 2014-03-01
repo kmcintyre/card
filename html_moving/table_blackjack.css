@@ -1,0 +1,14 @@
+.insurance,.double,.bj,.split {
+	position:absolute;	
+}
+.bj {
+	font-size: 1.66em;
+	color:black;
+	border:2px solid;
+	border-radius:12px;
+}
+.double,.insurance {	
+	font-size: 1.2em;
+	color:black;
+	z-index:23;
+}

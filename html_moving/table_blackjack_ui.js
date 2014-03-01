@@ -10,61 +10,59 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 		return css3transform('rotate(' + styler['card_suite_' + card_suite][0] + 'deg) translate(' + styler['card_suite_' + card_suite][1] + 'px,' + styler['card_suite_' + card_suite][2] + 'px)'); 
 	}
 	
-	function table_blackjack_ui() {}
+	function table_blackjack_ui(table, container_id, canvas_id) {
+		console.log('new blackjack ui:' + container_id + ' ' + canvas_id);
+		table_ui.call(this, table, container_id, canvas_id);
+	}
 	
 	table_blackjack_ui.prototype = new table_ui();
 	table_blackjack_ui.prototype.constructor=table_blackjack_ui;	
-	
+
 	/*
 	 * tweak incoming 
 	 */
-	table_blackjack_ui.prototype.paint = function(id) {
-		console.log('blackjack paint:' + id);
-		table_ui.prototype.paint.call(this, id);		
-		var table = $(document.body).data('tables')[id];
-		if ( id == 'home' ) {				
-			return;
-		}		
-		if ( table.maximum ) {
-			$("#" + table.id).attr("maximum" , table.maximum );
+	table_blackjack_ui.prototype.paint = function() {
+		table_ui.prototype.paint.call(this);
+		if ( this.table.maximum ) {
+			$("#" + this.table.id).attr("maximum" , this.table.maximum );
 		} else {
-			$("#" + table.id).removeAttr("maximum");
+			$("#" + this.table.id).removeAttr("maximum");
 		}				
-		$("#" + table.id).attr("splitlimit", table.splitlimit );
-		$("#" + table.id).attr("forless" , table.forless );
-		$("#" + table.id).attr("fornothing" , table.fornothing );
-		$("#" + table.id).attr("doubleon", table.doubleon);
-		$("#" + table.id).attr("blackjackpays", table.blackjackpays);
-		$("#" + table.id).attr("insurancepays", table.insurancepays);
-		$("#" + table.id).attr("holecards", table.holecards);
-		$("#" + table.id).attr("downdirty", table.downdirty);
-		$("#" + table.id).attr("surrender", table.surrender);
-		$("#" + table.id).attr("soft17", table.soft17);		
-		$("#" + table.id).attr("decks", table.decks);
+		$("#" + this.table.id).attr("splitlimit", this.table.splitlimit );
+		$("#" + this.table.id).attr("forless" , this.table.forless );
+		$("#" + this.table.id).attr("fornothing" , this.table.fornothing );
+		$("#" + this.table.id).attr("doubleon", this.table.doubleon);
+		$("#" + this.table.id).attr("blackjackpays", this.table.blackjackpays);
+		$("#" + this.table.id).attr("insurancepays", this.table.insurancepays);
+		$("#" + this.table.id).attr("holecards", this.table.holecards);
+		$("#" + this.table.id).attr("downdirty", this.table.downdirty);
+		$("#" + this.table.id).attr("surrender", this.table.surrender);
+		$("#" + this.table.id).attr("soft17", this.table.soft17);		
+		$("#" + this.table.id).attr("decks", this.table.decks);
 		
-		for (var s = 1; s < table.seats.length; s++) {
+		for (var s = 1; s < this.table.seats.length; s++) {
 			for (var h=0;;h++) {
-				if ( !table.seats[s]['hand' + h] ) {
+				if ( !this.table.seats[s]['hand' + h] ) {
 					break;;
 				}
-				if ( table.seats[s]['hand' + h].insured ) {
-					var handjq = $("#" + table.id).children('.seat:eq(' + s + ')').children('.hand:eq(' + h + ')');					
+				if ( this.table.seats[s]['hand' + h].insured ) {
+					var handjq = $("#" + this.table.id).children('.seat:eq(' + s + ')').children('.hand:eq(' + h + ')');					
 					if ( handjq.children('.insurance').length == 0 ) {
-						handjq.append('<div class="insurance">' + table.seats[s]['hand' + h].insured + '</div>');
+						handjq.append('<div class="insurance">' + this.table.seats[s]['hand' + h].insured + '</div>');
 					}
-					if ( table.seats[s]['hand' + h].doubled ) {
+					if ( this.table.seats[s]['hand' + h].doubled ) {
 						if ( handjq.children('.doubled').length == 0 ) {
-							handjq.append('<div class="doubled">' + table.seats[s]['hand' + h].doubled + '</div>');
+							handjq.append('<div class="doubled">' + this.table.seats[s]['hand' + h].doubled + '</div>');
 						}
 					}
-					if ( table.seats[s]['hand' + h].bj ) {
+					if ( this.table.seats[s]['hand' + h].bj ) {
 						if ( handjq.children('.bj').length == 0 ) {
-							handjq.append('<div class="bj">' + table.seats[s]['hand' + h].bj + '</div>');
+							handjq.append('<div class="bj">' + this.table.seats[s]['hand' + h].bj + '</div>');
 						}
 					}					
-					if ( table.seats[s]['hand' + h].payout ) {
+					if ( this.table.seats[s]['hand' + h].payout ) {
 						if ( handjq.children('.payout').length == 0 ) {
-							handjq.append('<div class="payout">' + table.seats[s]['hand' + h].payout + '</div>');
+							handjq.append('<div class="payout">' + this.table.seats[s]['hand' + h].payout + '</div>');
 						}
 					}					
 				}				
@@ -72,44 +70,28 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 		}
 		this.rules();
 		
-		var start_ang = Math.PI/3;
-		var ang_per = Math.PI/3 / (seats.length - 1);	  	
-		for (var s = 1; s < seats.length; s++) {
-			console.log('got here');
-			var ang = start_ang + ang_per/2 + (ang_per*(s-1));
-		  	var x = document.documentElement.clientWidth/2+Math.cos(ang)*styler.tableradius;
-		  	var y = styler.offscreen()+Math.sin(ang)*styler.tableradius+styler.betradius*2+styler.insurancewidth;
-		  	styler.seating[s] = [x,y];
-		  	this.context().save();
-		  	this.context().translate(x,y);
-		  	this.context().rotate(Math.PI+ang);
-		  	//drawseat(ctx,seats[s]);
-		  	this.context().restore();
-		}		
+		this.canvas();
 		
-		//this.canvas();
+		this.wire();
 		
-		//this.wire();
-		
-		//this.arm();
+		this.arm();
 		
 		//this.cards_and_chips();
 	}
 	
 	table_blackjack_ui.prototype.rules = function() {		
 		table_ui.prototype.rules.call(this);
-		
-		visible_table().children('.seat:first').find('.hand .options button[value="insurance"],button[value="backdoor"]').each(function() {
+		$('#' + this.table.id).children('.seat:first').find('.hand .options button[value="insurance"],button[value="backdoor"]').each(function() {
 			$(this).closest('.seat').siblings('.seat').find('.hand .options button').remove();			
 			$(this).closest('.options button[value="insurance"]').clone().appendTo(
 				$(this).closest('.seat').siblings('.seat').find('.hand .bet').siblings('.options')
 			).each(function () { console.log('need to offer different options to single players');});						
 		});
-		visible_table().children('.seat').children('.hand:gt('+ (visible_table().attr("splitlimit") - 1) + ')').each(function() { $(this).parent().find('button[value="split"]').remove(); });		
-		if ( visible_table().attr('blackjackpays') == '3 to 2' ) {
-			visible_table().find('.seat:not(:first) > .hand > .bj').parent().find(".options > button[value='insurance']").html('even').val('even');
+		$('#' + this.table.id).children('.seat').children('.hand:gt('+ (this.table.splitlimit - 1) + ')').each(function() { $(this).parent().find('button[value="split"]').remove(); });		
+		if (  $('#' + this.table.id).attr('blackjackpays') == '3 to 2' ) {
+			$('#' + this.table.id + ' > .seat:not(:first) > .hand > .bj').parent().find(".options > button[value='insurance']").html('even').val('even');
 		}
-		visible_table().find('.seat:first > .hand > .options > button[value="expose"]').each(function() {
+		$('#' + this.table.id + ' > .seat:first > .hand > .options > button[value="expose"]').each(function() {
 			if ( $(this).closest('.hand').children('.bj').each(function() {
 					console.log('blackjack I think');
 					$(this).html('Oh no!');
@@ -120,7 +102,7 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
 			};
 		});		
 		
-		visible_table().find('.seat:has(.player) .options button[value="lock"]').hide();
+		$('#' + this.table.id).find('.seat:has(.player) .options button[value="lock"]').hide();
 	}
 		
 	table_blackjack_ui.prototype.wire = function() {
@@ -378,7 +360,109 @@ define(["jquery", "table_ui", "card"], function($, table_ui, card) {
   			}
   		}  	  		
   	}
+	
+	table_blackjack_ui.prototype.shoe = function(decks) {
+		this.context().save();
+		this.context().translate(document.documentElement.clientWidth-styler.cardwidth,0);
+		this.context().rotate(-Math.PI/4);
+		this.context().drawImage( $('#burner')[0], 0, 0, styler.cardwidth, styler.cardwidth * 1.4);
+		this.context().restore();
+	  
+		this.context().save();
+		this.context().beginPath();
+		this.context().moveTo(document.documentElement.clientWidth-styler.cardwidth*2/3,0);	  	
+		this.context().lineTo(document.documentElement.clientWidth,styler.cardwidth*2/3);		
+		this.context().lineTo(document.documentElement.clientWidth,0);
+		this.context().closePath();
+	  	this.context().strokeStyle = 'black';
+	  	this.context().stroke();
+	  	this.context().fillStyle = 'rgba(255,255,255,.75)';
+	  	this.context().fill();
+	  	this.context().translate(document.documentElement.clientWidth-styler.cardwidth*2/3,0);
+	  	this.context().rotate(Math.PI/4);
+		this.context().fillStyle = 'gold';  		
+		this.context().font = styler.font('odds');
+		this.context().textAlign = "center";
+		this.context().fillText(decks + " deck",styler.cardwidth/2,0);
+		this.context().restore();
+  	}	
+	
+	table_blackjack_ui.prototype.insurancearc = function(table) {
+  		this.context().save();
+		this.context().beginPath();
+		this.context().arc(document.documentElement.clientWidth/2,styler.offscreen(),styler.tableradius,Math.PI/3,Math.PI*2/3);
+		this.context().arc(document.documentElement.clientWidth/2,styler.offscreen(),styler.tableradius+styler.insurancewidth,Math.PI*2/3,Math.PI/3,true);
+		this.context().closePath();
+		this.context().lineWidth = 3;	
+		this.context().strokeStyle = 'gold';
+		this.context().stroke();
+		this.context().fillStyle = '#57854e';
+		this.context().fill();
+		
+		if ( table.attr('insurancepays') ) {
+  			this.textCircle("Insurance Pays",document.documentElement.clientWidth/2,styler.offscreen(),styler.tableradius,Math.PI/2,
+  					{font:styler.font('insurance'), align:'center',textBaseline:'top', color:'black'}
+  			);
+  			this.textCircle(table.attr('insurancepays'),document.documentElement.clientWidth/2,styler.offscreen(),styler.tableradius+4,Math.PI*2/3,
+  					{font:styler.font('odds'), align:'left',textBaseline:'top'} 
+  			);
+  			this.textCircle(table.attr('insurancepays'),document.documentElement.clientWidth/2,styler.offscreen(),styler.tableradius+4,Math.PI/3,
+  					{font:styler.font('odds'), align:'right',textBaseline:'top'} 
+  			);
+		}  			
+		var soft17 = table.attr('soft17') + "s soft 17";		  			
+		this.textCircle(soft17,document.documentElement.clientWidth/2,styler.offscreen(),styler.tableradius,Math.PI/3,
+				{font: styler.font('soft17'), align:'right',textBaseline:'bottom', color:'white'}
+		);		  			
+		this.textCircle( "BJ Pays " + table.attr('blackjackpays'),
+				document.documentElement.clientWidth/2, styler.offscreen(), styler.tableradius+styler.insurancewidth + 5, Math.PI*.583,
+				{font: styler.font('odds'), align:'center', textBaseline:'top', color:'gold'},false
+		);		
+		this.textCircle( table.attr('splitlimit') + " Splits",
+				document.documentElement.clientWidth/2 + (styler.tableradius+styler.flowerarc-20) * Math.cos(Math.PI*.583),
+				styler.offscreen() + (styler.tableradius+styler.flowerarc-20) * Math.sin(Math.PI*.583),			
+				30,Math.PI*.583+Math.PI,
+				{font: styler.font('odds'), align:'center', color:'gold'},true
+		);
+		
+		
+		var doubleon = table.attr('doubleon') ? table.attr('doubleon') : 'Any 2';
+		this.textCircle( "Double " + doubleon,
+				document.documentElement.clientWidth/2 + (styler.tableradius+styler.flowerarc-60) * Math.cos(Math.PI*.416),
+				styler.offscreen() + (styler.tableradius+styler.flowerarc-60) * Math.sin(Math.PI*.416),
+				90,Math.PI*.416,{font: styler.font('odds'), align:'center', color:'gold'},false); 
+		this.context().restore();
+  	}
 
+  	table_blackjack_ui.prototype.canvas = function() {	
+
+  		table_ui.prototype.canvas.call(this);						
+		this.insurancearc($("#" + this.table.id));
+		this.shoe($("#" + this.table.id).attr('decks'));
+		
+		
+	  	//ctx.save();
+	  	//ctx.translate(document.documentElement.clientWidth/2,styler.betradius);
+	  	//ctx.rotate(Math.PI/2);
+	  	//betregion(ctx, seats[0]);
+	  	//ctx.restore();
+		
+	  	var start_ang = Math.PI/3;
+	  	var ang_per = Math.PI/3 / (seats.length - 1);	  	
+	  	for (var s = 1; s < seats.length; s++) {	  		
+	  		var ang = start_ang + ang_per/2 + (ang_per*(s-1));
+	  		var x = document.documentElement.clientWidth/2+Math.cos(ang)*styler.tableradius;
+	  		var y = styler.offscreen()+Math.sin(ang)*styler.tableradius+styler.betradius*2+styler.insurancewidth;
+	  		styler.seating[s] = [x,y];
+	  		ctx.save();
+	  		ctx.translate(x,y);
+	  		ctx.rotate(Math.PI+ang);
+	  		drawseat(ctx,seats[s]);
+	  		ctx.restore();
+	  	}		  	  		  	  		  	
+
+	}
+  	
 	table_blackjack_ui.prototype.dealcard = function(src, seat) {
 		var ctx = document.getElementById(this.canvas_id.substring(1)).getContext('2d');
 		var d2s = Math.pow(

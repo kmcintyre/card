@@ -1,6 +1,3 @@
-body {
-	overflow:hidden;
-}
 input, button, select, option, textarea {
 	position:absolute;
     font-size: 22pt;
@@ -10,7 +7,7 @@ input, button, select, option, textarea {
 button:disabled {
 	color:red;	
 }
-.options,.seat,.chair,.player,.chips,.bet,.payout,.lock,.ante,.hand,.stack {
+.options,.seat,.chair,.player,.chips,.bet,.payout,.lock,.ante,.hand {
 	position:absolute;	
 }
 #tape,.player,._id {

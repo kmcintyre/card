@@ -3,8 +3,8 @@ define(["jquery", "table_blackjack_ui", "table_blackjack", "table_blackjack_conf
 	if(typeof(Storage)!=="undefined") {
 		//no storage
 	} else {
-		alert('goodbye');
-	}	
+		//need to check cookies.
+	}
 	
 	var bj = new table_blackjack(8);
 	//bj.locked = true;
@@ -40,17 +40,11 @@ define(["jquery", "table_blackjack_ui", "table_blackjack", "table_blackjack_conf
 	}	
 	
 	$(function() {
-		$(window).resize( function() {
-			ui.measure();
-			bj.act({action: 'paint'});
-		});
-		try {
-			ui.measure();
-		} catch (err) {
-			setTimeout(function() {
-				ui.measure();
-			}, 300);			
-		}
+		//$(window).resize( function(e) {
+		//	ui.measure();
+		//	ui.act({action:"paint"});
+		//});	
+		ui.measure();		
 		//bj.seats[1].bet = 100;
 		//bj.seats[1].ante = 100;
 		//bj.seats[1].payout = 100;
@@ -62,7 +56,7 @@ define(["jquery", "table_blackjack_ui", "table_blackjack", "table_blackjack_conf
 		//bj.seats[2].lock = 100;	
 		//bj.act({action: 'paint'});
 		//
-		//bj.act({action: 'sit', seat: 4});
+		//
 		//bj.act({action: 'dispense', amount: 100, seat: 1});
 		/*bj.shoe.cards[1].card = 'A';
 		bj.shoe.cards[2].card = 'A';
