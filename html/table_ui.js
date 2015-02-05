@@ -309,7 +309,8 @@ define(["jquery", "card", "deck"], function($, card, deck) {
 		ctx['home'] = function() {
 			ctx.felt();
 			ctx.insurancearc();
-			var welcome_msg = "blackjack4all";
+			//var welcome_msg = "blackjack4all";
+			var welcome_msg = "Projects";
 			function welcome() {
 				ctx.save();
 				ctx.font = styler.font('welcome');
@@ -403,8 +404,13 @@ define(["jquery", "card", "deck"], function($, card, deck) {
 				
 				$(document.body).data('ui').stack(
 						oneofeach,
-						document.documentElement.clientWidth/2-styler.chipradius(),
-						styler.cardwidth()*1.4+65+styler.chipradius()*2
+						document.documentElement.clientWidth/2-styler.chipradius()*3-10,
+						styler.cardwidth()*1.4+50
+						);
+				$(document.body).data('ui').stack(
+						625,
+						document.documentElement.clientWidth/2+styler.chipradius()+15,
+						styler.cardwidth()*1.4+25
 						);
 				
 				$(".stack").click(function (e) {
@@ -462,15 +468,15 @@ define(["jquery", "card", "deck"], function($, card, deck) {
 				"top":posY,
 				"left":posX,
 			}
-		);						
+		);								 
 		for (var x = chips.length-1; x >= 0; x--) {					
 			while ( chips[x] > 0 ) {
 				chipstack.append( 
 					$('.chip' + styler.chips[x][0]).clone().css({
 						'position': 'absolute',
-						'top': x*2,
-						'left': x*2,
-						'transform':'rotateZ(-15deg)',
+						'top': x*3,
+						'left': x*3,
+						'transform':'rotateZ(-15deg) rotate(' + (Math.random() * 180 - 90)  + 'deg)',
 						'box-shadow': '0 2px 2px 2px rgba(0,0,0,.3)',
 						'border-radius' : styler.chipradius()						
 					}).show()
